@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Project | GIS Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/admin/styles.css">
+    <style>
+        /* Custom styles for form elements */
+        input, select, textarea {
+            background-color: #1e293b;
+            border: 1px solid #3f4c63;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            width: 100%;
+            margin-top: 0.25rem;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+        
+        textarea {
+            min-height: 120px;
+        }
+        
+        .coordinates {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        button {
+            transition: all 0.2s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold font-marlin">EDIT PROJECT</h1>
+            <p class="text-gray-400 font-marlinsoftmedium">UPDATE EXISTING PROJECT INFORMATION</p>
+        </header>
+        
+        <div id="projectDetails" class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
+            <!-- Project details are populated via JavaScript -->
+            <div class="animate-pulse">
+                <div class="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                <div class="h-3 bg-gray-700 rounded w-1/2"></div>
+            </div>
+        </div>
+        
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg">
+            <form id="editProjectForm" class="space-y-6">
+                <div>
+                    <label for="project_status" class="block text-sm font-bold mb-1 font-marlin">PROJECT STATUS</label>
+                    <select name="project_status" id="project_status" class="w-full text-base h-9 p-2 font-inter" ></select>
+                </div>
+                
+                <div>
+                    <label for="progress" class="block text-sm font-bold mb-1 font-marlin">PROJECT PROGRESS (%)</label>
+                    <input type="number" name="progress" id="progress" class="w-full text-base h-9 p-2 font-inter" >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-bold mb-1 font-marlin">COORDINATES</label>
+                    <div class="coordinates">
+                        <div>
+                            <label for="latitude" class="block text-xs text-gray-400 mb-1 font-marlinsoftmedium" >LATITUDE</label>
+                            <input type="number" name="latitude" id="latitude" step="0.000001"
+                                class="w-full text-base h-9 p-2 font-inter">
+                        </div>
+                        <div>
+                            <label for="longitude" class="block text-xs text-gray-400 mb-1 font-marlinsoftmedium" >LONGITUDE</label>
+                            <input type="number" name="longitude" id="longitude" step="0.000001"
+                                class="w-full text-base h-9 p-2 font-inter" >
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="description" class="block text-sm font-bold mb-1 font-marlin">PROJECT DESCRIPTION</label>
+                    <textarea name="description" id="description" class="w-full text-base h-9 p-2 font-inter" ></textarea>
+                </div>
+                
+                <button type="submit" class="w-full bg-white text-black py-3 px-4 rounded font-medium font-marlin hover:bg-gray-200">
+                    UPDATE PROJECT
+                </button>
+            </form>
+        </div>
+        
+        <div class="mt-8 text-center">
+            <a href="/search" class="text-gray-400 hover:text-white font-marlin">BACK TO SEARCH</a>
+            <span class="mx-2 text-gray-600">|</span>
+            <a href="/admin" class="text-gray-400 hover:text-white font-marlin">BACK TO DASHBOARD</a>
+        </div>
+    </div>
+    
+    <script src="admin/script-edit.js"></script>
+
+</body>
+</html>

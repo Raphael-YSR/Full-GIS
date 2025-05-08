@@ -1,0 +1,240 @@
+@font-face {
+  font-family: 'ABCFavoritMono-Bold';
+  src: url('../public/fonts/ABCFavoritMono-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'ABCFavoritMono-Regular';
+  src: url('../public/fonts/ABCFavoritMono-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('../public/fonts/inter-var-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Marlin';
+  src: url('../public/fonts/marlin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'MarlinSoft-ExtraBold';
+  src: url('../public/fonts/MarlinSoftSQ-ExtraBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'MarlinSoft-Medium';
+  src: url('../public/fonts/MarlinSoftSQ-Medium.woff2') format('woff2');
+}
+
+.font-abcfavoritmono {
+  font-family: 'ABCFavoritMono-Regular', monospace; /* Fallback to monospace */
+}
+
+.font-marlinsoftmedium{
+  font-family: 'MarlinSoft-Medium', monospace;
+}
+
+.font-marlin{
+  font-family: 'Marlin', monospace;
+}
+
+.font-inter{
+  font-family: 'Inter', monospace;
+}
+
+
+.project-card {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.project-card:hover {
+  background-color: #f0f0f0;
+}
+
+/* Custom styles for form elements */
+input, select, textarea {
+  background-color: #1e293b;
+  border: 1px solid #3f4c63;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #60a5fa;
+}
+
+textarea {
+  min-height: 120px;
+}
+
+button {
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+.password-container {
+  position: relative;
+}
+
+.copy-button {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #60a5fa;
+  cursor: pointer;
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.3s ease-in-out;
+}
+
+.copy-button.visible {
+  opacity: 1;
+}
+
+select option {
+  background-color: #1e293b;
+  color: white;
+}
+
+
+#department_id {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  margin-bottom: 1rem;
+  background-color: #374151;
+  color: white;
+  border: 2px solid #4B5563;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+/*
+
+*/
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #374151; /* Matches the dark theme */
+  color: white;
+  border: 1px solid #4B5563;
+  border-radius: 0.25rem;
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem; /* Extra padding right for the arrow */
+  width: 100%;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1.5;
+  /* Removed height: 9; - height will be determined by padding and line-height */
+}
+
+/* Custom select wrapper to position the arrow */
+.select-wrapper {
+  position: relative;
+  display: block;
+}
+
+/* Custom dropdown arrow */
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid white;
+  pointer-events: none;
+}
+
+/* Remove default arrow in IE */
+select::-ms-expand {
+  display: none;
+}
+
+/* Hover effect */
+select:hover {
+  border-color: #6B7280;
+}
+
+/* Focus styles */
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  border-color: #3B82F6;
+}
+
+/* Modal styles */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  z-index: 50;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: #1f2937;
+  border-radius: 0.5rem;
+  padding: 2rem;
+  max-width: 90%;
+  width: 500px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.password-container {
+  position: relative;
+}
+
+.copy-button {
+  position: absolute;
+  left: 10px;
+  top: 34px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.copy-button.visible {
+  opacity: 1;
+}
+
+.copied-animation {
+  position: absolute;
+  left: 35px;
+  top: 34px;
+  font-size: 0.75rem;
+  color: #10b981;
+}
+
+/* Make the dropdown arrow more visible */
+#department_id::-ms-expand {
+  display: block;
+}
+
+#department_id option {
+  background-color: #374151; /* Light enough to see text */
+  color: white;
+  padding: 10px;
+}
+

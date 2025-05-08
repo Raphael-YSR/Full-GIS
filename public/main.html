@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> TANA WATERS WEB-GIS</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="dscript.js" ></script>
+    <script src="searchFunction.js" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geometryutil/0.9.3/leaflet.geometryutil.min.js"></script>
+</head>
+<body>
+    <div id="map"></div>
+    <a href="https://tanawwda.go.ke" target="_blank">
+        <img src="images/logo.png" alt="Logo" class="logo" title="Back to Main Site">
+    </a>
+    <div class="search-container">
+        <div class="search-bar-wrapper">
+            <img src="images/search-2.png" alt="Search" class="search-icon">
+            <input type="text" id="projectSearchInput" class="search-bar" placeholder="Search Project...">
+            <div class="vl"></div> 
+        </div>
+
+
+        <div class="search-options hidden">
+            <img src="images/ruler.png" alt="Ruler" class="option-icon" title="Measure Distance">
+            <img src="images/line.png" alt="Line" class="option-icon" title="Draw a Line">
+            <img src="images/polygon.png" alt="Polygon" class="option-icon" title="Draw a Polygon">
+            <img src="images/placemarker.png" alt="Placemarker" class="option-icon" title="Add a Marker">
+            <img src="images/rectangle.png" alt="Rectangle" class="option-icon" title="Draw a Rectangle">
+            <img src="images/circle.png" alt="Circle" class="option-icon" title="Draw a Circle">
+        </div>
+    </div>
+
+    <div id="searchResultsContainer" class="search-results"></div>
+
+
+    <div class="admin-button">
+        <a href="/login">
+            <button class="btn">LOGIN AS ADMIN</button>
+        </a>
+    </div>
+    <div class="bottom-buttons">
+        <button class="btn" id="export_features">EXPORT</button>
+        <button class="btn" id="layers-btn">LAYERS</button>
+        <button class="btn" id="print-btn">PRINT MAP</button>
+    </div>
+
+    <div id="layerPopup" class="layer-popup">
+        <span class="close-btn" onclick="closeLayerPopup()">×</span>
+        <div>
+            <label><input type="checkbox" class="checkbox showNames"> SHOW PROJECT NAMES </label>
+        </div>
+        <div style="padding-top: 4px;">
+            <label><input type="checkbox" class="checkbox showCounty"> SHOW COUNTIES </label>
+        </div>
+        <hr>
+        <h4>FILTER BY STATUS</h4>
+        <div>
+            <div class="option">
+                <input type="checkbox" class="checkbox" id="option1">
+                <label class="option-label" onclick="toggleSubOptions(1)">
+                    COMPLETE <span id="icon1" class="expand-icon">+</span>
+                </label>
+            </div>
+            <div class="sub-options" id="subOptions1">
+                <label><input type="checkbox" class="checkbox sub-option" data-main="1"> Water</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="1"> Sanitation</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="1"> Boreholes</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="1"> Dams</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="1"> Irrigation</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="1"> Other</label>
+            </div>
+        </div>
+        <div>
+            <div class="option">
+                <input type="checkbox" class="checkbox" id="option2">
+                <label class="option-label" onclick="toggleSubOptions(2)">
+                    ONGOING <span id="icon2" class="expand-icon">+</span>
+                </label>
+            </div>
+            <div class="sub-options" id="subOptions2">
+                <label><input type="checkbox" class="checkbox sub-option" data-main="2"> Water</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="2"> Sanitation</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="2"> Boreholes</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="2"> Dams</label><br>
+                 <label><input type="checkbox" class="checkbox sub-option" data-main="2"> Irrigation</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="2"> Other</label>
+            </div>
+        </div>
+        <div>
+            <div class="option">
+                <input type="checkbox" class="checkbox" id="option3">
+                <label class="option-label" onclick="toggleSubOptions(3)">
+                    PLANNING & DESIGN <span id="icon3" class="expand-icon">+</span>
+                </label>
+            </div>
+            <div class="sub-options" id="subOptions3">
+                <label><input type="checkbox" class="checkbox sub-option" data-main="3"> Water</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="3"> Sanitation</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="3"> Boreholes</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="3"> Dams</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="3"> Irrigation</label><br>
+                <label><input type="checkbox" class="checkbox sub-option" data-main="3"> Other</label>
+            </div>
+        </div>
+        <hr>
+        <p><strong>FILTER BY COUNTY</strong></p>
+        <select id="county-select">
+            <option value="all">All</option>
+            <option value="nyeri">Nyeri</option>
+            <option value="embu">Embu</option>
+            <option value="meru">Meru</option>
+            <option value="kirinyaga">Kirinyaga</option>
+            <option value="tharaka nithi">Tharaka Nithi</option>
+        </select>
+        <hr>
+        <div class="map-layers">
+            <div class="map-layer-header" onclick="toggleMapLayers()">
+                BASEMAP <span id="mapLayersIcon" class="expand-icon">+</span>
+            </div>
+            <div class="layer-options" id="mapLayerOptions">
+                <div class="layer-option">
+                    <label>
+                        <input type="radio" name="mapLayer" value="carto" checked onclick="changeMapLayer('carto')">
+                        Clean (Light)
+                    </label>
+                </div>
+                <div class="layer-option">
+                    <label>
+                        <input type="radio" name="mapLayer" value="osm" onclick="changeMapLayer('osm')">
+                        OpenStreetMap
+                    </label>
+                </div>
+                <div class="layer-option">
+                    <label>
+                        <input type="radio" name="mapLayer" value="googleHybrid" onclick="changeMapLayer('googleHybrid')">
+                        Google Hybrid
+                    </label>
+                </div>
+                <div class="layer-option">
+                    <label>
+                        <input type="radio" name="mapLayer" value="googleSat" onclick="changeMapLayer('googleSat')">
+                        Google Satellite
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

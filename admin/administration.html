@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GIS Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen px-20">
+  <div class="container mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold font-marlin">GIS ADMINISTRATION DASHBOARD</h1>
+      <p class="text-gray-400">MANAGE YOUR GIS DATA AND PROJECTS</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <a href="/search" class="block">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-700 transition-colors">
+          <h2 class="text-xl font-bold mb-3 font-marlin">EDIT EXISTING DATA</h2>
+          <p class="text-sm text-gray-400 mb-4">MODIFY OR UPDATE INFORMATION FOR EXISTING PROJECTS IN THE DATABASE.</p>
+          <div class="bg-white text-black py-2 px-4 rounded text-center font-medium font-marlin">
+            EDIT DATA
+          </div>
+        </div>
+      </a>
+
+      <a href="/add-data" class="block">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-700 transition-colors">
+          <h2 class="text-xl font-bold mb-3 font-marlin">ADD NEW DATA</h2>
+          <p class="text-sm text-gray-400 mb-4">CREATE NEW PROJECTS AND ADD THEM TO THE DATABASE.</p>
+          <div class="bg-white text-black py-2 px-4 rounded text-center font-medium font-marlin">
+            ADD DATA
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="mt-8">
+      <a href="/" class="text-gray-400 hover:text-white font-marlin">Return to Main Map</a>
+      <span class="mx-2 text-gray-600">|</span>
+      <a href="/add-admin" class="text-gray-400 hover:text-white font-marlin">Add Admin</a>
+      <span class="mx-2 text-gray-600">|</span>      
+      <a href="/logout" class="text-gray-400 hover:text-white font-marlin">Logout</a>
+
+    </div>
+  </div>
+  <!-- Toast notification -->
+<div id="toast" class="fixed bottom-4 right-4 bg-red-600 text-white py-2 px-4 rounded-md shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
+  <p class="font-medium">Only Superadmins can access this feature</p>
+</div>
+
+<script>
+  // Check for error parameters in URL
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error') === 'superadmin') {
+      const toast = document.getElementById('toast');
+      toast.classList.remove('translate-y-full', 'opacity-0');
+      
+      // Auto-hide the toast after 5 seconds
+      setTimeout(() => {
+        toast.classList.add('translate-y-full', 'opacity-0');
+      }, 5000);
+      
+      // Clean up the URL to remove the error parameter
+      window.history.replaceState({}, document.title, '/admin');
+    }
+  });
+</script>
+
+</body>
+</html>

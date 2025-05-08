@@ -1,0 +1,674 @@
+@font-face {
+    font-family: 'ABCFavoritMono-Bold';
+    src: url('fonts/ABCFavoritMono-Bold.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'ABCFavoritMono-Regular';
+    src: url('fonts/ABCFavoritMono-Regular.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Inter';
+    src: url('fonts/inter-var-latin.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Marlin';
+    src: url('fonts/marlin.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'MarlinSoft-ExtraBold';
+    src: url('fonts/MarlinSoftSQ-ExtraBold.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'MarlinSoft-Medium';
+    src: url('fonts/MarlinSoftSQ-Medium.woff2') format('woff2');
+}
+
+
+.font-abcfavoritmono {
+    font-family: 'ABCFavoritMono-Regular', monospace; /* Fallback to monospace */
+  }
+
+  .font-marlinsoftmedium{
+    font-family: 'MarlinSoft-Medium' , monospace;
+  }
+
+  .font-marlin{
+    font-family: 'Marlin' , monospace;
+  }
+
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'MarlinSoft-Medium', monospace;
+    overflow: hidden; /* Prevent scrollbars */
+}
+
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 1; /* Keep map below other elements */
+}
+
+.logo {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    width: 54px;
+    height: 54px;
+    z-index: 1000; /* Above the map */
+}
+
+.search-container {
+    position: absolute;
+    top: 15px;
+    left: 90px; /* Adjust as needed */
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 8px 12px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    z-index: 1000; /* Above the map */
+    font-family: 'ABCFavoritMono-Bold', monospace;
+
+}
+
+.search-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.search-bar {
+    border: none;
+    outline: none;
+    width: 160px;
+    font-size: 14px;
+    font-family: 'MarlinSoft-Medium', monospace;
+
+}
+
+.vl {
+    border-left: 3px solid rgb(0, 0, 0);
+    height: 24px;
+    width: 1px;
+    margin-right: 0px;
+}
+
+.bottom-buttons {
+    position: absolute;
+    bottom: 10px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000; /* Above the map */
+}
+
+.admin-button {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000; /* Above the map */
+}
+
+.btn {
+    padding: 10px;
+    background-color: #314591; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'ABCFavoritMono-Bold', monospace;
+
+}
+
+
+.layer-popup {
+    position: fixed;
+    bottom: 20px;
+    left: 10px;
+    background: #28283b;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: smaller;
+    width: 280px;
+    display: none; /* Initially hidden */
+    color: #fafafa;
+    max-height: 50vh;
+    overflow-y: auto;
+    opacity: 0; /* Change from 1 to 0 */
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Add transition property */
+    font-family: 'ABCFavoritMono-Bold', monospace;
+    z-index: 1001;
+}
+
+#county-select {
+    font-family: 'ABCFavoritMono-Regular', monospace;
+
+}
+
+.layer-options {
+    display: none;
+    margin-left: 20px;
+}
+
+.layer-option {
+    margin: 10px 0;
+}
+
+.layer-option label {
+    display: flex;
+    align-items: center;
+}
+
+.layer-option input {
+    margin-right: 10px;
+}
+
+.layer-popup.show {
+    opacity: 1; /* Set opacity to 1 when popup is shown */
+    transform: translateY(0); /* Remove the translation when popup is shown */
+}
+
+.layer-popup .layer-options {
+    margin-left: 10px;
+}
+
+.layer-popup .layer-option {
+    margin: 5px 0;
+}
+
+.layer-popup .layer-option label {
+    display: flex;
+    align-items: center;
+}
+I
+
+.hidden {
+    display: none;
+}
+
+hr {
+    border: 0.5px solid #dadada; /* Light gray line */
+    margin: 10px 0;
+}
+
+ul {
+    list-style: none;
+    padding-left: 10px;
+}
+
+ul li {
+    margin: 5px 0;
+}
+
+select {
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+
+.project-name { /* Style for project name labels */
+    font-size: 12px;
+    background-color: rgba(59, 57, 168, 0.7); /* Semi-transparent white background */
+    padding: 2px 4px;
+    border-radius: 3px;
+    white-space: nowrap; /* Prevent names from wrapping */
+}
+
+
+/* Only when Printing*/
+
+@media print {  
+.search-container, .bottom-buttons, #layers-popup, .leaflet-control-container, .admin-button {
+    display: none !important; 
+}
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 1; /* Keep map below other elements */
+    height: 100%;
+}
+}
+
+
+
+.btn:hover {
+    cursor: pointer; /* Change cursor to pointer on button hover */
+}
+
+.project-category {
+    margin-left: auto;
+    cursor: pointer;
+    user-select: none;
+}
+
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.buttons-hidden {
+    display: none;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.option-label {
+    cursor: pointer;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.checkbox {
+    cursor: pointer;
+}
+
+
+.layer-category {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Ensures "+/-" is at the extreme right */
+    width: 100%;
+    cursor: pointer;
+}
+
+.expand-icon {
+    cursor: pointer;
+    font-size: 18px;
+    margin-left: 5px;
+}
+
+.sub-options {
+    display: none;
+    margin-left: 20px;
+}
+.sub-layers {
+    display: none;
+    margin-left: 20px;
+}
+.checkbox {
+    cursor: pointer;
+}
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.search-container {
+    position: absolute;
+    top: 15px;
+    left: 90px;
+    display: flex;
+    align-items: center;
+    background-color: rgb(250, 250, 250);
+    padding: 8px 12px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    overflow: hidden; /* Hide options initially */
+}
+
+.search-bar-wrapper {
+    display: flex;
+    align-items: center;
+}
+.search-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+.search-bar {
+    
+    border-color: #1f1d1d;
+    outline: none;
+    font-size: 14px;
+    flex-grow: 1; /* Allow search bar to expand */
+}
+
+.expand-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.search-options {
+    display: flex;
+    align-items: center;
+    padding-left: 8px; /* Add some spacing */
+}
+.option-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+    margin-left: 11px;
+    cursor: pointer;
+}
+
+
+.checkbox {
+    cursor: pointer;
+}
+
+.map-layers {
+    
+    margin-top: 20px;
+    border-top: 1px solid #444;
+    padding-top: 15px;
+}
+
+.map-layer-header {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+/* Default Tooltip Style (Light Background Maps) */
+#map.light-mode .leaflet-tooltip.project-name-tooltip {
+    background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    color: black; /* Black text */
+    padding: 2px 5px;
+    font-size: 10px;
+    font-family: 'MarlinSoft-Medium', Arial, sans-serif; /* Use your specific font */
+    white-space: nowrap;
+    box-shadow: none; /* Override default Leaflet shadow if needed */
+    border-radius: 3px;
+    user-select: none; /* Prevent text selection */
+    pointer-events: none; /* Tooltip shouldn't capture mouse events */
+}
+
+/* Tooltip Style for Dark Background Maps */
+#map.dark-mode .leaflet-tooltip.project-name-tooltip {
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: white; /* White text */
+    padding: 2px 5px;
+    font-size: 10px;
+    font-family: 'MarlinSoft-Medium', Arial, sans-serif;
+    white-space: nowrap;
+    box-shadow: none;
+    border-radius: 3px;
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Hide the default tooltip arrow/pointer */
+.leaflet-tooltip-top::before,
+.leaflet-tooltip-bottom::before,
+.leaflet-tooltip-left::before,
+.leaflet-tooltip-right::before {
+    display: none; /* Remove the little pointer triangle if desired */
+}
+
+
+/* Optional: Style for the Read More button */
+.read-more-btn {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 5px; /* Add some space */
+}
+.read-more-btn:hover {
+    background-color: #ddd;
+}
+
+/* Ensure popups have correct base styles */
+
+
+.layer-popup.show {
+    display: block; /* Made visible by JS */
+    opacity: 1;
+}
+
+.project-marker-divicon {
+    /* No background or border needed on the container itself */
+    background: transparent;
+    border: none;
+}
+
+/* Style for the content wrapper inside the DivIcon */
+.project-marker-divicon .project-marker-content {
+    position: relative; /* Establish positioning context for the label */
+    display: flex; /* Align icon */
+    justify-content: center; /* Center icon horizontally */
+    align-items: flex-end; /* Align icon to bottom (where anchor is) */
+    width: 10px; /* Match iconSize[0] */
+    height: 10px; /* Match iconSize[1] */
+}
+
+/* Style for the icon image inside */
+.project-marker-divicon .project-marker-content img {
+    display: block; /* Remove extra space below image */
+    /* Image size is set directly in HTML for clarity */
+}
+
+/* Style for the project name text */
+.project-marker-divicon .project-label-text {
+    display: none; /* Initially hidden */
+    position: absolute;
+    bottom: 13px; /* Position above the icon (icon height + desired space) */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Fine-tune horizontal centering */
+    white-space: nowrap; /* Prevent wrapping */
+    font-size: 10px;
+    font-family: 'MarlinSoft-Medium', Arial, sans-serif; /* Your font */
+    color: #314591; /* Requested text color */
+    background: transparent; /* No background */
+    border: none; /* No border */
+    padding: 1px 3px; /* Minimal padding */
+    /* Text shadow for readability on different backgrounds */
+    text-shadow:
+       -1px -1px 0 #fff,
+        1px -1px 0 #fff,
+       -1px  1px 0 #fff,
+        1px  1px 0 #fff,
+        0px 0px 3px #fff; /* White outline/glow */
+    pointer-events: auto; /* Allow clicks on the text */
+    cursor: pointer; /* Indicate it's clickable */
+    z-index: 1; /* Ensure text is above icon if overlap occurs */
+}
+
+/* Style to show the label when the parent DivIcon has the 'label-visible' class */
+.project-marker-divicon.label-visible .project-label-text {
+    display: block; /* Or 'inline-block' if needed */
+}
+
+
+/* Search results container styling */
+#searchResultsContainer {
+    position: absolute;
+    top: 55px; /* Position below the search bar - adjust based on your search bar height */
+    left: 90px; /* Match the left positioning of the search container */
+    width: 250px; /* Set appropriate width, can be wider than the search box */
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 999; /* Below the search bar but above the map */
+    display: none;
+    margin-top: 5px;
+    font-family: 'MarlinSoft-Medium', monospace;
+    font-size: 14px;
+}
+
+/* Search result item styling */
+.search-result-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-family: 'MarlinSoft-Medium', monospace;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: #f2f2f2;
+}
+
+.result-title {
+    font-weight: bold;
+    color: #314591;
+    margin-bottom: 3px;
+}
+
+.result-county {
+    font-size: 12px;
+    color: #666;
+}
+
+.no-results, .search-error {
+    padding: 10px 15px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.search-result-card:last-child {
+    border-bottom: none;
+}
+
+.search-result-card:hover {
+    background-color: #f9f9f9;
+}
+
+.result-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.result-county {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.no-results, .search-error {
+    padding: 15px;
+    text-align: center;
+    color: #666;
+}
+
+/* Highlighted marker */
+.highlight-marker {
+    z-index: 1001 !important;
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+}
+
+.highlight-marker img {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 0, 0.8));
+}
+
+/* Ensure the search bar has proper styling */
+.search-bar-wrapper {
+    position: relative;
+    z-index: 1001; /* Above map and search results */
+}
+
+/* Active tool styling */
+.option-icon.active-tool {
+    transform: scale(1.1);
+    filter: brightness(0.7);
+  }
+  
+  /* Style for export button when hidden */
+  #export_features {
+    display: none;
+  }
+  
+
+
+/* Smaller draw marker handles */
+.leaflet-edit-marker-selected,
+.leaflet-draw-marker-icon,
+.leaflet-draw-guide-dash,
+.leaflet-draw-tooltip {
+    font-size: 10px;
+}
+
+/* Thinner lines and smaller edit markers */
+.leaflet-draw-tooltip-subtext {
+    font-size: 9px;
+}
+
+.leaflet-draw-guide-dash {
+    width: 3px;
+    height: 3px;
+}
+
+.leaflet-edit-marker-selected {
+    border: 2px solid rgba(254, 87, 161, 0.6);
+    width: 8px;
+    height: 8px;
+}
+
+.leaflet-marker-icon.leaflet-div-icon.leaflet-editing-icon {
+    width: 8px !important;
+    height: 8px !important;
+    margin-left: -5px !important;
+    margin-top: -5px !important;
+  }
+  
+.leaflet-draw-guide-dash {
+    width: 2px !important;
+    height: 2px !important;
+    margin-right: 0.25px !important;
+  }
+
+/* Smaller vertex markers */
+.leaflet-edit-marker-selected, 
+.leaflet-draw-actions a, 
+.leaflet-draw-actions-top a, 
+.leaflet-draw-actions-bottom a {
+    width: 8px;
+    height: 8px;
+}
+
+.leaflet-draw-toolbar .leaflet-draw-draw-circle {
+    background-position: -152px -2px;
+}
+
+/* Smaller dashed lines */
+.leaflet-editing-icon {
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    margin-top: -3px;
+    border-radius: 3px;
+}
