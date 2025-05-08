@@ -7,7 +7,7 @@ import session from 'express-session';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import cors from 'cors';
-    app.use(cors());
+    
 
 // Load environment variables
 dotenv.config();
@@ -15,6 +15,8 @@ dotenv.config();
 // --- Configuration ---
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(cors());
 
 const { Pool } = pg;
 const pool = new Pool({
