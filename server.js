@@ -313,7 +313,7 @@ app.post('/api/projects', requireAuth, async (req, res) => {
             county_id,
             project_status,
             project_type,
-            description || null, // Handle potentially missing non-required fields
+            description || null, 
             people_served || null,
             hashed_location,
             progress || null,
@@ -373,12 +373,11 @@ app.get('/api/countyBounds', async (req, res) => {
   });
 
 
-// 9. API endpoints to get supporting data for dropdowns (can be public or protected)
-// Decide if these need requireAuth based on whether non-admins should see these lists
+// 9. API endpoints to get supporting data for dropdowns 
+//Add auth to these endpoints if needed
 
 // Get Counties
-app.get('/api/counties', async (req, res) => { // No auth needed usually
-    let client;
+app.get('/api/counties', async (req, res) => { 
     try {
         client = await pool.connect();
         const result = await client.query('SELECT id, county_name FROM public.county ORDER BY county_name'); // Added ORDER BY
@@ -392,7 +391,7 @@ app.get('/api/counties', async (req, res) => { // No auth needed usually
 });
 
 // Get Statuses
-app.get('/api/statuses', async (req, res) => { // No auth needed usually
+app.get('/api/statuses', async (req, res) => { 
     let client;
     try {
         client = await pool.connect();
@@ -407,7 +406,7 @@ app.get('/api/statuses', async (req, res) => { // No auth needed usually
 });
 
 // Get Types
-app.get('/api/types', async (req, res) => { // No auth needed usually
+app.get('/api/types', async (req, res) => { 
      let client;
      try {
         client = await pool.connect();
