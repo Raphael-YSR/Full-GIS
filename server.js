@@ -6,17 +6,24 @@ import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser';
 import session from 'express-session';
 import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // --- Configuration ---
 const app = express();
 const port = process.env.PORT || 3000;
 
 const dbConfig = {
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || '12345',
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'gis-admin',
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    ssl: {
+        rejectUnauthorized: false // Required for Supabase
+    }
 };
 
 const pool = new pg.Pool(dbConfig);
