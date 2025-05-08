@@ -7,22 +7,31 @@ import session from 'express-session';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import cors from 'cors';
-    
+import pgSession from 'connect-pg-simple';
 
-// Load environment variables
+// --- Load environment variables ---
 dotenv.config();
 
-// --- Configuration ---
+// --- Initialize app ---
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
-
+// --- Setup PostgreSQL Pool ---
 const { Pool } = pg;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // add this if Render requires SSL
+  ssl: { rejectUnauthorized: false }
 });
+
+
+// --- Setup Session Store ---
+const pgStore = pgSession(session);
+
+// --- Middleware ---
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json()); 
+app.use(express.static('docs'));
 
 pool.on('error', (err, client) => {
     console.error('Unexpected error on idle PostgreSQL client', err);
@@ -32,10 +41,7 @@ pool.on('error', (err, client) => {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- Middleware ---
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json()); // Add body-parser for JSON // << IMPORTANT for PUT requests
-app.use(express.static('docs'));
+
 
 
 // Add static middleware for admin directory
@@ -44,16 +50,21 @@ app.use(express.static('docs'));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'd9fd8v9v8d!fdj4f8jF9d9fd$83jJd8fJd', //ref .env
+    store: new pgStore({
+      pool: pool,
+      tableName: 'user_sessions'
+    }),
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // Use secure cookies ONLY in production (HTTPS)
-        httpOnly: true, // Prevent client-side JS access
-        maxAge: 1000 * 60 * 60 * 24, // 1 day
-        sameSite: 'lax' // Recommended for CSRF protection, 'lax' is a good default
-       }
-}));
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24,
+      sameSite: 'lax'
+    }
+  }));
+  
 
 // --- Routes ---
 
