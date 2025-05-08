@@ -1,3 +1,5 @@
+// LOGIN NOT REDIRECTING
+
 import express from 'express';
 import pg from 'pg';
 import path from 'path';
@@ -8,6 +10,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import pgSession from 'connect-pg-simple';
+import cookieParser from 'cookie-parser';
 
 // --- Load environment variables ---
 dotenv.config();
@@ -28,7 +31,43 @@ const pool = new Pool({
 const pgStore = pgSession(session);
 
 // --- Middleware ---
-app.use(cors());
+const corsOptions = {
+    origin: function(origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl, etc)
+      if (!origin) return callback(null, true);
+      
+      // Define allowed origins
+      const allowedOrigins = [
+        'https://full-gis.onrender.com',
+        'http://localhost:3000'
+      ];
+      
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        console.log('CORS blocked origin:', origin);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    optionsSuccessStatus: 204
+  };
+
+app.set('trust proxy', 1);
+
+// Add debug middleware for session tracking
+app.use((req, res, next) => {
+    console.log('=== Session Debug ===');
+    console.log('Request cookies:', req.headers.cookie);
+    console.log('Request path:', req.path);
+    console.log('Request method:', req.method);
+    console.log('===================');
+    next();
+});
+
+app.use(cors(corsOptions));
+app.use(cookieParser(process.env.SESSION_SECRET)); // Use the same secret as your session
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); 
 app.use(express.static('docs'));
@@ -42,29 +81,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-
-
-// Add static middleware for admin directory
 // Serve static files directly from the 'admin' directory when requested under '/admin' path
-// Example: /admin/styles.css will serve admin/styles.css
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
+// Replace your current session middleware with this:
 app.use(session({
     store: new pgStore({
       pool: pool,
       tableName: 'user_sessions'
     }),
     secret: process.env.SESSION_SECRET,
-    resave: false,
+    resave: false, 
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies only in production
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24,
-      sameSite: 'lax'
-    }
-  }));
-  
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 1000 * 60 * 60 * 24 // 24 hours
+    },
+    proxy: true // Set this to true regardless of environment if you're behind a proxy
+}));
 
 // --- Routes ---
 
@@ -96,7 +132,7 @@ app.post('/login', async (req, res) => {
         return res.status(400).redirect('/login?error=Email%20and%20password%20required');
     }
 
-    let client; // Declare client outside try block
+    let client;
     try {
         console.log("Trying to login:", email);
         client = await pool.connect();
@@ -105,9 +141,8 @@ app.post('/login', async (req, res) => {
 
         if (result.rows.length > 0) {
             const user = result.rows[0];
-            console.log("User found:", result.rows[0]);
-            console.log("Hashed pass in DB:", user.hashed_pass);
-            // Ensure hashed_pass column exists and is not null
+            console.log("User found:", user);
+            
             if (!user.hashed_pass) {
                 console.error(`User ${email} found but has no hashed_pass defined.`);
                 return res.status(500).redirect('/login?error=Server%20configuration%20error');
@@ -116,27 +151,38 @@ app.post('/login', async (req, res) => {
             const passwordMatch = await bcrypt.compare(password, user.hashed_pass);
 
             if (passwordMatch) {
-                req.session.regenerate((err) => {
-                    if (err) {
-                        console.error('Session regeneration error:', err);
-                        return res.status(500).redirect('/login?error=Session%20error');
-                    }
-                    
-                    // Set user data AFTER regeneration
-                    req.session.user = { id: user.role_id, email: user.email };
-                    
-                    // Save the session before redirecting
-                    req.session.save((err) => {
-                        if (err) {
-                            console.error('Session save error:', err);
-                            return res.status(500).redirect('/login?error=Session%20error');
-                        }
-                        
-                        console.log(`User ${email} logged in successfully.`);
-                        console.log('Session ID:', req.sessionID);
-                        res.redirect('/admin');
+                // Set user data in session
+                req.session.user = { 
+                    id: user.id, 
+                    email: user.email,
+                    roleId: user.role_id
+                };
+                
+                // Update last login timestamp in background
+                client.query('UPDATE admin.admin SET last_login = NOW() WHERE id = $1', [user.id])
+                    .catch(err => console.error('Failed to update last login time:', err));
+                
+                // Save session and wait for completion
+                try {
+                    await new Promise((resolve, reject) => {
+                        req.session.save(err => {
+                            if (err) reject(err);
+                            else resolve();
+                        });
                     });
-                });
+                    
+                    console.log('Session saved with ID:', req.sessionID);
+                    console.log('Session data:', req.session);
+                    
+                    // Get the return URL or default to /admin
+                    const returnTo = req.session.returnTo || '/admin';
+                    delete req.session.returnTo;
+                    
+                    return res.redirect(returnTo);
+                } catch (saveErr) {
+                    console.error('Session save error:', saveErr);
+                    return res.status(500).redirect('/login?error=Session%20error');
+                }
             } else {
                 console.log(`Password mismatch for user ${email}`);
                 return res.redirect('/login?error=Incorrect%20email%20or%20password');
@@ -150,18 +196,26 @@ app.post('/login', async (req, res) => {
         res.status(500).redirect('/login?error=Internal%20Server%20Error');
     } finally {
         if (client) {
-            client.release(); // Ensure client is always released
+            client.release();
         }
     }
 });
 
 // 4.  Middleware to protect admin routes
 const requireAuth = (req, res, next) => {
-    console.log('Checking authentication: '); //add console log to see session.
+    console.log('Checking authentication: ');
+    console.log('Session exists:', !!req.session);
+    console.log('User in session:', req.session?.user);
+    console.log('Session ID:', req.sessionID);
+    console.log('Request cookies:', req.headers.cookie);
+    
     if (req.session && req.session.user) {
+        console.log('Authentication successful for user:', req.session.user.email);
         next();
     } else {
         console.log('Authentication required, redirecting to login.');
+        // Store the original URL for redirecting back after login
+        req.session.returnTo = req.originalUrl;
         res.redirect('/login');
     }
 };
@@ -590,7 +644,7 @@ app.put('/api/project/:id', requireAuth, async (req, res) => {
 });
 
 
-// 13. API endpoint to delete a project (protected)
+// 13. API endpoint to delete a project
 // DELETE /api/project/123
 app.delete('/api/project/:id', requireAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
