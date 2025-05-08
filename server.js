@@ -698,7 +698,7 @@ app.use((err, req, res, next) => {
         client.release();
 
         app.listen(port, () => {
-            console.log(`>>> Server listening at http://localhost:${port}`);
+            //console.log(`>>> Server listening at http://localhost:${port}`);
             //console.log(`>>> Admin accessible at http://localhost:${port}/admin (requires login)`);
         });
 
