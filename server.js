@@ -1,4 +1,3 @@
-// server.js (Editable - Current: Stage 1 Start)
 import express from 'express';
 import pg from 'pg';
 import path from 'path';
@@ -7,6 +6,8 @@ import bodyParser from 'body-parser';
 import session from 'express-session';
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+import cors from 'cors';
+    app.use(cors());
 
 // Load environment variables
 dotenv.config();
@@ -15,7 +16,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-const { Pool } = require('pg');
+const { Pool } = pg;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false } // add this if Render requires SSL
@@ -32,7 +33,7 @@ const __dirname = path.dirname(__filename);
 // --- Middleware ---
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // Add body-parser for JSON // << IMPORTANT for PUT requests
-app.use(express.static('public'));
+app.use(express.static('docs'));
 
 
 // Add static middleware for admin directory
@@ -41,7 +42,7 @@ app.use(express.static('public'));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-very-secret-key-change-me', // Use environment variable
+    secret: process.env.SESSION_SECRET || 'd9fd8v9v8d!fdj4f8jF9d9fd$83jJd8fJd', //ref .env
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -54,9 +55,14 @@ app.use(session({
 
 // --- Routes ---
 
+// 0. Confirmation for uptime monitoring  
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+  });
+  
 // 1. Serve the main map HTML
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'main.html'));
+    res.sendFile(path.join(__dirname, 'docs', 'index.html'));
 });
 
 // 2. Serve the login form
@@ -65,7 +71,7 @@ app.get('/login', (req, res) => {
     if (req.session.user) {
        return res.redirect('/admin');
     }
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    res.sendFile(path.join(__dirname, 'docs', 'login.html'));
 });
 
 
@@ -369,6 +375,8 @@ app.get('/api/countyBounds', async (req, res) => {
 // 9. API endpoints to get supporting data for dropdowns 
 //Add auth to these endpoints if needed
 
+const isProd = process.env.NODE_ENV === 'production';
+
 // Get Counties
 app.get('/api/counties', async (req, res) => { 
     try {
@@ -377,11 +385,13 @@ app.get('/api/counties', async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         console.error('Error fetching counties:', err);
-        res.status(500).json({ error: 'Error fetching counties.', details: err.message });
-    } finally {
+        res.status(500).json({error: 'Server error fetching counties.',...(isProd ? {} : { details: err.message })
+        });
+            } finally {
         if (client) client.release();
     }
 });
+
 
 // Get Statuses
 app.get('/api/statuses', async (req, res) => { 
@@ -392,8 +402,9 @@ app.get('/api/statuses', async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         console.error('Error fetching statuses:', err);
-        res.status(500).json({ error: 'Error fetching statuses.', details: err.message });
-    } finally {
+        res.status(500).json({error: 'Server error fetching Statuses.',...(isProd ? {} : { details: err.message })
+        });
+        } finally {
         if (client) client.release();
     }
 });
@@ -407,8 +418,8 @@ app.get('/api/types', async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         console.error('Error fetching types:', err);
-        res.status(500).json({ error: 'Error fetching types.', details: err.message });
-    } finally {
+        res.status(500).json({error: 'Server error fetching Types.',...(isProd ? {} : { details: err.message })
+        });    } finally {
         if (client) client.release();
     }
 });
