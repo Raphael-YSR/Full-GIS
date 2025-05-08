@@ -98,12 +98,15 @@ app.post('/login', async (req, res) => {
 
     let client; // Declare client outside try block
     try {
+        console.log("Trying to login:", email);
         client = await pool.connect();
 
         const result = await client.query('SELECT * FROM admin.admin WHERE email = $1', [email]);
 
         if (result.rows.length > 0) {
             const user = result.rows[0];
+            console.log("User found:", result.rows[0]);
+            console.log("Hashed pass in DB:", user.hashed_pass);
             // Ensure hashed_pass column exists and is not null
             if (!user.hashed_pass) {
                 console.error(`User ${email} found but has no hashed_pass defined.`);
@@ -392,9 +395,10 @@ const isProd = process.env.NODE_ENV === 'production';
 
 // Get Counties
 app.get('/api/counties', async (req, res) => { 
+    let client;
     try {
         client = await pool.connect();
-        const result = await client.query('SELECT id, county_name FROM public.county ORDER BY county_name'); // Added ORDER BY
+        const result = await client.query('SELECT id, county_name FROM public.county ORDER BY county_name');
         res.json(result.rows);
     } catch (err) {
         console.error('Error fetching counties:', err);
