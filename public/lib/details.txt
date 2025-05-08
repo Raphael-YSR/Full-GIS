@@ -1,5 +1,0 @@
-Optimizations.
-
-Start working on the search bar, once a project is searched, it gives options from the databse under the searcbar, 
-then after clicking it, it automatically zooms to the project's area
-
