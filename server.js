@@ -15,18 +15,11 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-const dbConfig = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    ssl: {
-        rejectUnauthorized: false // Required for Supabase
-    }
-};
-
-const pool = new pg.Pool(dbConfig);
+const { Pool } = require('pg');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false } // add this if Render requires SSL
+});
 
 pool.on('error', (err, client) => {
     console.error('Unexpected error on idle PostgreSQL client', err);
