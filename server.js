@@ -11,9 +11,13 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import pgSession from 'connect-pg-simple';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+
 
 // --- Load environment variables ---
 dotenv.config();
+
+app.use(helmet());
 
 // --- Initialize app ---
 const app = express();
@@ -23,6 +27,7 @@ const port = process.env.PORT || 3000;
 const { Pool } = pg;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+   max: 20,
   ssl: { rejectUnauthorized: false }
 });
 
@@ -56,18 +61,9 @@ const corsOptions = {
 
 app.set('trust proxy', 1);
 
-// Add debug middleware for session tracking
-app.use((req, res, next) => {
-    console.log('=== Session Debug ===');
-    console.log('Request cookies:', req.headers.cookie);
-    console.log('Request path:', req.path);
-    console.log('Request method:', req.method);
-    console.log('===================');
-    next();
-});
 
 app.use(cors(corsOptions));
-app.use(cookieParser(process.env.SESSION_SECRET)); // Use the same secret as your session
+app.use(cookieParser(process.env.SESSION_SECRET)); 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); 
 app.use(express.static('docs'));
@@ -97,7 +93,7 @@ app.use(session({
       secure: process.env.NODE_ENV === 'production', // Use secure cookies only in production
       httpOnly: true,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 1000 * 60 * 60 * 24 // 24 hours
+      maxAge: 1000 * 60 * 60 * 2 // 2 hours
     },
     proxy: true // Set this to true regardless of environment if you're behind a proxy
 }));
@@ -185,11 +181,11 @@ app.post('/login', async (req, res) => {
                 }
             } else {
                 console.log(`Password mismatch for user ${email}`);
-                return res.redirect('/login?error=Incorrect%20email%20or%20password');
+                return res.redirect('/login?error=IncorrectDetails');
             }
         } else {
             console.log(`User not found: ${email}`);
-            return res.redirect('/login?error=Incorrect%20email%20or%20password');
+            return res.redirect('/login?error=IncorrectDetails');
         }
     } catch (err) {
         console.error('Login error:', err);
@@ -202,22 +198,10 @@ app.post('/login', async (req, res) => {
 });
 
 // 4.  Middleware to protect admin routes
-const requireAuth = (req, res, next) => {
-    console.log('Checking authentication: ');
-    console.log('Session exists:', !!req.session);
-    console.log('User in session:', req.session?.user);
-    console.log('Session ID:', req.sessionID);
-    console.log('Request cookies:', req.headers.cookie);
-    
-    if (req.session && req.session.user) {
-        console.log('Authentication successful for user:', req.session.user.email);
-        next();
-    } else {
-        console.log('Authentication required, redirecting to login.');
-        // Store the original URL for redirecting back after login
-        req.session.returnTo = req.originalUrl;
-        res.redirect('/login');
-    }
+export const requireAuth = (req, res, next) => {
+    if (req.session && req.session.user) return next();
+    req.session.returnTo = req.originalUrl;
+    return res.redirect('/login');
 };
 
 // 4.1 Middleware for superadmin authentication
