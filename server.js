@@ -221,35 +221,16 @@ const requireAuth = (req, res, next) => {
 };
 
 // 4.1 Middleware for superadmin authentication
-const superAdminAuth = async (req, res, next) => {
-    console.log('Checking superadmin permissions'); 
-    if (req.session && req.session.user) {
-        let client;
-        try {
-            client = await pool.connect();
-            const result = await client.query('SELECT role_id FROM admin.admin WHERE role_id = $1', [req.session.user.id]);
-            
-            if (result.rows.length > 0 && result.rows[0].role_id === 2) {
-                next();
-            } else {
-                // Return 403 Forbidden status for AJAX requests
-                if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-                    return res.status(403).json({ error: 'Superadmin privileges required' });
-                }
-                // Otherwise redirect with a message
-                return res.redirect('/admin?error=superadmin');
-            }
-        } catch (err) {
-            console.error('Error checking superadmin status:', err);
-            return res.status(500).redirect('/admin?error=internal');
-        } finally {
-            if (client) client.release();
-        }
-    } else {
-        console.log('Authentication required, redirecting to login.');
-        res.redirect('/admin');
+const superAdminAuth = (req, res, next) => {
+    if (req.session && req.session.user && req.session.user.roleId === 2) {
+        return next();
     }
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+        return res.status(403).json({ error: 'Superadmin privileges required' });
+    }
+    return res.redirect('/admin?error=superadmin');
 };
+
 
 
 // 5. Serve protected admin pages (protected by requireAuth middleware)
