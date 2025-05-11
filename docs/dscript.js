@@ -318,19 +318,28 @@ function createProjectMarker(project) {
             status = 'unknown';
     }
 
-    // Get SVG markup for marker
-    const svgIcon = getColoredSVG(color);
-    
     // Size of the icon
-    const iconSize = [16, 16]; 
+    const iconSize = [8, 8]; 
 
-    // Create HTML for the DivIcon with inline SVG
+    // SOLUTION 1: Inline SVG with direct color control
     const markerHtml = `
         <div class="project-marker-content">
-            ${svgIcon}
+            <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="${color}" stroke="#ffffff" stroke-width="1"/>
+            </svg>
             ${project.project_name ? `<span class="project-label-text">${project.project_name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>` : ''}
         </div>
     `;
+
+    /* SOLUTION 2: Apply CSS filter to recolor black SVG
+    const markerHtml = `
+        <div class="project-marker-content">
+            <img src="images/fill.svg" width="8" height="8" alt="Location" 
+                 style="filter: ${convertHexToFilter(color)} drop-shadow(0px 1px 2px rgba(0,0,0,0.3));">
+            ${project.project_name ? `<span class="project-label-text">${project.project_name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>` : ''}
+        </div>
+    `;
+    */
 
     const projectDivIcon = L.divIcon({
         html: markerHtml,
@@ -345,7 +354,6 @@ function createProjectMarker(project) {
 
     // Click event for detail popup
     marker.on('click', function() {
-        // console.log(`Marker clicked: ${project.project_name || 'Unnamed'}`);
         showProjectDetail(project);
     });
 
@@ -372,24 +380,18 @@ function createProjectMarker(project) {
     });
 }
 
-// Helper function to generate SVG markup
-function getColoredSVG(color) {
-    // Option 1: Use external SVG file with color styling
-    return `
-        <div style="color: ${color};">
-            <img src="images/fill.svg" width="16" height="16" alt="Location" style="filter: drop-shadow(0px 1px 2px rgba(0,0,0,0.3));">
-        </div>
-    `;
+// Helper function to convert hex color to CSS filter (for Solution 2)
+function convertHexToFilter(hexColor) {
+    // Convert hex to RGB
+    const r = parseInt(hexColor.slice(1, 3), 16) / 255;
+    const g = parseInt(hexColor.slice(3, 5), 16) / 255;
+    const b = parseInt(hexColor.slice(5, 7), 16) / 255;
     
-    // Option 2: Create a simple round point marker (uncomment to use this instead)
-    /*
-    return `    
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-            <circle cx="8" cy="8" r="7" fill="${color}" stroke="#ffffff" stroke-width="1" filter="drop-shadow(0px 1px 2px rgba(0,0,0,0.3))"/>
-        </svg>
-    `;
-    */
+    // Calculate sepia, saturate, and hue-rotate values
+    // This is a simplified conversion that works for many colors
+    return `brightness(0) saturate(100%) invert(${r * 100}%) sepia(${g * 100}%) saturate(${b * 1000}%)`;
 }
+
 
     // --- Function to Update Label Visibility (For DivIcon labels) ---
     function updateLabelVisibility() {
