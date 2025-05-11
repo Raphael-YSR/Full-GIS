@@ -56,12 +56,14 @@ app.set('trust proxy', 1);
 
 // Add debug middleware for session tracking
 app.use((req, res, next) => {
+    /*
     console.log('=== Session Debug ===');
     console.log('Request cookies:', req.headers.cookie);
     console.log('Request path:', req.path);
     console.log('Request method:', req.method);
     console.log('===================');
     next();
+    */
 });
 
 app.use(cors(corsOptions));
@@ -132,14 +134,14 @@ app.post('/login', async (req, res) => {
 
     let client;
     try {
-        console.log("Trying to login:", email);
+        //console.log("Trying to login:", email);
         client = await pool.connect();
 
         const result = await client.query('SELECT * FROM admin.admin WHERE email = $1', [email]);
 
         if (result.rows.length > 0) {
             const user = result.rows[0];
-            console.log("User found:", user);
+            //console.log("User found:", user);
             
             if (!user.hashed_pass) {
                 console.error(`User ${email} found but has no hashed_pass defined.`);
@@ -169,8 +171,8 @@ app.post('/login', async (req, res) => {
                         });
                     });
                     
-                    console.log('Session saved with ID:', req.sessionID);
-                    console.log('Session data:', req.session);
+                    //console.log('Session saved with ID:', req.sessionID);
+                    //console.log('Session data:', req.session);
                     
                     // Get the return URL or default to /admin
                     const returnTo = req.session.returnTo || '/admin';
@@ -182,11 +184,11 @@ app.post('/login', async (req, res) => {
                     return res.status(500).redirect('/login?error=Session%20error');
                 }
             } else {
-                console.log(`Password mismatch for user ${email}`);
+                //console.log(`Password mismatch for user ${email}`);
                 return res.redirect('/login?error=Incorrect%20email%20or%20password');
             }
         } else {
-            console.log(`User not found: ${email}`);
+            //console.log(`User not found: ${email}`);
             return res.redirect('/login?error=Incorrect%20email%20or%20password');
         }
     } catch (err) {
@@ -201,17 +203,19 @@ app.post('/login', async (req, res) => {
 
 // 4.  Middleware to protect admin routes
 const requireAuth = (req, res, next) => {
+    /*
     console.log('Checking authentication: ');
     console.log('Session exists:', !!req.session);
     console.log('User in session:', req.session?.user);
     console.log('Session ID:', req.sessionID);
     console.log('Request cookies:', req.headers.cookie);
-    
+    */
     if (req.session && req.session.user) {
-        console.log('Authentication successful for user:', req.session.user.email);
+        //console.log('Authentication successful for user:', req.session.user.email);
         next();
     } else {
-        console.log('Authentication required, redirecting to login.');
+        //console.log('Authentication required, redirecting to login.');
+
         // Store the original URL for redirecting back after login
         req.session.returnTo = req.originalUrl;
         res.redirect('/login');
@@ -276,11 +280,11 @@ app.get('/logout', (req, res) => {
 
 // 6. API endpoint to get project locations for the main public map (does not require auth)
 app.get('/api/projects/locations', async (req, res) => {
-    console.log('Received request for /api/projects/locations');
+    //console.log('Received request for /api/projects/locations');
     let client;
     try {
         client = await pool.connect();
-        console.log('Connected to database for project locations');
+        //console.log('Connected to database for project locations');
         // Ensure column names and table names match your schema EXACTLY
         const sql = `
             SELECT
@@ -301,7 +305,7 @@ app.get('/api/projects/locations', async (req, res) => {
                 AND ST_GeometryType(p.hashed_location::geometry) = 'ST_Point';
         `;
         const result = await client.query(sql);
-        console.log(`Found ${result.rows.length} projects with locations.`);
+        //console.log(`Found ${result.rows.length} projects with locations.`);
         res.json(result.rows);
     } catch (err) {
         console.error('Error executing query or connecting to DB for project locations:', err.stack);
@@ -309,7 +313,7 @@ app.get('/api/projects/locations', async (req, res) => {
     } finally {
         if (client) {
             client.release();
-            console.log('Database client released for project locations');
+            //console.log('Database client released for project locations');
         }
     }
 });
