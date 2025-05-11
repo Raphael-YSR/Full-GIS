@@ -1,3 +1,5 @@
+// FIXED SERVER.JS - Correct initialization order
+
 import express from 'express';
 import pg from 'pg';
 import path from 'path';
@@ -72,7 +74,6 @@ pool.on('error', (err, client) => {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
 // Serve static files directly from the 'admin' directory when requested under '/admin' path
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
@@ -114,7 +115,6 @@ app.get('/login', (req, res) => {
     }
     res.sendFile(path.join(__dirname, 'docs', 'login.html'));
 });
-
 
 // 3. Handle login form submission
 app.post('/login', async (req, res) => {
@@ -211,8 +211,6 @@ const superAdminAuth = (req, res, next) => {
     return res.redirect('/admin?error=superadmin');
 };
 
-
-
 // 5. Serve protected admin pages (protected by requireAuth middleware)
 
 // Serve the admin landing page
@@ -242,7 +240,6 @@ app.get('/edit-data', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'admin', 'edit-data.html'));
 });
 
-
 // Handle logout
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
@@ -254,7 +251,6 @@ app.get('/logout', (req, res) => {
         res.redirect('/');
     });
 });
-
 
 // 6. API endpoint to get project locations for the main public map (does not require auth)
 app.get('/api/projects/locations', async (req, res) => {
@@ -295,7 +291,6 @@ app.get('/api/projects/locations', async (req, res) => {
         }
     }
 });
-
 
 // --- Protected API Endpoints (apply requireAuth) ---
 
@@ -400,7 +395,7 @@ app.get('/api/countyBounds', async (req, res) => {
       console.error("Query Error:", err);
       res.status(500).json({ error: err.message });
     }
-  });
+});
 
 
 // 9. API endpoints to get supporting data for dropdowns 
