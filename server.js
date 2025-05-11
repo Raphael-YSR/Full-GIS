@@ -1,5 +1,3 @@
-// LOGIN NOT REDIRECTING
-
 import express from 'express';
 import pg from 'pg';
 import path from 'path';
@@ -13,15 +11,15 @@ import pgSession from 'connect-pg-simple';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 
-
 // --- Load environment variables ---
 dotenv.config();
 
-app.use(helmet());
-
-// --- Initialize app ---
+// --- Initialize app --- 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Apply helmet middleware AFTER app is initialized
+app.use(helmet());
 
 // --- Setup PostgreSQL Pool ---
 const { Pool } = pg;
@@ -30,7 +28,6 @@ const pool = new Pool({
    max: 20,
   ssl: { rejectUnauthorized: false }
 });
-
 
 // --- Setup Session Store ---
 const pgStore = pgSession(session);
@@ -60,7 +57,6 @@ const corsOptions = {
   };
 
 app.set('trust proxy', 1);
-
 
 app.use(cors(corsOptions));
 app.use(cookieParser(process.env.SESSION_SECRET)); 
