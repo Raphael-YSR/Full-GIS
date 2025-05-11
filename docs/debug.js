@@ -1,5 +1,4 @@
 const apiUrl = '/api/projects/locations';
-//console.log(`Fetching data from ${apiUrl}...`);
 
 fetch(apiUrl)
     .then(response => {
@@ -16,7 +15,7 @@ fetch(apiUrl)
     .then(projects => {
         // Diagnostic: Validate and log potential rendering issues
         // USED IT FOR DEBUGGING, CAN BE USED LATER AGAIN
-        /*
+        
             const issues = {
                 missingCoords: [],
                 invalidCoords: [],
@@ -64,8 +63,8 @@ fetch(apiUrl)
             console.log("❓ Projects with Unknown County:", issues.unknownCounty);
             console.groupEnd();
 
-            */
-         if (projects.length === 0) {
+            
+            if (projects.length === 0) {
              // console.warn("No project locations found in the database or returned by API.");
              L.popup().setLatLng(map.getCenter()).setContent("No projects found.").openOn(map);
              return;

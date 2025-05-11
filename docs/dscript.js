@@ -303,27 +303,30 @@ document.addEventListener('DOMContentLoaded', function () {
         let iconUrl = '';
         let status = project.status ? project.status.toLowerCase().trim() : 'unknown'; // Normalize status
 
-        // Determine icon based on project status
-        switch (status) {
-            case 'complete':
-                iconUrl = 'images/pr-blue.png';
-                break;
-            case 'planning & design': // Handle combined status
-            case 'planning':
-                iconUrl = 'images/pr-black.png';
-                status = 'planning'; // Standardize
-                break;
-            case 'ongoing':
-                iconUrl = 'images/pr-gray.png';
-                status = 'ongoing'; // Standardize
-                break;
-            case 'design':
-                iconUrl = 'images/pr-load.png';
-                break;
-            default:
-                iconUrl = 'images/pr-hollow.png';
-                status = 'unknown';
-        }
+        function getColoredSVG(color) {
+  return `
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="${color}" viewBox="0 0 24 24">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 4.67 7 13 7 13s7-8.33 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+    </svg>
+  `;
+}
+
+// In your marker rendering logic:
+let color;
+switch (status) {
+    case 'complete':
+        color = '#4169E1'; // royal blue
+        break;
+    case 'ongoing':
+        color = '#6e6e6e'; // medium gray
+        break;
+    case 'design':
+        color = '#F4C542'; // gold
+        break;
+    default:
+        color = '#444'; // dark gray
+        status = 'unknown';
+}
 
         // Size of the image icon 
         const iconSize = [7, 7]; 
@@ -466,7 +469,7 @@ fetch('/api/countyBounds')
             }
         });
         
-        // Don't add to map by default - will be toggled by checkbox
+        // Not added to map by default - will be toggled by checkbox
         
         // Set up the checkbox listener for county visibility
         const showCountyCheckbox = document.querySelector('.checkbox.showCounty');
