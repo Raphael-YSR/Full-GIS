@@ -1,5 +1,3 @@
-// LOGIN NOT REDIRECTING
-
 import express from 'express';
 import pg from 'pg';
 import path from 'path';
@@ -97,7 +95,7 @@ app.use(session({
       secure: process.env.NODE_ENV === 'production', // Use secure cookies only in production
       httpOnly: true,
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 1000 * 60 * 60 * 24 // 24 hours
+      maxAge: 1000 * 60 * 60 * 2 // 2 hours
     },
     proxy: true // Set this to true regardless of environment if you're behind a proxy
 }));
