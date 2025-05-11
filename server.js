@@ -1,5 +1,3 @@
-// FIXED SERVER.JS - Correct initialization order
-
 import express from 'express';
 import pg from 'pg';
 import path from 'path';
@@ -20,7 +18,6 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Apply helmet middleware AFTER app is initialized
 app.use(helmet());
 
 // --- Setup PostgreSQL Pool ---
