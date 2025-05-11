@@ -290,93 +290,96 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 8000);
             }
 
-    // --- Function to Create Project Marker (Using DivIcon) ---
-    function createProjectMarker(project) {
-        const lat = parseFloat(project.lat);
-        const lng = parseFloat(project.lng);
+// --- Function to Create Project Marker (Using DivIcon with SVG) ---
+function createProjectMarker(project) {
+    const lat = parseFloat(project.lat);
+    const lng = parseFloat(project.lng);
 
-        if (isNaN(lat) || isNaN(lng)) {
-            console.warn(`Skipping project "${project.project_name}" due to invalid coordinates: lat=${project.lat}, lng=${project.lng}`);
-            return;
-        }
-
-    function getColoredSVG(color) {
-        return `    
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="${color}" viewBox="0 0 24 24">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 4.67 7 13 7 13s7-8.33 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-            </svg>
-        `;
-        }
-
-        // In your marker rendering logic:
-        let color;
-        switch (status) {
-            case 'complete':
-                color = '#4169E1'; // royal blue
-                break;
-            case 'ongoing':
-                color = '#6e6e6e'; // medium gray
-                break;
-            case 'design':
-                color = '#F4C542'; // gold
-                break;
-            default:
-                color = '#444'; // dark gray
-                status = 'unknown';
-}
-        // Size of the image icon 
-        const iconSize = [7, 7]; 
-
-        // Create HTML for the DivIcon
-         const markerHtml = `
-         <div class="project-marker-content">
-             <img src="${iconUrl}" width="${iconSize[0]}" height="${iconSize[1]}" alt="Project">
-             ${project.project_name ? `<span class="project-label-text">${project.project_name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>` : ''}
-         </div>
-     `;
-     
-
-        const projectDivIcon = L.divIcon({
-            html: markerHtml,
-            className: 'project-marker-divicon', // Base class for styling container
-            iconSize: iconSize, // Set to image size for anchor calculation
-            iconAnchor: [iconSize[0] / 2, iconSize[1]] // Anchor at the bottom-center of the image
-        });
-
-        const marker = L.marker([lat, lng], {
-            icon: projectDivIcon
-        });
-
-        // Click event for detail popup
-        marker.on('click', function() {
-            // console.log(`Marker clicked: ${project.project_name || 'Unnamed'}`);
-            showProjectDetail(project);
-        });
-
-        // Store project type normalized to lowercase
-        let rawType = project.project_type ? project.project_type.toLowerCase().trim() : 'other';
-        //to match UI selection
-        switch (rawType) {
-            case 'dam':
-                rawType = 'dams';
-                break;
-            case 'sewer':
-                rawType = 'sanitation'; 
-                break;
-        }
-        const projectType = rawType;
-
-
-        // Store marker with metadata for filtering
-        allMarkers.push({
-            marker: marker,
-            project: project,
-            status: status,
-            type: projectType,
-            county: project.county ? project.county.toLowerCase() : ''
-        });
-
+    if (isNaN(lat) || isNaN(lng)) {
+        console.warn(`Skipping project "${project.project_name}" due to invalid coordinates: lat=${project.lat}, lng=${project.lng}`);
+        return;
     }
+
+    // Determine status color
+    let status = project.status ? project.status.toLowerCase().trim() : 'unknown';
+    let color;
+    switch (status) {
+        case 'complete':
+            color = '#4169E1'; // royal blue
+            break;
+        case 'ongoing':
+            color = '#6e6e6e'; // medium gray
+            break;
+        case 'design':
+            color = '#F4C542'; // gold
+            break;
+        default:
+            color = '#444'; // dark gray
+            status = 'unknown';
+    }
+
+    // Get SVG markup for marker
+    const svgIcon = getColoredSVG(color);
+    
+    // Size of the icon
+    const iconSize = [32, 32]; // Match the SVG width/height
+
+    // Create HTML for the DivIcon with inline SVG
+    const markerHtml = `
+        <div class="project-marker-content">
+            ${svgIcon}
+            ${project.project_name ? `<span class="project-label-text">${project.project_name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>` : ''}
+        </div>
+    `;
+
+    const projectDivIcon = L.divIcon({
+        html: markerHtml,
+        className: 'project-marker-divicon', // Base class for styling container
+        iconSize: iconSize, // Set to SVG size for anchor calculation
+        iconAnchor: [iconSize[0] / 2, iconSize[1]] // Anchor at the bottom-center of the SVG
+    });
+
+    const marker = L.marker([lat, lng], {
+        icon: projectDivIcon
+    });
+
+    // Click event for detail popup
+    marker.on('click', function() {
+        // console.log(`Marker clicked: ${project.project_name || 'Unnamed'}`);
+        showProjectDetail(project);
+    });
+
+    // Store project type normalized to lowercase
+    let rawType = project.project_type ? project.project_type.toLowerCase().trim() : 'other';
+    //to match UI selection
+    switch (rawType) {
+        case 'dam':
+            rawType = 'dams';
+            break;
+        case 'sewer':
+            rawType = 'sanitation'; 
+            break;
+    }
+    const projectType = rawType;
+
+    // Store marker with metadata for filtering
+    allMarkers.push({
+        marker: marker,
+        project: project,
+        status: status,
+        type: projectType,
+        county: project.county ? project.county.toLowerCase() : ''
+    });
+}
+
+// Helper function to generate SVG markup
+function getColoredSVG(color) {
+    return `    
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="${color}" viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 4.67 7 13 7 13s7-8.33 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+        </svg>
+    `;
+}
 
     // --- Function to Update Label Visibility (For DivIcon labels) ---
     function updateLabelVisibility() {
