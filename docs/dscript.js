@@ -322,7 +322,7 @@ function createProjectMarker(project) {
     const svgIcon = getColoredSVG(color);
     
     // Size of the icon
-    const iconSize = [32, 32]; // Match the SVG width/height
+    const iconSize = [16, 16]; 
 
     // Create HTML for the DivIcon with inline SVG
     const markerHtml = `
@@ -374,11 +374,21 @@ function createProjectMarker(project) {
 
 // Helper function to generate SVG markup
 function getColoredSVG(color) {
-    return `    
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="${color}" viewBox="0 0 24 24">
-            <path d="M10 10" />        
-        </svg>    
+    // Option 1: Use external SVG file with color styling
+    return `
+        <div style="color: ${color};">
+            <img src="images/fill.svg" width="16" height="16" alt="Location" style="filter: drop-shadow(0px 1px 2px rgba(0,0,0,0.3));">
+        </div>
     `;
+    
+    // Option 2: Create a simple round point marker (uncomment to use this instead)
+    /*
+    return `    
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+            <circle cx="8" cy="8" r="7" fill="${color}" stroke="#ffffff" stroke-width="1" filter="drop-shadow(0px 1px 2px rgba(0,0,0,0.3))"/>
+        </svg>
+    `;
+    */
 }
 
     // --- Function to Update Label Visibility (For DivIcon labels) ---
