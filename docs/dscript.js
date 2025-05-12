@@ -304,18 +304,17 @@ function createProjectMarker(project) {
     let status = project.status ? project.status.toLowerCase().trim() : 'unknown';
     let color;
     switch (status) {
-        //different shades of blue
         case 'complete':
-            color = '#4169E1'; // royal blue
+            color = '#1f78b4'; 
             break;
         case 'ongoing':
-            color = '#728FCE'; // light purple blue
+            color = '#33a02c '; 
             break;
         case 'design':
-            color = '#98AFC7'; //blue gray
+            color = '#e6550d '; 
             break;
         default:
-            color = '#444'; // dark gray
+            color = '#444'; 
             status = 'unknown';
     }
 
