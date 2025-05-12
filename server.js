@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import pgSession from 'connect-pg-simple';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 // --- Load environment variables ---
 dotenv.config();
@@ -54,18 +55,20 @@ const corsOptions = {
 
 app.set('trust proxy', 1);
 
-// Add debug middleware for session tracking
-app.use((req, res, next) => {
     /*
+// debug middleware for session tracking
+app.use((req, res, next) => {
+
     console.log('=== Session Debug ===');
     console.log('Request cookies:', req.headers.cookie);
     console.log('Request path:', req.path);
     console.log('Request method:', req.method);
     console.log('===================');
     next();
-    */
-});
 
+});
+    */
+app.use(helmet());
 app.use(cors(corsOptions));
 app.use(cookieParser(process.env.SESSION_SECRET)); // Use the same secret as your session
 app.use(bodyParser.urlencoded({ extended: true }));
