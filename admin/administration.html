@@ -5,119 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GIS Admin Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* Sidebar integration styles */
-    #sidebar {
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    }
 
-    .sidebar-item {
-      @apply flex items-center p-3 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors duration-200;
-    }
-
-    .sidebar-item i {
-      @apply w-6 text-center;
-    }
-
-    .sidebar-text {
-      @apply ml-3 opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300;
-    }
-
-    /* Ensure content doesn't get hidden behind sidebar */
-    body {
-      margin-left: 4rem;
-    }
-
-    #sidebar:hover {
-      margin-left: 0;
-    }
   </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
-  <!-- Sidebar -->
-  <div id="sidebar" class="fixed left-0 top-0 h-screen bg-gray-900 z-50 transition-all duration-300 ease-in-out 
-      w-16 hover:w-64 group overflow-hidden">
-      <!-- Sidebar Header -->
-      <div class="p-4 border-b border-gray-700 relative">
-          <div class="flex items-center">
-              <span class="text-xl font-bold font-marlin text-white 
-                  opacity-0 group-hover:opacity-100 transition-opacity duration-300 
-                  absolute left-16 group-hover:left-4">GIS ADMIN</span>
-          </div>
-      </div>
-
-      <!-- Admin Section -->
-      <div class="sidebar-section">
-          <div class="text-xs text-gray-500 px-4 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">ADMIN</div>
-          <ul>
-              <li>
-                  <a href="/admin" class="sidebar-item">
-                      <i class="fas fa-home"></i>
-                      <span class="sidebar-text">Dashboard</span>
-                  </a>
-              </li>
-              <li>
-                  <a href="/add-data" class="sidebar-item">
-                      <i class="fas fa-table"></i>
-                      <span class="sidebar-text">Add Project Data</span>
-                  </a>
-              </li>
-              <li>
-                  <a href="/edit-data" class="sidebar-item">
-                      <i class="fas fa-database"></i>
-                      <span class="sidebar-text">Edit Project Data</span>
-                  </a>
-              </li>
-          </ul>
-      </div>
-
-      <!-- Superadmin Section -->
-      <div class="sidebar-section">
-          <div class="text-xs text-gray-500 px-4 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">SUPERADMIN</div>
-          <ul>
-              <li>
-                  <a href="/add-admin" class="sidebar-item">
-                      <i class="fas fa-user-plus"></i>
-                      <span class="sidebar-text">Add Admins</span>
-                  </a>
-              </li>
-              <li>
-                  <a href="/delete-project" class="sidebar-item">
-                      <i class="fas fa-cubes"></i>
-                      <span class="sidebar-text">Delete Project</span>
-                  </a>
-              </li>
-              <li>
-                  <a href="/change-admin-password" class="sidebar-item">
-                      <i class="fas fa-shield-alt"></i>
-                      <span class="sidebar-text">Change Passwords</span>
-                  </a>
-              </li>
-          </ul>
-      </div>
-
-      <!-- Additional Links -->
-      <div class="sidebar-section mt-auto">
-          <ul>
-              <li>
-                  <a href="/" class="sidebar-item">
-                      <i class="fas fa-map"></i>
-                      <span class="sidebar-text">Return to Main Map</span>
-                  </a>
-              </li>
-              <li>
-                  <a href="/logout" class="sidebar-item">
-                      <i class="fas fa-sign-out-alt"></i>
-                      <span class="sidebar-text">Logout</span>
-                  </a>
-              </li>
-          </ul>
-      </div>
-  </div>
-
-  <div class="container mx-auto px-4 py-8 ml-20">
+<body class="bg-gray-900 text-white min-h-screen px-20">
+  <div class="container mx-auto px-4 py-8">
     <header class="mb-8">
       <h1 class="text-3xl font-bold font-marlin">GIS ADMINISTRATION DASHBOARD</h1>
       <p class="text-gray-400">MANAGE YOUR GIS DATA AND PROJECTS</p>
@@ -144,42 +38,39 @@
         </div>
       </a>
     </div>
-  </div>
 
+    <div class="mt-8">
+      <a href="/" class="text-gray-400 hover:text-white font-marlin">Return to Main Map</a>
+      <span class="mx-2 text-gray-600">|</span>
+      <a href="/add-admin" class="text-gray-400 hover:text-white font-marlin">Add Admin</a>
+      <span class="mx-2 text-gray-600">|</span>      
+      <a href="/logout" class="text-gray-400 hover:text-white font-marlin">Logout</a>
+
+    </div>
+  </div>
   <!-- Toast notification -->
-  <div id="toast" class="fixed bottom-4 right-4 bg-red-600 text-white py-2 px-4 rounded-md shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
-    <p class="font-medium">ONLY SUPERADMINS CAN ACCESS THIS FEATURE</p>
-  </div>
+<div id="toast" class="fixed bottom-4 right-4 bg-red-600 text-white py-2 px-4 rounded-md shadow-lg transform transition-transform duration-300 translate-y-full opacity-0">
+  <p class="font-medium">ONLY SUPERADMINS CAN ACCESS THIS FEATURE</p>
+</div>
 
-  <script>
-    // Sidebar active page highlighting
-    document.addEventListener('DOMContentLoaded', () => {
-      const sidebar = document.getElementById('sidebar');
-      const currentPath = window.location.pathname;
+<script>
+  // Check for error parameters in URL
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('error') === 'superadmin') {
+      const toast = document.getElementById('toast');
+      toast.classList.remove('translate-y-full', 'opacity-0');
+      
+      // Auto-hide the toast after 5 seconds
+      setTimeout(() => {
+        toast.classList.add('translate-y-full', 'opacity-0');
+      }, 5000);
+      
+      // Clean up the URL to remove the error parameter
+      window.history.replaceState({}, document.title, '/admin');
+    }
+  });
+</script>
 
-      // Highlight active page
-      const sidebarItems = sidebar.querySelectorAll('.sidebar-item');
-      sidebarItems.forEach(item => {
-        if (item.getAttribute('href') === currentPath) {
-          item.classList.add('bg-gray-700', 'text-white');
-        }
-      });
-
-      // Check for error parameters in URL
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('error') === 'superadmin') {
-        const toast = document.getElementById('toast');
-        toast.classList.remove('translate-y-full', 'opacity-0');
-        
-        // Auto-hide the toast after 5 seconds
-        setTimeout(() => {
-          toast.classList.add('translate-y-full', 'opacity-0');
-        }, 5000);
-        
-        // Clean up the URL to remove the error parameter
-        window.history.replaceState({}, document.title, '/admin');
-      }
-    });
-  </script>
 </body>
 </html>
