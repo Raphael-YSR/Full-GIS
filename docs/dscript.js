@@ -304,14 +304,15 @@ function createProjectMarker(project) {
     let status = project.status ? project.status.toLowerCase().trim() : 'unknown';
     let color;
     switch (status) {
+        //different shades of blue
         case 'complete':
             color = '#4169E1'; // royal blue
             break;
         case 'ongoing':
-            color = '#6e6e6e'; // medium gray
+            color = '#728FCE'; // light purple blue
             break;
         case 'design':
-            color = '#F4C542'; // gold
+            color = '#98AFC7'; //blue gray
             break;
         default:
             color = '#444'; // dark gray
@@ -321,7 +322,6 @@ function createProjectMarker(project) {
     // Size of the icon
     const iconSize = [8, 8]; 
 
-    // SOLUTION 1: Inline SVG with direct color control
     const markerHtml = `
         <div class="project-marker-content">
             <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24">
@@ -331,15 +331,6 @@ function createProjectMarker(project) {
         </div>
     `;
 
-    /* SOLUTION 2: Apply CSS filter to recolor black SVG
-    const markerHtml = `
-        <div class="project-marker-content">
-            <img src="images/fill.svg" width="8" height="8" alt="Location" 
-                 style="filter: ${convertHexToFilter(color)} drop-shadow(0px 1px 2px rgba(0,0,0,0.3));">
-            ${project.project_name ? `<span class="project-label-text">${project.project_name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</span>` : ''}
-        </div>
-    `;
-    */
 
     const projectDivIcon = L.divIcon({
         html: markerHtml,
@@ -951,7 +942,7 @@ function initializeDrawControls() {
             },
             circle: {
                 shapeOptions: {
-                    color: '#FF9800',  // Orange color for circles
+                    color: '#FF9800',  
                     fillColor: '#FF9800',
                     fillOpacity: 0.2,
                     weight: 1
