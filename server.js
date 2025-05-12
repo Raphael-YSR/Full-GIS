@@ -68,12 +68,12 @@ app.use((req, res, next) => {
 
 });
     */
-app.use(helmet());
 app.use(cors(corsOptions));
 app.use(cookieParser(process.env.SESSION_SECRET)); // Use the same secret as your session
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); 
 app.use(express.static('docs'));
+app.use(helmet());
 
 pool.on('error', (err, client) => {
     console.error('Unexpected error on idle PostgreSQL client', err);
