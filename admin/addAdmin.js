@@ -62,14 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const newPassword = generatePassword(12); 
         passwordInput.value = newPassword;
 
-        // Make the copy button visible
-        if (passwordInput.value.length >= 6) {
-            copyButton.style.opacity = '1';
-            copyButton.classList.add('visible');
-        } else {
-            copyButton.style.opacity = '0';
-            copyButton.classList.remove('visible');
-        }
     });
 
 

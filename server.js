@@ -266,6 +266,18 @@ app.get('/add-admin', requireAuth, superAdminAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'admin', 'add-admin.html'));
 });
 
+app.get('/search-delete-project', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'search-delete-project.html'));
+});
+
+app.get('/search-delete-admin', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'search-delete-admin.html'));
+});
+
+app.get('/password-reset', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'password-reset.html'));
+});
+
 
 
 
