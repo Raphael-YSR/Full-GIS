@@ -1,4 +1,10 @@
-/* ALWAYS USE MONOSPACE */
+/*
+Instead of changing each page(there are many), I have now removed the *specific font family
+*/
+.font-abcfavoritmonobold {
+  font-family: monospace;
+}
+
 .font-abcfavoritmono {
   font-family: monospace; 
 }

@@ -9,7 +9,6 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import pgSession from 'connect-pg-simple';
 import cookieParser from 'cookie-parser';
-import helmet from 'helmet';
 
 // --- Load environment variables ---
 dotenv.config();
@@ -237,7 +236,7 @@ const superAdminAuth = (req, res, next) => {
 
 
 
-// 5. Serve protected admin pages (protected by requireAuth middleware)
+// 5. Serve protected admin pages 
 
 // Serve the admin landing page
 app.get('/admin', requireAuth, (req, res) => {
@@ -523,7 +522,6 @@ app.get("/api/search", requireAuth, async (req, res) => {
 
 
 // 11. API endpoint to get a SINGLE project by ID (protected)
-// GET /api/project/123
 app.get('/api/project/:id', requireAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10); // Ensure ID is an integer
 
@@ -563,8 +561,8 @@ app.get('/api/project/:id', requireAuth, async (req, res) => {
     }
 });
 
-// 12. API endpoint to update a project (protected)
-// PUT /api/project/123
+// 12. API endpoint to update a project
+
 app.put('/api/project/:id', requireAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
      if (isNaN(projectId)) {
@@ -633,8 +631,7 @@ app.put('/api/project/:id', requireAuth, async (req, res) => {
 
 
 // 13. API endpoint to delete a project
-// DELETE /api/project/123
-app.delete('/api/project/:id', requireAuth, async (req, res) => {
+app.delete('/api/project/:id', requireAuth, superAdminAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
      if (isNaN(projectId)) {
         return res.status(400).json({ error: 'Invalid project ID format.' });
@@ -727,8 +724,7 @@ app.post('/api/admins', requireAuth, superAdminAuth, async (req, res) => {
     }
 });
 
-// --- Error Handling Middleware (Basic Example) ---
-// Place this after all routes
+// --- Error Handling Middleware ---
 app.use((err, req, res, next) => {
     console.error("Unhandled error:", err.stack);
     res.status(500).send('Something broke!');

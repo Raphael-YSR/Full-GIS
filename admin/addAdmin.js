@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to populate the department dropdown
     async function populateDept() {
-        console.log('populateDept called.');
+        //console.log('populateDept called.');
 
         try {
             const departmentData = await fetch('/api/departments').then(res => res.json());
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener for the "GENERATE PASSWORD" link
     passgenLink.addEventListener('click', (event) => {
         event.preventDefault();
-        const newPassword = generatePassword(12); // Increased to 12 for better security
+        const newPassword = generatePassword(12); 
         passwordInput.value = newPassword;
 
         // Make the copy button visible
@@ -72,35 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Password input listener for showing/hiding copy button
-    passwordInput.addEventListener('input', function() {
-        if (passwordInput.value.length >= 6) {
-            copyButton.style.opacity = '1';
-            copyButton.classList.add('visible');
-        } else {
-            copyButton.style.opacity = '0';
-            copyButton.classList.remove('visible');
-        }
-    });
-
-    // Copy password button listener
-    copyButton.addEventListener('click', async function() {
-        try {
-            await navigator.clipboard.writeText(passwordInput.value);
-            copiedTextSpan.style.display = 'inline-block';
-            setTimeout(() => {
-                copiedTextSpan.style.display = 'none';
-            }, 1000);
-        } catch (err) {
-            console.error('Failed to copy text to clipboard:', err);
-            passwordInput.select();
-            document.execCommand('copy');
-            copiedTextSpan.style.display = 'inline-block';
-            setTimeout(() => {
-                copiedTextSpan.style.display = 'none';
-            }, 1000);
-        }
-    });
 
     // Add admin form submission logic
     addAdminForm.addEventListener('submit', async (event) => {
