@@ -58,6 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusSelect = document.getElementById('project_status');
         const typeSelect = document.getElementById('project_type');
 
+        // Check if all required dropdown elements exist before proceeding
+        if (!countySelect || !statusSelect || !typeSelect) {
+            console.log('One or more dropdown elements not found. This might be expected if you are on a different page.');
+            return; // Exit the function if any element is missing
+        }
+
         try {
             const countyData = await fetch('/api/counties').then(res => res.json());
             const statusData = await fetch('/api/statuses').then(res => res.json());
@@ -90,36 +96,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    populateDropdowns();
+    // Only call populateDropdowns if the form exists
+    if (addProjectForm) {
+        populateDropdowns();
+        
+        addProjectForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
 
-    addProjectForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        const formData = new FormData(addProjectForm);
-        const projectData = {};
-        formData.forEach((value, key) => {
-            projectData[key] = value;
-        });
-
-        try {
-            const response = await fetch('/api/projects', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(projectData),
+            const formData = new FormData(addProjectForm);
+            const projectData = {};
+            formData.forEach((value, key) => {
+                projectData[key] = value;
             });
 
-            if (response.ok) {
-                showPopup(`${projectData.project_name} has been added!`);
-                addProjectForm.reset();
-            } else {
-                const errorData = await response.json();
-                showPopup(`Error adding project: ${errorData.error || 'Unknown error'}`);
+            try {
+                const response = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(projectData),
+                });
+
+                if (response.ok) {
+                    showPopup(`${projectData.project_name} has been added!`);
+                    addProjectForm.reset();
+                } else {
+                    const errorData = await response.json();
+                    showPopup(`Error adding project: ${errorData.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showPopup('An unexpected error occurred. Please try again.');
             }
-        } catch (error) {
-            console.error('Error:', error);
-            showPopup('An unexpected error occurred. Please try again.');
-        }
-    });
+        });
+    }
 });
