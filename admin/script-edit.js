@@ -70,13 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchProjectDetails(projectId) {
-        console.log('Fetching project details for ID:', projectId); 
         try {
             const response = await fetch(`/api/project/${projectId}`);
-            console.log('API response:', response); 
             if (response.ok) {
                 const project = await response.json();
-                console.log('Project data:', project); 
                 originalProjectData = project; // Store the data
                 
                 // Fetch related data (county name and project type name)
@@ -103,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     populateForm(project);
                 }
             } else {
-                console.log('API response not ok', response);
                 showPopup('Error fetching project details.', 'Error');
             }
         } catch (error) {
@@ -154,7 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function populateDropdowns() {
-        console.log('Populating dropdowns');
         const statusSelect = document.getElementById('project_status');
         
         try {
@@ -217,8 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showPopup('An error occurred during update.', 'Error');
         }
     });
-
-    // --- EDIT PASSWORD ---
-
+    
 
 });

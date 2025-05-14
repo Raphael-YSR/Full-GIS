@@ -1,26 +1,26 @@
 @font-face {
   font-family: 'ABCFavoritMono-Bold';
-  src: url('../public/fonts/ABCFavoritMono-Bold.woff2') format('woff2');
+  src: url('../admin/fonts/ABCFavoritMono-Bold.woff2') format('woff2');
 }
 @font-face {
   font-family: 'ABCFavoritMono-Regular';
-  src: url('../public/fonts/ABCFavoritMono-Regular.woff2') format('woff2');
+  src: url('../admin/fonts/ABCFavoritMono-Regular.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Inter';
-  src: url('../public/fonts/inter-var-latin.woff2') format('woff2');
+  src: url('../admin/fonts/inter-var-latin.woff2') format('woff2');
 }
 @font-face {
   font-family: 'Marlin';
-  src: url('../public/fonts/marlin.woff2') format('woff2');
+  src: url('../admin/fonts/marlin.woff2') format('woff2');
 }
 @font-face {
   font-family: 'MarlinSoft-ExtraBold';
-  src: url('../public/fonts/MarlinSoftSQ-ExtraBold.woff2') format('woff2');
+  src: url('../admin/fonts/MarlinSoftSQ-ExtraBold.woff2') format('woff2');
 }
 @font-face {
   font-family: 'MarlinSoft-Medium';
-  src: url('../public/fonts/MarlinSoftSQ-Medium.woff2') format('woff2');
+  src: url('../admin/fonts/MarlinSoftSQ-Medium.woff2') format('woff2');
 }
 
 .font-abcfavoritmono {
