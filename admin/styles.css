@@ -1,44 +1,25 @@
-@font-face {
-  font-family: 'ABCFavoritMono-Bold';
-  src: url('../admin/fonts/ABCFavoritMono-Bold.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'ABCFavoritMono-Regular';
-  src: url('../admin/fonts/ABCFavoritMono-Regular.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Inter';
-  src: url('../admin/fonts/inter-var-latin.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Marlin';
-  src: url('../admin/fonts/marlin.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'MarlinSoft-ExtraBold';
-  src: url('../admin/fonts/MarlinSoftSQ-ExtraBold.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'MarlinSoft-Medium';
-  src: url('../admin/fonts/MarlinSoftSQ-Medium.woff2') format('woff2');
+/*
+Instead of changing each page(there are many), I have now removed the *specific font family
+*/
+.font-abcfavoritmonobold {
+  font-family: monospace;
 }
 
 .font-abcfavoritmono {
-  font-family: 'ABCFavoritMono-Regular', monospace; /* Fallback to monospace */
+  font-family: monospace; 
 }
 
 .font-marlinsoftmedium{
-  font-family: 'MarlinSoft-Medium', monospace;
+  font-family: monospace;
 }
 
 .font-marlin{
-  font-family: 'Marlin', monospace;
+  font-family: monospace;
 }
 
 .font-inter{
-  font-family: 'Inter', monospace;
+  font-family: monospace;
 }
-
 
 .project-card {
   border: 1px solid #ddd;
