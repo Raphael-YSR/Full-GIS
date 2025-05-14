@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GIS Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen px-20">
+  <div class="container mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold font-marlin">GIS SUPERADMIN DASHBOARD</h1>
+      <p class="text-gray-400">MANAGE YOUR GIS DATA AND PROJECTS</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <a href="/add-admin" class="block">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-700 transition-colors">
+          <h2 class="text-xl font-bold mb-3 font-marlin">ADD NEW ADMINISTRATORS</h2>
+          <p class="text-sm text-gray-400 mb-4">ADD NEW ADMINISTRATORS THE DATABASE.</p>
+          <div class="bg-white text-black py-2 px-4 rounded text-center font-medium font-marlin">
+            ADD ADMINISTRATORS
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <a href="/search-delete-project" class="block">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-700 transition-colors">
+          <h2 class="text-xl font-bold mb-3 font-marlin">DELETE PROJECTS</h2>
+          <p class="text-sm text-gray-400 mb-4">DELETE PROJECTS FROM THE DATABASE.</p>
+          <div class="bg-white text-black py-2 px-4 rounded text-center font-medium font-marlin">
+            DELETE PROJECTS
+          </div>
+        </div>
+      </a>
+    </div>
+
+
+    <a href="/search-delete-admin" class="block">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-700 transition-colors">
+          <h2 class="text-xl font-bold mb-3 font-marlin">DELETE ADMINISTRATORS</h2>
+          <p class="text-sm text-gray-400 mb-4">DELETE ADMINISTRATORS FROM THE DATABASE.</p>
+          <div class="bg-white text-black py-2 px-4 rounded text-center font-medium font-marlin">
+            DELETE ADMINISTRATORS
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <a href="/password-reset" class="block">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-gray-700 transition-colors">
+          <h2 class="text-xl font-bold mb-3 font-marlin">PASSWORD RESET</h2>
+          <p class="text-sm text-gray-400 mb-4">RESET PASSWORD FOR ADMINISTRATORS.</p>
+          <div class="bg-white text-black py-2 px-4 rounded text-center font-medium font-marlin">
+            RESET PASSWORD
+          </div>
+        </div>
+      </a>
+    </div>
+
+
+
+    <div class="mt-8">
+      <a href="/" class="text-gray-400 hover:text-white font-marlin">RETURN TO MAIN MAP</a>
+      <span class="mx-2 text-gray-600">|</span>
+      <a href="/admin" class="text-gray-400 hover:text-white font-marlin">BACK TO ADMIN DASHBOARD</a>
+      <span class="mx-2 text-gray-600">|</span>      
+      <a href="/logout" class="text-gray-400 hover:text-white font-marlin">LOGOUT</a>
+
+    </div>
+  </div>
+
+</body>
+</html>
