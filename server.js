@@ -252,14 +252,23 @@ app.get('/add-data', requireAuth, (req, res) => {
 app.get('/search', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'admin', 'search.html'));
 });
+// Serving the static file here is okay, JS will fetch the specific data.
+app.get('/edit-data', requireAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'edit-data.html'));
+});
 
 app.get('/add-admin', requireAuth, superAdminAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'admin', 'add-admin.html'));
 });
 
-// Serving the static file here is okay, JS will fetch the specific data.
-app.get('/edit-data', requireAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin', 'edit-data.html'));
+
+
+app.get('/superadminpanel', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'superadministration.html'));
+});
+
+app.get('/search-admin-pass', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'search-pass.html'));
 });
 
 
