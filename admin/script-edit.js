@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // EDIT PROJECT DATA //
+
     const projectId = getProjectIdFromUrl();
     const projectDetailsDiv = document.getElementById('projectDetails');
     const editProjectForm = document.getElementById('editProjectForm');
@@ -214,4 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
             showPopup('An error occurred during update.', 'Error');
         }
     });
+
+    // --- EDIT PASSWORD ---
+
+
 });
