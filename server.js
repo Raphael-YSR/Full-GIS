@@ -236,7 +236,7 @@ const superAdminAuth = (req, res, next) => {
 
 
 
-// 5. Serve protected admin pages (protected by requireAuth middleware)
+// 5. Serve protected admin pages 
 
 // Serve the admin landing page
 app.get('/admin', requireAuth, (req, res) => {
