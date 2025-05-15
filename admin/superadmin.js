@@ -546,7 +546,8 @@ The GIS Admin Team`;
                         <h2 class="text-xl font-bold mb-2 font-marlin">${project.project_name}</h2>
                         <p class="text-gray-400 font-marlinsoftmedium">County: ${project.county || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Status: ${project.status || 'N/A'}</p>
-                        <p class="text-gray-400 font-marlinsoftmedium">Type: ${project.project_type_name || project.project_type || 'N/A'}</p> <p class="text-gray-400 font-marlinsoftmedium">Description: ${project.description || 'No description'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">Type: ${project.project_type_name || project.project_type || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">Description: ${project.description || 'No description'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">People Served: ${project.people_served || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Progress: ${project.progress || 'N/A'}</p>
                     `;
@@ -657,34 +658,39 @@ The GIS Admin Team`;
         }
 
 
-        // Function to load departments
-        async function loadDepartments() {
+        // Function to populate the department dropdown (Using logic from addAdmin.js)
+        async function populateDept() {
+            console.log('populateDept called.'); // Keep console log for debugging if needed
+
             try {
-                const response = await fetch('/api/departments'); // Assuming an API endpoint for departments
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch departments (Status: ${response.status})`);
-                }
-                const departments = await response.json();
+                const departmentData = await fetch('/api/departments').then(res => res.json());
 
                 if (departmentSelect) {
-                    // Clear existing options except the disabled selected one
-                    departmentSelect.innerHTML = '<option value="" disabled selected>Select department...</option>';
-                    departments.forEach(dept => {
+                    // Clear any existing options except the placeholder
+                    while (departmentSelect.options.length > 1) {
+                        departmentSelect.remove(1);
+                    }
+
+                    // Add new options
+                    departmentData.forEach(department => {
                         const option = document.createElement('option');
-                        option.value = dept.id;
-                        option.textContent = dept.name;
+                        option.value = department.id;
+                        // Use department_name as per the original addAdmin.js logic
+                        option.textContent = department.department_name;
                         departmentSelect.appendChild(option);
                     });
                 }
 
             } catch (error) {
-                console.error('Error loading departments:', error);
+                console.error('Error fetching departments:', error);
                 // Optionally display an error message in the select or elsewhere
                  if (departmentSelect) {
                      departmentSelect.innerHTML = '<option value="" disabled selected>Error loading departments</option>';
                  }
+                 alert('Error loading department data. Please try again.'); // Keep alert as in original addAdmin.js
             }
         }
+
 
          // Generate password button click handler
         if(passgenButton && passwordInput) {
@@ -729,8 +735,7 @@ The GIS Admin Team`;
                     const responseData = await response.json();
 
                     if (response.ok) {
-                        // Admin added successfully, now prepare email message and copy
-                        const newAdmin = responseData.admin; // Assuming the response includes the new admin details
+                        const newAdmin = responseData.admin;
                         const generatedPassword = adminData.password; // Use the password that was sent
 
                         // Create email message (Email Ready Format)
@@ -795,7 +800,7 @@ The GIS Admin Team`;
              closeModalBtn.addEventListener('click', function() {
                 hideModal('successModal');
                  // Decide where to redirect after closing modal, maybe stay on page or go to dashboard
-                // window.location.href = '/superadmin';
+                // window.location.href = '/superadmin'; // Keeping on the page as per previous turn's implicit behavior
             });
 
              // Also close modal when clicking outside
@@ -803,7 +808,7 @@ The GIS Admin Team`;
                 if (event.target === successModal) {
                     hideModal('successModal');
                      // Decide where to redirect after closing modal
-                    // window.location.href = '/superadmin';
+                    // window.location.href = '/superadmin'; // Keeping on the page as per previous turn's implicit behavior
                 }
             });
 
@@ -824,15 +829,11 @@ The GIS Admin Team`;
 
 
         // Load departments when on the add admin page
-        loadDepartments();
+        populateDept(); 
 
         // Generate a random password when the page loads
          if(passgenButton) passgenButton.click();
      }
 
-    // Note: Other page-specific JS logic (like add-data, edit-data)
-    // should also be included in this file, wrapped in checks for elements
-    // specific to those pages (e.g., if (document.getElementById('addDataForm')) { ... }).
-    // This ensures the code only runs on the relevant page.
 
 });
