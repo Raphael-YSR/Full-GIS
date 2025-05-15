@@ -748,21 +748,55 @@ app.post('/api/admins', requireAuth, superAdminAuth, async (req, res) => {
 
 // 16. API TO RESET PASSWORD
 app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (req, res) => {
+    let client;
     try {
+        client = await pool.connect();
         const { id } = req.params;
         const { password } = req.body;
-        
+
+        // Validate admin ID
+        const adminId = parseInt(id, 10);
+        if (isNaN(adminId)) {
+            return res.status(400).json({ error: 'Invalid admin ID format' });
+        }
+
+        // Validate password
+        if (!password || password.length < 8) {
+            return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+        }
+
+        // Check if admin exists
+        const adminCheck = await client.query('SELECT id FROM admin.admin WHERE id = $1', [adminId]);
+        if (adminCheck.rows.length === 0) {
+            return res.status(404).json({ error: 'Admin not found' });
+        }
+
         // Hash the password with bcrypt
         const hashedPassword = await bcrypt.hash(password, 12);
         
         // Update the admin's password in the database
-        const result = await client.query('UPDATE admin.admin SET hashed_pass = $1 WHERE id = $2', [hashedPassword, id]);
+        const result = await client.query(
+            'UPDATE admin.admin SET hashed_pass = $1, last_password_change = NOW() WHERE id = $2 RETURNING id',
+            [hashedPassword, adminId]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(500).json({ error: 'Failed to update password' });
+        }
+
+        // Log the password reset action
+        await client.query(
+            'INSERT INTO admin.audit_log (admin_id, action, details) VALUES ($1, $2, $3)',
+            [req.session.user.id, 'PASSWORD_RESET', `Reset password for admin ID: ${adminId}`]
+        );
         
         res.status(200).json({ message: 'Password reset successful' });
     } catch (error) {
         console.error('Error resetting password:', error);
-        res.status(500).json({ error: error.message });
-    }
+        res.status(500).json({ error: 'An error occurred while resetting the password' });
+    } finally {
+        if (client) client.release();
+    }   
 });
 
 // --- Error Handling Middleware ---
