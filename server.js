@@ -33,13 +33,13 @@ const corsOptions = {
     origin: function(origin, callback) {
       // Allow requests with no origin (like mobile apps, curl, etc)
       if (!origin) return callback(null, true);
-      
+
       // Define allowed origins
       const allowedOrigins = [
         'https://full-gis.onrender.com',
         'http://localhost:3000'
       ];
-      
+
       if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
         callback(null, true);
       } else {
@@ -70,17 +70,11 @@ app.use((req, res, next) => {
 app.use(cors(corsOptions));
 app.use(cookieParser(process.env.SESSION_SECRET)); // Use the same secret as your session
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json()); 
-app.use(express.static('docs'));
-
-pool.on('error', (err, client) => {
-    console.error('Unexpected error on idle PostgreSQL client', err);
-    process.exit(-1);
-});
-
+app.use(bodyParser.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
+// Serve static files from the 'docs' directory at the root
+app.use(express.static(path.join(__dirname, 'docs')));
 
 // Serve static files directly from the 'admin' directory when requested under '/admin' path
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
@@ -92,7 +86,7 @@ app.use(session({
       tableName: 'user_sessions'
     }),
     secret: process.env.SESSION_SECRET,
-    resave: false, 
+    resave: false,
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === 'production', // Use secure cookies only in production
@@ -103,26 +97,33 @@ app.use(session({
     proxy: true // Set this to true regardless of environment if you're behind a proxy
 }));
 
+pool.on('error', (err, client) => {
+    console.error('Unexpected error on idle PostgreSQL client', err);
+    process.exit(-1);
+});
+
+
+
 // --- Routes ---
 
-// 0. Confirmation for uptime monitoring  
+// 0. Confirmation for uptime monitoring
 app.get('/health', (req, res) => {
     res.status(200).send('OK');
   });
-  
-// 1. Serve the main map HTML
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'docs', 'index.html'));
-});
 
-// 2. Serve the login form
-app.get('/login', (req, res) => {
-    // If already logged in, redirect to admin
-    if (req.session.user) {
-       return res.redirect('/admin');
-    }
-    res.sendFile(path.join(__dirname, 'docs', 'login.html'));
-});
+// 1. Serve the main map HTML (now served by express.static)
+// app.get('/', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'docs', 'index.html'));
+// });
+
+// 2. Serve the login form (now served by express.static)
+// app.get('/login', (req, res) => {
+//     // If already logged in, redirect to admin
+//     if (req.session.user) {
+//        return res.redirect('/admin');
+//     }
+//     res.sendFile(path.join(__dirname, 'docs', 'login.html'));
+// });
 
 
 // 3. Handle login form submission
@@ -143,7 +144,7 @@ app.post('/login', async (req, res) => {
         if (result.rows.length > 0) {
             const user = result.rows[0];
             //console.log("User found:", user);
-            
+
             if (!user.hashed_pass) {
                 console.error(`User ${email} found but has no hashed_pass defined.`);
                 return res.status(500).redirect('/login?error=Server%20configuration%20error');
@@ -153,16 +154,16 @@ app.post('/login', async (req, res) => {
 
             if (passwordMatch) {
                 // Set user data in session
-                req.session.user = { 
-                    id: user.id, 
+                req.session.user = {
+                    id: user.id,
                     email: user.email,
                     roleId: user.role_id
                 };
-                
+
                 // Update last login timestamp in background
                 client.query('UPDATE admin.admin SET last_login = NOW() WHERE id = $1', [user.id])
                     .catch(err => console.error('Failed to update last login time:', err));
-                
+
                 // Save session and wait for completion
                 try {
                     await new Promise((resolve, reject) => {
@@ -171,14 +172,14 @@ app.post('/login', async (req, res) => {
                             else resolve();
                         });
                     });
-                    
+
                     //console.log('Session saved with ID:', req.sessionID);
                     //console.log('Session data:', req.session);
-                    
+
                     // Get the return URL or default to /admin
                     const returnTo = req.session.returnTo || '/admin';
                     delete req.session.returnTo;
-                    
+
                     return res.redirect(returnTo);
                 } catch (saveErr) {
                     console.error('Session save error:', saveErr);
@@ -228,15 +229,16 @@ const superAdminAuth = (req, res, next) => {
     if (req.session && req.session.user && req.session.user.roleId === 2) {
         return next();
     }
+    // Check if the request is an API request (e.g., from fetch)
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
         return res.status(403).json({ error: 'Superadmin privileges required' });
     }
+    // For regular page requests, redirect
     return res.redirect('/admin?error=superadmin');
 };
 
 
-
-// 5. Serve protected admin pages 
+// 5. Serve protected admin pages (now served by express.static with requireAuth middleware)
 
 // Serve the admin landing page
 app.get('/admin', requireAuth, (req, res) => {
@@ -322,7 +324,7 @@ app.get('/api/projects/locations', async (req, res) => {
                 t.type AS project_type,
                 ST_Y(p.hashed_location::geometry) AS lat, -- Ensure correct casting if needed
                 ST_X(p.hashed_location::geometry) AS lng  -- Ensure correct casting if needed
-            FROM public.project p 
+            FROM public.project p
             JOIN public.county c ON p.county_id = c.id
             JOIN public.status s ON p.project_status = s.id
             JOIN public.type t ON p.project_type = t.id
@@ -348,7 +350,7 @@ app.get('/api/projects/locations', async (req, res) => {
 // --- Protected API Endpoints (apply requireAuth) ---
 
 // 7. API endpoint to add a new project
-app.post('/api/projects', requireAuth, async (req, res) => { 
+app.post('/api/projects', requireAuth, async (req, res) => {
     const {
       county_id,
       project_status,
@@ -391,7 +393,7 @@ app.post('/api/projects', requireAuth, async (req, res) => {
             county_id,
             project_status,
             project_type,
-            description || null, 
+            description || null,
             people_served || null,
             hashed_location,
             progress || null,
@@ -413,9 +415,9 @@ app.post('/api/projects', requireAuth, async (req, res) => {
     }
 });
 
-// 8. 
+// 8.
 // API route to serve County Boundaries GeoJSON
- 
+
 app.get('/api/countyBounds', async (req, res) => {
     try {
       // Query using the correct column names from the county table
@@ -424,11 +426,11 @@ app.get('/api/countyBounds', async (req, res) => {
         FROM public.county
         WHERE geom IS NOT NULL
       `);
-  
+
       if (result.rows.length === 0) {
         return res.status(404).json({ error: 'No counties found' });
       }
-  
+
       // Create GeoJSON with the correct column mappings
       const geojson = {
         type: "FeatureCollection",
@@ -436,14 +438,14 @@ app.get('/api/countyBounds', async (req, res) => {
           type: "Feature",
           geometry: row.geometry,
           properties: {
-            id: row.id,            
-            county_name: row.county_name  
+            id: row.id,
+            county_name: row.county_name
           }
         }))
       };
-  
+
       res.json(geojson);
-  
+
     } catch (err) {
       console.error("Query Error:", err);
       res.status(500).json({ error: err.message });
@@ -451,13 +453,13 @@ app.get('/api/countyBounds', async (req, res) => {
   });
 
 
-// 9. API endpoints to get supporting data for dropdowns 
+// 9. API endpoints to get supporting data for dropdowns
 //Add auth to these endpoints if needed
 
 const isProd = process.env.NODE_ENV === 'production';
 
 // Get Counties
-app.get('/api/counties', async (req, res) => { 
+app.get('/api/counties', requireAuth, async (req, res) => { // Added requireAuth
     let client;
     try {
         client = await pool.connect();
@@ -474,7 +476,7 @@ app.get('/api/counties', async (req, res) => {
 
 
 // Get Statuses
-app.get('/api/statuses', async (req, res) => { 
+app.get('/api/statuses', requireAuth, async (req, res) => { // Added requireAuth
     let client;
     try {
         client = await pool.connect();
@@ -490,7 +492,7 @@ app.get('/api/statuses', async (req, res) => {
 });
 
 // Get Types
-app.get('/api/types', async (req, res) => { 
+app.get('/api/types', requireAuth, async (req, res) => { // Added requireAuth
      let client;
      try {
         client = await pool.connect();
@@ -506,7 +508,7 @@ app.get('/api/types', async (req, res) => {
 
 
 // 10. Search endpoint (protected)
-app.get("/api/search", requireAuth, async (req, res) => {
+app.get("/api/search", requireAuth, async (req, res) => { // This is for projects
     const query = req.query.q;
     if (!query) {
         return res.status(400).json({ error: "Search query parameter 'q' is required." });
@@ -517,7 +519,7 @@ app.get("/api/search", requireAuth, async (req, res) => {
         client = await pool.connect();
         const result = await client.query(
             `SELECT
-                p.id, 
+                p.id,
                 p.project_name,
                 c.county_name AS county,
                 p.progress,
@@ -571,7 +573,7 @@ app.get("/api/admins/search", requireAuth, superAdminAuth, async (req, res) => {
             ORDER BY a.lname, a.fname -- Order by last name, then first name
             LIMIT 50 -- Limit results
             `,
-            [`%${query}%`] 
+            [`%${query}%`]
         );
         // Do NOT return hashed_pass here
         res.json(result.rows);
@@ -584,8 +586,8 @@ app.get("/api/admins/search", requireAuth, superAdminAuth, async (req, res) => {
 });
 
 
-// 11. 
-// 11.1API endpoint to get a SINGLE project by ID (protected)
+// 11.
+// 11.1 API endpoint to get a SINGLE project by ID (protected)
 
 app.get('/api/project/:id', requireAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10); // Ensure ID is an integer
@@ -627,12 +629,44 @@ app.get('/api/project/:id', requireAuth, async (req, res) => {
 });
 
 // 11.2 API endpoint to get a SINGLE admin by ID (protected)
+// This route already exists and is correctly protected.
 app.get('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
-    const adminId = parseInt(req.params.id, 10);
-    if (isNaN(adminId)) {
-        return res.status(400).json({ error: 'Invalid admin ID format.' });
+    let client;
+    try {
+        client = await pool.connect();
+        const adminId = parseInt(req.params.id, 10); // Ensure ID is an integer
+
+        if (isNaN(adminId)) {
+            return res.status(400).json({ error: 'Invalid admin ID format.' });
+        }
+
+        // Query to fetch admin with department name
+        const query = `
+            SELECT a.*, d.department_name
+            FROM admin.admin a
+            LEFT JOIN admin.department d ON a.department_id = d.id
+            WHERE a.id = $1
+        `;
+
+        const result = await client.query(query, [adminId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Administrator not found' });
+        }
+
+        // Don't send the hashed password to the client
+        const admin = result.rows[0];
+        delete admin.hashed_pass;
+
+        res.json(admin);
+    } catch (error) {
+        console.error('Error fetching admin details:', error);
+        res.status(500).json({ error: 'An error occurred while fetching admin details' });
+    } finally {
+        if (client) client.release();
     }
 });
+
 // 12. API endpoint to update a project
 
 app.put('/api/project/:id', requireAuth, async (req, res) => {
@@ -703,6 +737,7 @@ app.put('/api/project/:id', requireAuth, async (req, res) => {
 
 
 // 13. API endpoint to delete a project
+// This route already exists and is correctly protected.
 app.delete('/api/project/:id', requireAuth, superAdminAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
      if (isNaN(projectId)) {
@@ -781,7 +816,7 @@ app.post('/api/admins', requireAuth, superAdminAuth, async (req, res) => {
              RETURNING id, email, fname, lname, is_active, department_id, role_id`,
             [hashedPassword, email, f_name, l_name, true, department_id, 1] // role_id is always 1 for new admins
         );
-        
+
 
         res.status(201).json({ message: `Administrator '${f_name} ${l_name}' has been added!`, admin: result.rows[0] });
 
@@ -796,41 +831,62 @@ app.post('/api/admins', requireAuth, superAdminAuth, async (req, res) => {
     }
 });
 
-// GET endpoint to fetch a single admin's details
-app.get('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
+// 16. API TO DELETE ADMIN
+app.delete('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
     let client;
     try {
         client = await pool.connect();
-        const { id } = req.params;
-        
-        // Query to fetch admin with department name
-        const query = `
-            SELECT a.*, d.department_name 
-            FROM admin.admin a
-            LEFT JOIN admin.department d ON a.department_id = d.id
-            WHERE a.id = $1
-        `;
-        
-        const result = await client.query(query, [id]);
-        
-        if (result.rows.length === 0) {
+        const adminId = parseInt(req.params.id, 10);
+
+        if (isNaN(adminId)) {
+            return res.status(400).json({ error: 'Invalid admin ID format.' });
+        }
+
+        // Prevent deleting the currently logged-in superadmin
+        if (req.session.user && req.session.user.id === adminId) {
+             return res.status(403).json({ error: 'Cannot delete your own superadmin account.' });
+        }
+
+        // Check if the admin exists and get their name for the response
+        const adminCheck = await client.query('SELECT fname, lname FROM admin.admin WHERE id = $1', [adminId]);
+        if (adminCheck.rows.length === 0) {
             return res.status(404).json({ error: 'Administrator not found' });
         }
-        
-        // Don't send the hashed password to the client
-        const admin = result.rows[0];
-        delete admin.hashed_pass;
-        
-        res.json(admin);
+        const adminName = `${adminCheck.rows[0].fname} ${adminCheck.rows[0].lname}`;
+
+
+        // Perform the deletion
+        const result = await client.query('DELETE FROM admin.admin WHERE id = $1 RETURNING id', [adminId]);
+
+        if (result.rowCount === 0) {
+             // This case should ideally not happen if adminCheck passed, but good for safety
+            return res.status(404).json({ error: 'Administrator not found for deletion.' });
+        }
+
+        // Log the deletion action
+         await client.query(
+            'INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())',
+            [req.session.user.id, 'ADMIN_DELETED', `Deleted admin ID: ${adminId} (${adminName})`]
+        );
+
+
+        res.status(200).json({ message: `Administrator '${adminName}' (ID: ${adminId}) deleted successfully!` });
+
     } catch (error) {
-        console.error('Error fetching admin details:', error);
-        res.status(500).json({ error: error.message });
+        console.error('Error deleting administrator:', error);
+         // Handle potential foreign key constraint errors if admins are linked elsewhere (e.g., in audit logs)
+        if (error.code === '23503') { // Foreign key violation
+             return res.status(409).json({ error: 'Cannot delete administrator because they are linked to other records (e.g., audit logs). Consider deactivating instead.'});
+        }
+        res.status(500).json({ error: 'An error occurred while deleting the administrator.' });
     } finally {
         if (client) client.release();
     }
 });
 
+
 // 17. API TO RESET PASSWORD
+// This route already exists and is correctly protected.
 app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (req, res) => {
     let client;
     try {
@@ -857,7 +913,7 @@ app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (r
 
         // Hash the password with bcrypt
         const hashedPassword = await bcrypt.hash(password, 12);
-        
+
         // Update the admin's password in the database
         const result = await client.query(
             'UPDATE admin.admin SET hashed_pass = $1, last_password_change = NOW() WHERE id = $2 RETURNING id',
@@ -869,19 +925,27 @@ app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (r
         }
 
         // Log the password reset action
-        await client.query(
-            'INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, $4)',
-            [req.session.user.id, 'PASSWORD_RESET', `Reset password for admin ID: ${adminId}`, NOW()]
-        );
-        
+        // Ensure req.session.user.id is available and valid
+        const performingAdminId = req.session.user ? req.session.user.id : null;
+         if (performingAdminId) {
+              await client.query(
+                'INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())',
+                [performingAdminId, 'PASSWORD_RESET', `Reset password for admin ID: ${adminId}`]
+            );
+         } else {
+             console.warn('Audit log: Could not log password reset action, performing admin ID not found in session.');
+         }
+
+
         res.status(200).json({ message: 'Password reset successful' });
     } catch (error) {
         console.error('Error resetting password:', error);
         res.status(500).json({ error: 'An error occurred while resetting the password' });
     } finally {
         if (client) client.release();
-    }   
+    }
 });
+
 
 // --- Error Handling Middleware ---
 app.use((err, req, res, next) => {
@@ -898,10 +962,10 @@ app.use((err, req, res, next) => {
         console.log('>>> Initial database connection successful.');
         client.release();
 
-        app.listen(port, () => {
+        //app.listen(port, () => {
             //console.log(`>>> Server listening at http://localhost:${port}`);
             //console.log(`>>> Admin accessible at http://localhost:${port}/admin (requires login)`);
-        });
+       // });
 
     } catch (err) {
         console.error('FATAL: Initial database connection failed:', err);
