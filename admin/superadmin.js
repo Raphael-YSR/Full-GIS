@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function copyToClipboard(text) {
         try {
             await navigator.clipboard.writeText(text);
-            console.log('Content copied to clipboard.');
             return true; // Indicate success
         } catch (err) {
             console.error('Failed to copy to clipboard:', err);
@@ -49,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
             textArea.select();
             try {
                 document.execCommand('copy');
-                console.log('Content copied to clipboard using fallback.');
                 document.body.removeChild(textArea);
                 return true; // Indicate success
             } catch (fallbackErr) {
@@ -540,8 +538,8 @@ The GIS Admin Team`;
                 if (projectDetailsContainer) {
                     projectDetailsContainer.innerHTML = `
                         <h2 class="text-xl font-bold mb-2 font-marlin">${project.project_name}</h2>
-                        <p class="text-gray-400 font-marlinsoftmedium">County: ${project.county || 'N/A'}</p>
-                        <p class="text-gray-400 font-marlinsoftmedium">Status: ${project.status || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">County: ${project.county_name || project.county || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">Status: ${project.status_name || project.status || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Type: ${project.project_type_name || project.project_type || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Description: ${project.description || 'No description'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">People Served: ${project.people_served || 'N/A'}</p>
@@ -656,7 +654,6 @@ The GIS Admin Team`;
 
         // Function to populate the department dropdown (Using logic from addAdmin.js)
         async function populateDept() {
-            console.log('populateDept called.'); // Keep console log for debugging if needed
 
             try {
                 const departmentData = await fetch('/api/departments').then(res => res.json());
