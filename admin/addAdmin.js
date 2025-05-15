@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const addAdminForm = document.getElementById('addAdminForm');
     const passwordInput = document.getElementById('password');
     const passgenLink = document.getElementById('passgen');
-    const copyButton = document.getElementById('copyPassword');
     const departmentSelect = document.getElementById('department_id');
     const copiedTextSpan = document.getElementById('copiedText');
     

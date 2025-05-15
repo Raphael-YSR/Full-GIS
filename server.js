@@ -275,7 +275,7 @@ app.get('/search-delete-admin', requireAuth, superAdminAuth, (req, res) => {
 });
 
 app.get('/password-reset', requireAuth, superAdminAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin', 'password-reset.html'));
+    res.sendFile(path.join(__dirname, 'admin', 'searchpass.html'));
 });
 
 
