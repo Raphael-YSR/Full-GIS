@@ -239,6 +239,9 @@ const superAdminAuth = (req, res, next) => {
 
 
 // 5. Serve protected admin pages (now served by express.static with requireAuth middleware)
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'docs', 'login.html'));
+});
 
 // Serve the admin landing page
 app.get('/admin', requireAuth, (req, res) => {
