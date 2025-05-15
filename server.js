@@ -54,32 +54,18 @@ const corsOptions = {
 
 app.set('trust proxy', 1);
 
-    /*
-// debug middleware for session tracking
-app.use((req, res, next) => {
 
-    console.log('=== Session Debug ===');
-    console.log('Request cookies:', req.headers.cookie);
-    console.log('Request path:', req.path);
-    console.log('Request method:', req.method);
-    console.log('===================');
-    next();
-
-});
-    */
 app.use(cors(corsOptions));
 app.use(cookieParser(process.env.SESSION_SECRET)); // Use the same secret as your session
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// Serve static files from the 'docs' directory at the root
-app.use(express.static(path.join(__dirname, 'docs')));
 
-// Serve static files directly from the 'admin' directory when requested under '/admin' path
+app.use(express.static(path.join(__dirname, 'docs')));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
-// Replace your current session middleware with this:
+// session middleware
 app.use(session({
     store: new pgStore({
       pool: pool,
@@ -111,22 +97,8 @@ app.get('/health', (req, res) => {
     res.status(200).send('OK');
   });
 
-// 1. Serve the main map HTML (now served by express.static)
-// app.get('/', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'docs', 'index.html'));
-// });
 
-// 2. Serve the login form (now served by express.static)
-// app.get('/login', (req, res) => {
-//     // If already logged in, redirect to admin
-//     if (req.session.user) {
-//        return res.redirect('/admin');
-//     }
-//     res.sendFile(path.join(__dirname, 'docs', 'login.html'));
-// });
-
-
-// 3. Handle login form submission
+// 1. Handle login form submission
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -173,8 +145,7 @@ app.post('/login', async (req, res) => {
                         });
                     });
 
-                    //console.log('Session saved with ID:', req.sessionID);
-                    //console.log('Session data:', req.session);
+
 
                     // Get the return URL or default to /admin
                     const returnTo = req.session.returnTo || '/admin';
@@ -203,20 +174,12 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// 4.  Middleware to protect admin routes
+// 2. Middleware to protect admin routes
 const requireAuth = (req, res, next) => {
-    /*
-    console.log('Checking authentication: ');
-    console.log('Session exists:', !!req.session);
-    console.log('User in session:', req.session?.user);
-    console.log('Session ID:', req.sessionID);
-    console.log('Request cookies:', req.headers.cookie);
-    */
+
     if (req.session && req.session.user) {
-        //console.log('Authentication successful for user:', req.session.user.email);
         next();
     } else {
-        //console.log('Authentication required, redirecting to login.');
 
         // Store the original URL for redirecting back after login
         req.session.returnTo = req.originalUrl;
@@ -224,7 +187,7 @@ const requireAuth = (req, res, next) => {
     }
 };
 
-// 4.1 Middleware for superadmin authentication
+// 3. Middleware for superadmin authentication
 const superAdminAuth = (req, res, next) => {
     if (req.session && req.session.user && req.session.user.roleId === 2) {
         return next();
@@ -238,7 +201,7 @@ const superAdminAuth = (req, res, next) => {
 };
 
 
-// 5. Serve protected admin pages (now served by express.static with requireAuth middleware)
+// 4. Serve protected admin pages by express.static 
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'docs', 'login.html'));
 });
@@ -309,14 +272,13 @@ app.get('/logout', (req, res) => {
 });
 
 
-// 6. API endpoint to get project locations for the main public map (does not require auth)
+// 5. API endpoint to get project locations for the main public map 
+// (does not require auth)
+
 app.get('/api/projects/locations', async (req, res) => {
-    //console.log('Received request for /api/projects/locations');
     let client;
     try {
         client = await pool.connect();
-        //console.log('Connected to database for project locations');
-        // Ensure column names and table names match your schema EXACTLY
         const sql = `
             SELECT
                 p.project_name,
@@ -336,7 +298,6 @@ app.get('/api/projects/locations', async (req, res) => {
                 AND ST_GeometryType(p.hashed_location::geometry) = 'ST_Point';
         `;
         const result = await client.query(sql);
-        //console.log(`Found ${result.rows.length} projects with locations.`);
         res.json(result.rows);
     } catch (err) {
         console.error('Error executing query or connecting to DB for project locations:', err.stack);
@@ -344,15 +305,14 @@ app.get('/api/projects/locations', async (req, res) => {
     } finally {
         if (client) {
             client.release();
-            //console.log('Database client released for project locations');
         }
     }
 });
 
 
-// --- Protected API Endpoints (apply requireAuth) ---
+// --- Protected API Endpoints ---
 
-// 7. API endpoint to add a new project
+// 6. API endpoint to add a new project
 app.post('/api/projects', requireAuth, async (req, res) => {
     const {
       county_id,
@@ -388,7 +348,7 @@ app.post('/api/projects', requireAuth, async (req, res) => {
         const hashed_location = `POINT(${lon} ${lat})`;
 
         client = await pool.connect();
-        // Use parameterized query to prevent SQL injection
+        // Using parameterized query to prevent SQL injection
         await client.query(
           `INSERT INTO public.project (county_id, project_status, project_type, description, people_served, hashed_location, progress, project_name)
            VALUES ($1, $2, $3, $4, $5, ST_GeomFromText($6, 4326), $7, $8)`,
@@ -408,7 +368,6 @@ app.post('/api/projects', requireAuth, async (req, res) => {
 
     } catch (err) {
       console.error('Error adding project:', err);
-      // Provide more specific error messages if possible (e.g., constraint violations)
       if (err.code === '23505') { // Unique constraint violation
            return res.status(409).json({ error: 'Project name already exists.'});
       }
@@ -418,12 +377,10 @@ app.post('/api/projects', requireAuth, async (req, res) => {
     }
 });
 
-// 8.
-// API route to serve County Boundaries GeoJSON
+// 7. API route to serve County Boundaries GeoJSON
 
 app.get('/api/countyBounds', async (req, res) => {
     try {
-      // Query using the correct column names from the county table
       const result = await pool.query(`
         SELECT id, county_name, ST_AsGeoJSON(geom)::json AS geometry
         FROM public.county
@@ -456,13 +413,12 @@ app.get('/api/countyBounds', async (req, res) => {
   });
 
 
-// 9. API endpoints to get supporting data for dropdowns
-//Add auth to these endpoints if needed
+// 8. API endpoints to get supporting data for dropdowns
 
 const isProd = process.env.NODE_ENV === 'production';
 
 // Get Counties
-app.get('/api/counties', requireAuth, async (req, res) => { // Added requireAuth
+app.get('/api/counties', requireAuth, async (req, res) => { 
     let client;
     try {
         client = await pool.connect();
@@ -479,7 +435,7 @@ app.get('/api/counties', requireAuth, async (req, res) => { // Added requireAuth
 
 
 // Get Statuses
-app.get('/api/statuses', requireAuth, async (req, res) => { // Added requireAuth
+app.get('/api/statuses', requireAuth, async (req, res) => { 
     let client;
     try {
         client = await pool.connect();
@@ -495,7 +451,7 @@ app.get('/api/statuses', requireAuth, async (req, res) => { // Added requireAuth
 });
 
 // Get Types
-app.get('/api/types', requireAuth, async (req, res) => { // Added requireAuth
+app.get('/api/types', requireAuth, async (req, res) => { 
      let client;
      try {
         client = await pool.connect();
@@ -509,9 +465,25 @@ app.get('/api/types', requireAuth, async (req, res) => { // Added requireAuth
     }
 });
 
+// Get Departments
 
-// 10. Search endpoint (protected)
-app.get("/api/search", requireAuth, async (req, res) => { // This is for projects
+app.get('/api/departments', requireAuth, async (req, res) => {
+    let client;
+    try {
+        client = await pool.connect();
+        const result = await client.query('SELECT id, department_name FROM admin.department ORDER BY department_name');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error('Error fetching departments:', err);
+        res.status(500).json({ error: 'Error fetching departments.', details: err.message });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+
+// 10. projects Search endpoint (protected)
+app.get("/api/search", requireAuth, async (req, res) => { 
     const query = req.query.q;
     if (!query) {
         return res.status(400).json({ error: "Search query parameter 'q' is required." });
@@ -562,7 +534,6 @@ app.get("/api/admins/search", requireAuth, superAdminAuth, async (req, res) => {
     try {
         client = await pool.connect();
         // Search based on first name, last name, or email in the admin table
-        // Join with the department table to get the department name
         const result = await client.query(
             `SELECT
                 a.id,
@@ -578,7 +549,6 @@ app.get("/api/admins/search", requireAuth, superAdminAuth, async (req, res) => {
             `,
             [`%${query}%`]
         );
-        // Do NOT return hashed_pass here
         res.json(result.rows);
     } catch (err) {
         console.error("Admin Search Database error:", err);
@@ -589,8 +559,7 @@ app.get("/api/admins/search", requireAuth, superAdminAuth, async (req, res) => {
 });
 
 
-// 11.
-// 11.1 API endpoint to get a SINGLE project by ID (protected)
+// 9. API endpoint to get a SINGLE project by ID (protected)
 
 app.get('/api/project/:id', requireAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10); // Ensure ID is an integer
@@ -631,8 +600,7 @@ app.get('/api/project/:id', requireAuth, async (req, res) => {
     }
 });
 
-// 11.2 API endpoint to get a SINGLE admin by ID (protected)
-// This route already exists and is correctly protected.
+// 10. API endpoint to get a SINGLE admin by ID (protected)
 app.get('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
     let client;
     try {
@@ -643,7 +611,6 @@ app.get('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
             return res.status(400).json({ error: 'Invalid admin ID format.' });
         }
 
-        // Query to fetch admin with department name
         const query = `
             SELECT a.*, d.department_name
             FROM admin.admin a
@@ -657,7 +624,6 @@ app.get('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
             return res.status(404).json({ error: 'Administrator not found' });
         }
 
-        // Don't send the hashed password to the client
         const admin = result.rows[0];
         delete admin.hashed_pass;
 
@@ -670,7 +636,7 @@ app.get('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
     }
 });
 
-// 12. API endpoint to update a project
+// 11. API endpoint to update a project
 
 app.put('/api/project/:id', requireAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
@@ -739,8 +705,7 @@ app.put('/api/project/:id', requireAuth, async (req, res) => {
 });
 
 
-// 13. API endpoint to delete a project
-// This route already exists and is correctly protected.
+// 12. API endpoint to delete a project
 app.delete('/api/project/:id', requireAuth, superAdminAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
      if (isNaN(projectId)) {
@@ -762,7 +727,6 @@ app.delete('/api/project/:id', requireAuth, superAdminAuth, async (req, res) => 
 
     } catch (err) {
         console.error(`Error deleting project ${projectId}:`, err);
-        // Handle potential foreign key constraint errors if projects are linked elsewhere
         if (err.code === '23503') { // Foreign key violation
              return res.status(409).json({ error: 'Cannot delete project because it is referenced elsewhere.'});
         }
@@ -773,24 +737,9 @@ app.delete('/api/project/:id', requireAuth, superAdminAuth, async (req, res) => 
 });
 
 
-// 14. API TO FETCH DEPARTMENTS
-
-app.get('/api/departments', requireAuth, async (req, res) => {
-    let client;
-    try {
-        client = await pool.connect();
-        const result = await client.query('SELECT id, department_name FROM admin.department ORDER BY department_name');
-        res.status(200).json(result.rows);
-    } catch (err) {
-        console.error('Error fetching departments:', err);
-        res.status(500).json({ error: 'Error fetching departments.', details: err.message });
-    } finally {
-        if (client) client.release();
-    }
-});
 
 
-// 15. API TO ADD ADMINS
+// 13. API TO ADD ADMINS
 
 app.post('/api/admins', requireAuth, superAdminAuth, async (req, res) => {
     const { email, password, f_name, l_name, department_id } = req.body;
@@ -834,7 +783,7 @@ app.post('/api/admins', requireAuth, superAdminAuth, async (req, res) => {
     }
 });
 
-// 16. API TO DELETE ADMIN
+// 14. API TO DELETE ADMIN
 app.delete('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
     let client;
     try {
@@ -888,8 +837,7 @@ app.delete('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
 });
 
 
-// 17. API TO RESET PASSWORD
-// This route already exists and is correctly protected.
+// 15. API TO RESET PASSWORD
 app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (req, res) => {
     let client;
     try {
@@ -927,8 +875,7 @@ app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (r
             return res.status(500).json({ error: 'Failed to update password' });
         }
 
-        // Log the password reset action
-        // Ensure req.session.user.id is available and valid
+        // Log the password reset action in the audit log
         const performingAdminId = req.session.user ? req.session.user.id : null;
          if (performingAdminId) {
               await client.query(
@@ -950,14 +897,14 @@ app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (r
 });
 
 
-// --- Error Handling Middleware ---
+// 16. Error Handling Middleware
 app.use((err, req, res, next) => {
     console.error("Unhandled error:", err.stack);
     res.status(500).send('Something broke!');
 });
 
-// --- Start Server ---
-// Use an async IIFE to ensure DB connection before starting server
+// 17. Start Server
+// Using an async IIFE to ensure DB connection before starting server
 (async () => {
     let client;
     try {

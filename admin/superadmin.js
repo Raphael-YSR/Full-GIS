@@ -86,16 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Display format: f_name l_name | department
             adminCard.innerHTML = `
                 <p class="text-lg font-semibold">${admin.f_name} ${admin.l_name} <span class="text-gray-400 font-normal">| ${admin.department_name || 'N/A'}</span></p>
-                <p class="text-sm text-gray-400">Email: ${admin.email}</p>
             `;
 
             // Add click listener to navigate to the appropriate action page
             adminCard.addEventListener('click', () => {
                 if (isReset) {
-                     // Navigate to the reset password page, passing the admin's ID
                     window.location.href = `/reset-password?id=${admin.id}`;
                 } else { // Must be search-admin for deletion
-                     // Navigate to the delete admin page, passing the admin's ID
                     window.location.href = `/delete-admin?id=${admin.id}`;
                 }
             });
@@ -115,18 +112,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         projects.forEach(project => {
             const projectCard = document.createElement('div');
-            projectCard.classList.add('project-card'); // Assuming you have .project-card CSS
+            projectCard.classList.add('project-card'); 
 
             // Display project details
             projectCard.innerHTML = `
                 <p class="text-lg font-semibold">${project.project_name} <span class="text-gray-400 font-normal">| ${project.county || 'N/A'}</span></p>
                 <p class="text-sm text-gray-400">Status: ${project.status || 'N/A'} | Progress: ${project.progress || 'N/A'}</p>
-                <p class="text-sm text-gray-400">${project.description || 'No description'}</p>
             `;
 
             // Add click listener to navigate to the delete project page
             projectCard.addEventListener('click', () => {
-                // Navigate to the delete project page, passing the project's ID
                 window.location.href = `/delete-project?id=${project.id}`;
             });
 
@@ -506,13 +501,12 @@ GIS Admin Team`;
                 if (projectDetailsContainer) {
                     projectDetailsContainer.innerHTML = `
                         <h2 class="text-xl font-bold mb-2 font-marlin">${project.project_name}</h2>
-                        <p class="text-gray-400 font-marlinsoftmedium">County ID: ${project.county_id || 'N/A'}</p>
-                        <p class="text-gray-400 font-marlinsoftmedium">Status ID: ${project.project_status || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">County: ${project.county || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">Status: ${project.status || 'N/A'} 
                         <p class="text-gray-400 font-marlinsoftmedium">Type ID: ${project.project_type || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Description: ${project.description || 'No description'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">People Served: ${project.people_served || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Progress: ${project.progress || 'N/A'}</p>
-                        <p class="text-gray-400 font-marlinsoftmedium">Location: Lat ${project.latitude}, Lng ${project.longitude}</p>
                     `;
                 }
 
