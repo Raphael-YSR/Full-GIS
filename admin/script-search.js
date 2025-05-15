@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p>Status: ${project.status}</p>
             `;
 
-            // In script-search.js
             projectCard.addEventListener('click', () => {
                 window.location.href = `/edit-data?id=${project.id}`; // Navigate to edit page
             });

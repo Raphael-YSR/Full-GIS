@@ -541,6 +541,47 @@ app.get("/api/search", requireAuth, async (req, res) => {
     }
 });
 
+// API endpoint to search for administrators (protected)
+app.get("/api/admins/search", requireAuth, superAdminAuth, async (req, res) => {
+    const query = req.query.q;
+    if (!query) {
+        return res.status(400).json({ error: "Search query parameter 'q' is required." });
+    }
+
+    // Basic validation: prevent searching with very short queries if not handled client-side
+    if (query.length < 2) {
+        return res.status(200).json([]); // Return empty results for short queries
+    }
+
+    let client;
+    try {
+        client = await pool.connect();
+        // Search based on first name, last name, or email in the admin table
+        // Join with the department table to get the department name
+        const result = await client.query(
+            `SELECT
+                a.id,
+                a.fname AS f_name,
+                a.lname AS l_name,
+                a.email,
+                d.department_name
+            FROM admin.admin a
+            LEFT JOIN admin.department d ON a.department_id = d.id
+            WHERE a.fname ILIKE $1 OR a.lname ILIKE $1 OR a.email ILIKE $1
+            ORDER BY a.lname, a.fname -- Order by last name, then first name
+            LIMIT 50 -- Limit results
+            `,
+            [`%${query}%`] 
+        );
+        // Do NOT return hashed_pass here
+        res.json(result.rows);
+    } catch (err) {
+        console.error("Admin Search Database error:", err);
+        res.status(500).json({ error: "Internal server error during admin search", details: err.message });
+    } finally {
+        if (client) client.release();
+    }
+});
 
 
 // 11. 
@@ -829,8 +870,8 @@ app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (r
 
         // Log the password reset action
         await client.query(
-            'INSERT INTO admin.audit_log (admin_id, action, details) VALUES ($1, $2, $3)',
-            [req.session.user.id, 'PASSWORD_RESET', `Reset password for admin ID: ${adminId}`]
+            'INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, $4)',
+            [req.session.user.id, 'PASSWORD_RESET', `Reset password for admin ID: ${adminId}`, NOW()]
         );
         
         res.status(200).json({ message: 'Password reset successful' });
