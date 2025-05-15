@@ -33,10 +33,10 @@
                 <div class="mb-4">
                     <label for="department_id" class="block text-sm font-bold mb-1 font-marlin">DEPARTMENT</label>
                     <div class="select-wrapper">
-                        <select name="department_id" id="department_id"
-                        class="w-full text-sm font-inter ">
+                        <select name="department_id" id="department_id" required
+                        class="w-full text-sm font-inter bg-gray-700 border border-gray-600 rounded text-white h-9 p-2">
                             <option value="" disabled selected>Select department...</option>
-                        </select>
+                            </select>
                     </div>
                 </div>
 
@@ -48,15 +48,17 @@
 
                 <div class="mb-4 password-container">
                     <label for="password" class="block text-sm font-marlin mb-1">PASSWORD</label>
-                    <input type="password" id="password" name="password" placeholder="•••"
-                           class="w-full px-4 py-2 text-white bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-gray-500">
-                  
-                    <a href="#" id="passgen" class="font-marlin text-sm text-green-400 hover:underline float-right mt-1">
-                        GENERATE PASSWORD</a>
+                     <div class="flex space-x-2">
+                        <input type="text" id="password" name="password" placeholder="••••••••••••" required
+                           class="flex-grow px-4 py-2 text-white bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        <button type="button" id="passgen" class="bg-green-600 text-white px-4 py-2 rounded font-marlin hover:bg-green-700">
+                            GENERATE
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" class="w-full bg-white text-black py-3 px-4 rounded font-medium font-marlin hover:bg-gray-200">
-                    ADD ADMINISTRATOR
+                    ADD ADMIN & COPY TO CLIPBOARD
                 </button>
             </form>
         </div>
@@ -70,13 +72,13 @@
         </div>
     </div>
 
-    <div id="successModal" class="modal-overlay">
+    <div id="successModal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="text-center mb-6">
                 <i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i>
                 <h2 class="text-2xl font-bold font-marlin">ADMINISTRATOR ADDED SUCCESFULLY!</h2>
                 <p class="text-gray-300 mt-2 mb-4 font-marlinsoftmedium">
-                    CLICK <span class="font-bold"> COPY </span> TO SAVE ADMINISTRATORS DETAILS</p>
+                    THE EMAIL MESSAGE HAS BEEN COPIED TO YOUR CLIPBOARD</p>
             </div>
 
             <div class="bg-gray-700 p-4 rounded mb-4 font-marlin">
@@ -85,7 +87,7 @@
 
             <div class="flex flex-col items-center">
                 <button id="copyDetailsBtn" class="bg-white text-black py-2 px-8 rounded font-medium font-marlin hover:bg-gray-200 mb-4">
-                    <i class="fas fa-copy mr-2"></i> COPY
+                    <i class="fas fa-copy mr-2"></i> COPY MANUALLY
                 </button>
             </div>
 
@@ -95,6 +97,35 @@
         </div>
     </div>
 
-    <script src="/admin/addAdmin.js"></script>
-</body>
+     <style>
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+         .hidden {
+            display: none;
+        }
+    </style>
+
+
+    <script src="/admin/superadmin.js"></script>
+    </body>
 </html>

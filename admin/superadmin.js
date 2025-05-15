@@ -14,6 +14,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- Helper function to show modal ---
+    function showModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    // --- Helper function to hide modal ---
+    function hideModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    // --- Helper function to copy text to clipboard ---
+    async function copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            console.log('Content copied to clipboard.');
+            return true; // Indicate success
+        } catch (err) {
+            console.error('Failed to copy to clipboard:', err);
+            // Fallback for browsers that don't support clipboard API
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed"; // Avoid scrolling to bottom
+            textArea.style.left = "-9999px";
+            textArea.style.top = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                console.log('Content copied to clipboard using fallback.');
+                document.body.removeChild(textArea);
+                return true; // Indicate success
+            } catch (fallbackErr) {
+                console.error('Fallback copy failed:', fallbackErr);
+                document.body.removeChild(textArea);
+                return false; // Indicate failure
+            }
+        }
+    }
+
+
     // --- Logic for Search Pages ---
 
     // Get references to the search input and results container (common IDs)
@@ -81,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         admins.forEach(admin => {
             const adminCard = document.createElement('div');
-            adminCard.classList.add('admin-card'); // Assuming you have .admin-card CSS
+            adminCard.classList.add('admin-card');
 
             // Display format: f_name l_name | department
             adminCard.innerHTML = `
@@ -112,13 +159,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         projects.forEach(project => {
             const projectCard = document.createElement('div');
-            projectCard.classList.add('project-card'); 
+            projectCard.classList.add('project-card');
 
-            // Display project details
+            // Display project details (County, Status, Type Name)
             projectCard.innerHTML = `
-                <p class="text-lg font-semibold">${project.project_name} <span class="text-gray-400 font-normal">| ${project.county || 'N/A'}</span></p>
-                <p class="text-sm text-gray-400">Status: ${project.status || 'N/A'} | Progress: ${project.progress || 'N/A'}</p>
-            `;
+                <p class="text-lg font-semibold">${project.project_name}</p>
+                <p class="text-sm text-gray-400">County: ${project.county || 'N/A'} | Status: ${project.status || 'N/A'} | Type: ${project.project_type_name || project.project_type || 'N/A'}</p> `;
 
             // Add click listener to navigate to the delete project page
             projectCard.addEventListener('click', () => {
@@ -130,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // --- Logic for Action Pages (Reset Password, Delete Admin, Delete Project) ---
+    // --- Logic for Action Pages (Reset Password, Delete Admin, Delete Project, Add Admin) ---
 
     // --- Reset Password Page Logic ---
     if (document.getElementById('resetPasswordForm')) {
@@ -208,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } catch (error) {
                 console.error('Error loading admin details for reset:', error);
+                // Use alert for error indication
                 alert(`Failed to load administrator details: ${error.message}`);
 
                 // Update the UI to show the error
@@ -266,49 +313,36 @@ document.addEventListener('DOMContentLoaded', () => {
                         const adminName = adminFullNameElement.textContent;
                         const adminEmail = adminEmailElement.textContent;
 
-                        // Create email message
-                        const emailMessage = `Dear ${adminName},
+                        // Create email message (Email Ready Format)
+                        const emailMessage = `Subject: GIS Admin Dashboard Password Reset
 
-We have successfully reset your password for the GIS Admin Dashboard.
+Dear ${adminName},
 
-Your new password is: ${newPassword}
+Your password for the GIS Admin Dashboard has been successfully reset.
 
-You can now login with the new password.
+Your new temporary password is: ${newPassword}
+
+Please log in using this temporary password and consider changing it after your first login.
+
+You can access the dashboard here: [Link to dashboard login page - replace with actual link]
+
+If you did not request this password reset, please contact the system administrator immediately.
 
 Best regards,
-GIS Admin Team`;
+The GIS Admin Team`;
 
                         // Update modal with email message
                         if(emailMessageElement) emailMessageElement.textContent = emailMessage;
 
                         // Copy email message to clipboard
-                        try {
-                            await navigator.clipboard.writeText(emailMessage);
-                            console.log('Email message copied to clipboard.');
-                        } catch (err) {
-                            console.error('Failed to copy email message:', err);
-                            // Fallback for browsers that don't support clipboard API
-                            // This fallback might not work in all contexts (e.g., if not triggered by user action)
-                            const textArea = document.createElement("textarea");
-                            textArea.value = emailMessage;
-                            textArea.style.position = "fixed"; // Avoid scrolling to bottom
-                            textArea.style.left = "-9999px";
-                            textArea.style.top = "-9999px";
-                            document.body.appendChild(textArea);
-                            textArea.focus();
-                            textArea.select();
-                            try {
-                                document.execCommand('copy');
-                                console.log('Email message copied to clipboard using fallback.');
-                            } catch (fallbackErr) {
-                                console.error('Fallback copy failed:', fallbackErr);
-                                alert('Failed to automatically copy the email message to your clipboard. Please copy it manually from the box.');
-                            }
-                             document.body.removeChild(textArea);
+                        const copySuccess = await copyToClipboard(emailMessage);
+                        if (!copySuccess) {
+                             alert('Failed to automatically copy the email message to your clipboard. Please copy it manually from the box.');
                         }
 
+
                         // Show success modal
-                        if(successModal) successModal.classList.remove('hidden');
+                        showModal('successModal');
 
                         // Reset form
                         resetPasswordForm.reset();
@@ -316,10 +350,12 @@ GIS Admin Team`;
                         if(passgenButton) passgenButton.click();
                     } else {
                         console.error('Error response:', responseData);
+                        // Use alert for error indication
                         alert(`Error resetting password: ${responseData.error || 'Unknown error'}`);
                     }
                 } catch (error) {
                     console.error('Error:', error);
+                     // Use alert for error indication
                     alert('An unexpected error occurred. Please try again.');
                 } finally {
                     // Re-enable form button
@@ -335,7 +371,9 @@ GIS Admin Team`;
         // Close modal button
         if(closeModalBtn) {
             closeModalBtn.addEventListener('click', function() {
-                if(successModal) successModal.classList.add('hidden');
+                hideModal('successModal');
+                // Decide where to redirect after closing modal, maybe back to search or dashboard
+                // window.location.href = '/superadmin';
             });
         }
 
@@ -344,7 +382,9 @@ GIS Admin Team`;
         if(successModal) {
             successModal.addEventListener('click', function(event) {
                 if (event.target === successModal) {
-                    successModal.classList.add('hidden');
+                    hideModal('successModal');
+                    // Decide where to redirect after closing modal
+                    // window.location.href = '/superadmin';
                 }
             });
         }
@@ -442,14 +482,17 @@ GIS Admin Team`;
                      const responseData = await response.json();
 
                     if (response.ok) {
+                        // Use alert for success indication
                         alert(responseData.message || 'Administrator deleted successfully!');
                         window.location.href = '/search-admin'; // Redirect back to search after deletion
                     } else {
                         console.error('Error response:', responseData);
+                        // Use alert for error indication
                         alert(`Error deleting administrator: ${responseData.error || 'Unknown error'}`);
                     }
                 } catch (error) {
                     console.error('Delete admin error:', error);
+                     // Use alert for error indication
                     alert('An unexpected error occurred during deletion. Please try again.');
                 } finally {
                     // Re-enable button (if not redirected)
@@ -497,14 +540,13 @@ GIS Admin Team`;
                     throw new Error('Project not found');
                 }
 
-                // Display project details for confirmation
+                // Display project details for confirmation (County, Status, Type Name)
                 if (projectDetailsContainer) {
                     projectDetailsContainer.innerHTML = `
                         <h2 class="text-xl font-bold mb-2 font-marlin">${project.project_name}</h2>
                         <p class="text-gray-400 font-marlinsoftmedium">County: ${project.county || 'N/A'}</p>
-                        <p class="text-gray-400 font-marlinsoftmedium">Status: ${project.status || 'N/A'} 
-                        <p class="text-gray-400 font-marlinsoftmedium">Type ID: ${project.project_type || 'N/A'}</p>
-                        <p class="text-gray-400 font-marlinsoftmedium">Description: ${project.description || 'No description'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">Status: ${project.status || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">Type: ${project.project_type_name || project.project_type || 'N/A'}</p> <p class="text-gray-400 font-marlinsoftmedium">Description: ${project.description || 'No description'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">People Served: ${project.people_served || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Progress: ${project.progress || 'N/A'}</p>
                     `;
@@ -554,14 +596,17 @@ GIS Admin Team`;
                      const responseData = await response.json();
 
                     if (response.ok) {
+                        // Use alert for success indication
                         alert(responseData.message || 'Project deleted successfully!');
                         window.location.href = '/search-delete'; // Redirect back to search after deletion
                     } else {
                          console.error('Error response:', responseData);
+                         // Use alert for error indication
                         alert(`Error deleting project: ${responseData.error || 'Unknown error'}`);
                     }
                 } catch (error) {
                     console.error('Delete project error:', error);
+                     // Use alert for error indication
                     alert('An unexpected error occurred during deletion. Please try again.');
                 } finally {
                     // Re-enable button (if not redirected)
@@ -576,9 +621,218 @@ GIS Admin Team`;
         loadProjectDetailsForDelete();
     }
 
-    // Note: Other page-specific JS logic (like add-admin, add-data, edit-data)
+     // --- Add Admin Page Logic ---
+     if (document.getElementById('addAdminForm')) {
+        const addAdminForm = document.getElementById('addAdminForm');
+        const departmentSelect = document.getElementById('department_id');
+        const passgenButton = document.getElementById('passgen');
+        const passwordInput = document.getElementById('password'); // Assuming the password input has this ID
+
+        // Modal elements for Add Admin success
+        const successModal = document.getElementById('successModal');
+        const adminDetailsPre = document.getElementById('adminDetails');
+        const copyDetailsBtn = document.getElementById('copyDetailsBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn'); // Assuming the close button in this modal also has this ID
+
+
+        // Function to generate a random password (reused from reset password)
+        function generatePassword(length) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+=';
+            let password = '';
+
+            // Ensure at least one uppercase, one lowercase, one number, and one special character
+            password += characters.charAt(Math.floor(Math.random() * 26)); // lowercase
+            password += characters.charAt(Math.floor(Math.random() * 26) + 26); // uppercase
+            password += characters.charAt(Math.floor(Math.random() * 10) + 52); // number
+            password += characters.charAt(Math.floor(Math.random() * 18) + 62); // special char
+
+            // Fill the rest randomly
+            for (let i = 4; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                password += characters.charAt(randomIndex);
+            }
+
+            // Shuffle the password to avoid predictable pattern
+            return password.split('').sort(() => 0.5 - Math.random()).join('');
+        }
+
+
+        // Function to load departments
+        async function loadDepartments() {
+            try {
+                const response = await fetch('/api/departments'); // Assuming an API endpoint for departments
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch departments (Status: ${response.status})`);
+                }
+                const departments = await response.json();
+
+                if (departmentSelect) {
+                    // Clear existing options except the disabled selected one
+                    departmentSelect.innerHTML = '<option value="" disabled selected>Select department...</option>';
+                    departments.forEach(dept => {
+                        const option = document.createElement('option');
+                        option.value = dept.id;
+                        option.textContent = dept.name;
+                        departmentSelect.appendChild(option);
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error loading departments:', error);
+                // Optionally display an error message in the select or elsewhere
+                 if (departmentSelect) {
+                     departmentSelect.innerHTML = '<option value="" disabled selected>Error loading departments</option>';
+                 }
+            }
+        }
+
+         // Generate password button click handler
+        if(passgenButton && passwordInput) {
+            passgenButton.addEventListener('click', (event) => {
+                 event.preventDefault(); // Prevent form submission if button is inside form
+                const newPassword = generatePassword(12);
+                passwordInput.value = newPassword;
+            });
+        }
+
+
+        // Form submission handler
+        if(addAdminForm) {
+            addAdminForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const formData = new FormData(addAdminForm);
+                const adminData = Object.fromEntries(formData.entries());
+
+                 // Ensure password is included, especially if generated
+                if (!adminData.password) {
+                     adminData.password = passwordInput.value;
+                }
+
+
+                // Disable form during submission
+                const submitButton = addAdminForm.querySelector('button[type="submit"]');
+                if(submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> ADDING & COPYING...';
+                }
+
+                try {
+                    const response = await fetch('/api/admins', { // Assuming the API endpoint for adding admins is /api/admins
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(adminData),
+                    });
+
+                    const responseData = await response.json();
+
+                    if (response.ok) {
+                        // Admin added successfully, now prepare email message and copy
+                        const newAdmin = responseData.admin; // Assuming the response includes the new admin details
+                        const generatedPassword = adminData.password; // Use the password that was sent
+
+                        // Create email message (Email Ready Format)
+                        const emailMessage = `Subject: Your GIS Admin Dashboard Account
+
+Dear ${newAdmin.f_name} ${newAdmin.l_name},
+
+Your account for the GIS Admin Dashboard has been created.
+
+Your username is your email address: ${newAdmin.email}
+Your temporary password is: ${generatedPassword}
+
+Please log in using these credentials and consider changing your password after your first login.
+
+You can access the dashboard here: [Link to dashboard login page - replace with actual link]
+
+If you have any questions, please contact the system administrator.
+
+Best regards,
+The GIS Admin Team`;
+
+                        // Update modal with admin details/email message
+                        if(adminDetailsPre) adminDetailsPre.textContent = emailMessage;
+
+                        // Copy email message to clipboard immediately after successful add and before showing modal
+                        const copySuccess = await copyToClipboard(emailMessage);
+                         if (!copySuccess) {
+                             alert('Failed to automatically copy the email message to your clipboard. Please copy it manually from the box.');
+                        }
+
+
+                        // Show success modal
+                        showModal('successModal');
+
+                        // Reset form
+                        addAdminForm.reset();
+                         // Generate a new password for the next admin
+                        if(passgenButton) passgenButton.click();
+
+
+                    } else {
+                        console.error('Error response:', responseData);
+                         // Use alert for error indication
+                        alert(`Error adding administrator: ${responseData.error || 'Unknown error'}`);
+                    }
+                } catch (error) {
+                    console.error('Add admin error:', error);
+                     // Use alert for error indication
+                    alert('An unexpected error occurred. Please try again.');
+                } finally {
+                    // Re-enable form button
+                    if(submitButton) {
+                         submitButton.disabled = false;
+                         submitButton.innerHTML = 'ADD ADMIN & COPY TO CLIPBOARD';
+                    }
+                }
+            });
+        }
+
+        // Close modal button for Add Admin modal
+        if(closeModalBtn && successModal && adminDetailsPre) { // Check if these elements exist (specific to add-admin modal)
+             closeModalBtn.addEventListener('click', function() {
+                hideModal('successModal');
+                 // Decide where to redirect after closing modal, maybe stay on page or go to dashboard
+                // window.location.href = '/superadmin';
+            });
+
+             // Also close modal when clicking outside
+            successModal.addEventListener('click', function(event) {
+                if (event.target === successModal) {
+                    hideModal('successModal');
+                     // Decide where to redirect after closing modal
+                    // window.location.href = '/superadmin';
+                }
+            });
+
+             // Add event listener for the copy button inside the modal (if user clicks it manually)
+             if (copyDetailsBtn) {
+                 copyDetailsBtn.addEventListener('click', async () => {
+                     const textToCopy = adminDetailsPre.textContent;
+                     const copySuccess = await copyToClipboard(textToCopy);
+                      if (copySuccess) {
+                         // Optionally provide feedback that copy was successful
+                         alert('Email message copied to clipboard!');
+                     } else {
+                         alert('Failed to copy email message.');
+                     }
+                 });
+             }
+        }
+
+
+        // Load departments when on the add admin page
+        loadDepartments();
+
+        // Generate a random password when the page loads
+         if(passgenButton) passgenButton.click();
+     }
+
+    // Note: Other page-specific JS logic (like add-data, edit-data)
     // should also be included in this file, wrapped in checks for elements
-    // specific to those pages (e.g., if (document.getElementById('addAdminForm')) { ... }).
+    // specific to those pages (e.g., if (document.getElementById('addDataForm')) { ... }).
     // This ensures the code only runs on the relevant page.
 
 });
