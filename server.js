@@ -543,7 +543,9 @@ app.get("/api/search", requireAuth, async (req, res) => {
 
 
 
-// 11. API endpoint to get a SINGLE project by ID (protected)
+// 11. 
+// 11.1API endpoint to get a SINGLE project by ID (protected)
+
 app.get('/api/project/:id', requireAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10); // Ensure ID is an integer
 
@@ -583,6 +585,13 @@ app.get('/api/project/:id', requireAuth, async (req, res) => {
     }
 });
 
+// 11.2 API endpoint to get a SINGLE admin by ID (protected)
+app.get('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
+    const adminId = parseInt(req.params.id, 10);
+    if (isNaN(adminId)) {
+        return res.status(400).json({ error: 'Invalid admin ID format.' });
+    }
+});
 // 12. API endpoint to update a project
 
 app.put('/api/project/:id', requireAuth, async (req, res) => {
@@ -746,7 +755,41 @@ app.post('/api/admins', requireAuth, superAdminAuth, async (req, res) => {
     }
 });
 
-// 16. API TO RESET PASSWORD
+// GET endpoint to fetch a single admin's details
+app.get('/api/admins/:id', requireAuth, superAdminAuth, async (req, res) => {
+    let client;
+    try {
+        client = await pool.connect();
+        const { id } = req.params;
+        
+        // Query to fetch admin with department name
+        const query = `
+            SELECT a.*, d.department_name 
+            FROM admin.admin a
+            LEFT JOIN admin.department d ON a.department_id = d.id
+            WHERE a.id = $1
+        `;
+        
+        const result = await client.query(query, [id]);
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Administrator not found' });
+        }
+        
+        // Don't send the hashed password to the client
+        const admin = result.rows[0];
+        delete admin.hashed_pass;
+        
+        res.json(admin);
+    } catch (error) {
+        console.error('Error fetching admin details:', error);
+        res.status(500).json({ error: error.message });
+    } finally {
+        if (client) client.release();
+    }
+});
+
+// 17. API TO RESET PASSWORD
 app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (req, res) => {
     let client;
     try {
