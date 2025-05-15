@@ -962,10 +962,9 @@ app.use((err, req, res, next) => {
         console.log('>>> Initial database connection successful.');
         client.release();
 
-        //app.listen(port, () => {
-            //console.log(`>>> Server listening at http://localhost:${port}`);
-            //console.log(`>>> Admin accessible at http://localhost:${port}/admin (requires login)`);
-       // });
+        app.listen(port, () => {
+            console.log(`>>> Server listening at ${port}`);
+       });
 
     } catch (err) {
         console.error('FATAL: Initial database connection failed:', err);
