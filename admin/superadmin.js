@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Display format: f_name l_name | department
             adminCard.innerHTML = `
-                <p class="text-lg font-semibold">${admin.f_name} ${admin.l_name} <span class="text-gray-400 font-normal">| ${admin.department_name || 'N/A'}</span></p>
+                <p class="text-base font-semibold">${admin.f_name} ${admin.l_name} <span class="text-gray-400 font-normal">| ${admin.department_name || 'N/A'}</span></p>
             `;
 
             // Add click listener to navigate to the appropriate action page
@@ -320,13 +320,9 @@ Dear ${adminName},
 
 Your password for the GIS Admin Dashboard has been successfully reset.
 
-Your new temporary password is: ${newPassword}
+Your new password is: ${newPassword}
 
-Please log in using this temporary password and consider changing it after your first login.
-
-You can access the dashboard here: [Link to dashboard login page - replace with actual link]
-
-If you did not request this password reset, please contact the system administrator immediately.
+You can now access the dashboard here: [Link to dashboard login page - replace with actual link]
 
 Best regards,
 The GIS Admin Team`;
@@ -746,11 +742,9 @@ Dear ${newAdmin.f_name} ${newAdmin.l_name},
 Your account for the GIS Admin Dashboard has been created.
 
 Your username is your email address: ${newAdmin.email}
-Your temporary password is: ${generatedPassword}
+Your password is: ${generatedPassword}
 
-Please log in using these credentials and consider changing your password after your first login.
-
-You can access the dashboard here: [Link to dashboard login page - replace with actual link]
+You can now access the dashboard here: [Link to dashboard login page - replace with actual link]
 
 If you have any questions, please contact the system administrator.
 

@@ -9,7 +9,6 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
-    "helmet": "^8.1.0",
     "leaflet-easyprint": "^2.1.9",
     "pg": "^8.14.1"
   }
