@@ -266,19 +266,29 @@ app.get('/add-admin', requireAuth, superAdminAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'admin', 'add-admin.html'));
 });
 
-app.get('/search-delete-project', requireAuth, superAdminAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin', 'search-delete-project.html'));
+app.get('/search-delete', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'search-delete.html'));
 });
 
-app.get('/search-delete-admin', requireAuth, superAdminAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin', 'search-delete-admin.html'));
+app.get('/delete-project', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'delete-project.html'));
 });
 
-app.get('/password-reset', requireAuth, superAdminAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin', 'searchpass.html'));
+app.get('/search-admin', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'search-admin.html'));
 });
 
+app.get('/delete-admin', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'delete-admin.html'));
+});
 
+app.get('/reset-search', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'reset-search.html'));
+});
+
+app.get('/reset-password', requireAuth, superAdminAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin', 'reset-password.html'));
+});
 
 
 // Handle logout
@@ -507,7 +517,7 @@ app.get("/api/search", requireAuth, async (req, res) => {
         client = await pool.connect();
         const result = await client.query(
             `SELECT
-                p.id, -- Return the ID for linking to edit page
+                p.id, 
                 p.project_name,
                 c.county_name AS county,
                 p.progress,
@@ -733,6 +743,25 @@ app.post('/api/admins', requireAuth, superAdminAuth, async (req, res) => {
         res.status(500).json({ error: 'Error adding administrator.', details: err.message });
     } finally {
         if (client) client.release();
+    }
+});
+
+// 16. API TO RESET PASSWORD
+app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { password } = req.body;
+        
+        // Hash the password with bcrypt
+        const hashedPassword = await bcrypt.hash(password, 12);
+        
+        // Update the admin's password in the database
+        const result = await client.query('UPDATE admin.admin SET hashed_pass = $1 WHERE id = $2', [hashedPassword, id]);
+        
+        res.status(200).json({ message: 'Password reset successful' });
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 

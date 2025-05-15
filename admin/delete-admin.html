@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delete Project | GIS Admin Dashboard</title>
+    <title>Delete Administrator | GIS Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/admin/styles.css">
     <style>
@@ -24,12 +24,12 @@
 <body class="bg-gray-900 text-white min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-3xl">
         <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold font-marlin">DELETE PROJECT</h1>
-            <p class="text-gray-400 font-marlinsoftmedium">PERMANENTLY REMOVE PROJECT FROM DATABASE</p>
+            <h1 class="text-3xl font-bold font-marlin">DELETE ADMINISTRATOR</h1>
+            <p class="text-gray-400 font-marlinsoftmedium">PERMANENTLY REMOVE ADMINISTRATOR ACCOUNT</p>
         </header>
         
-        <div id="projectDetails" class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
-            <!-- Project details are populated via JavaScript -->
+        <div id="adminDetails" class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
+            <!-- Admin details are populated via JavaScript -->
             <div class="animate-pulse">
                 <div class="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
                 <div class="h-3 bg-gray-700 rounded w-1/2"></div>
@@ -44,21 +44,21 @@
                     </svg>
                 </div>
                 <h2 class="text-xl font-bold mb-2 font-marlin">WARNING: This action cannot be undone</h2>
-                <p class="text-gray-400 mb-4">Are you sure you want to permanently delete this project?</p>
+                <p class="text-gray-400 mb-4">Are you sure you want to permanently delete this administrator account?</p>
             </div>
             
             <div class="flex space-x-4">
-                <a href="/search-delete" class="w-1/2 bg-gray-600 py-3 px-4 rounded font-medium font-marlin hover:bg-gray-500 text-center">
+                <a href="/search-admin" class="w-1/2 bg-gray-600 py-3 px-4 rounded font-medium font-marlin hover:bg-gray-500 text-center">
                     CANCEL
                 </a>
-                <button id="deleteProjectBtn" class="w-1/2 bg-red-600 py-3 px-4 rounded font-medium font-marlin hover:bg-red-500 delete-btn">
-                    DELETE PROJECT
+                <button id="deleteAdminBtn" class="w-1/2 bg-red-600 py-3 px-4 rounded font-medium font-marlin hover:bg-red-500 delete-btn">
+                    DELETE ADMINISTRATOR
                 </button>
             </div>
         </div>
         
         <div class="mt-8 text-center">
-            <a href="/search-delete" class="text-gray-400 hover:text-white font-marlin">BACK TO SEARCH</a>
+            <a href="/search-admin" class="text-gray-400 hover:text-white font-marlin">BACK TO SEARCH</a>
             <span class="mx-2 text-gray-600">|</span>
             <a href="/superadmin" class="text-gray-400 hover:text-white font-marlin">BACK TO SUPERADMIN DASHBOARD</a>
         </div>

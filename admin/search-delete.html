@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Projects to Delete | GIS Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/admin/styles.css">
+    <style>
+        /* Custom styles for search elements */
+        input {
+            background-color: #1e293b;
+            border: 1px solid #3f4c63;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            width: 60%;
+            margin-top: 0.25rem;
+            font-size: 1.125rem;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+        
+        .project-card {
+            background-color: #1e293b;
+            border: 1px solid #3f4c63;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-2px);
+            border-color: #60a5fa;
+            background-color: #2d3748;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold font-marlin">SEARCH PROJECTS TO DELETE</h1>
+            <p class="text-gray-400 font-marlinsoftmedium">FIND AND DELETE EXISTING PROJECTS</p>
+        </header>
+        
+        <div class="bg-gray-800 p-10 py-12 rounded-lg shadow-lg mb-6 font-marlinsoftmedium"> 
+            <div class="mb-6">
+                <label for="searchInput" class="block text-xl font-bold mb-2 font-marlin">SEARCH</label> 
+                <input type="text" id="searchInput" placeholder="Enter project name or keyword..." 
+                    class="w-full text-base h-10 p-2"> 
+            </div>
+            
+            <div id="searchResults" class="mt-8 space-y-4"> 
+                <!-- Results will be populated here via JavaScript -->
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center text-base">
+            <a href="/superadmin" class="text-gray-400 hover:text-white font-marlin">BACK TO SUPERADMIN DASHBOARD</a>
+            <span class="mx-2 text-gray-600">|</span>
+            <a href="/" class="text-gray-400 hover:text-white font-marlin">RETURN TO MAIN MAP</a>
+        </div>
+    </div>
+    
+    <script src="/admin/superadmin.js"></script>
+</body>
+</html>
