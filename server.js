@@ -507,7 +507,7 @@ app.get("/api/search", requireAuth, async (req, res) => {
             ORDER BY p.project_name -- Add ordering
             LIMIT 50 -- Add a limit to prevent huge responses
             `,
-            [`%${query}%`] // Use query parameter safely
+            [`%${query}%`] 
         );
         res.json(result.rows);
     } catch (err) {

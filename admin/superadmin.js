@@ -534,13 +534,13 @@ The GIS Admin Team`;
                     throw new Error('Project not found');
                 }
 
-                // Display project details for confirmation (County, Status, Type Name)
+                // Display project details for confirmation
                 if (projectDetailsContainer) {
                     projectDetailsContainer.innerHTML = `
                         <h2 class="text-xl font-bold mb-2 font-marlin">${project.project_name}</h2>
-                        <p class="text-gray-400 font-marlinsoftmedium">County: ${project.county_name || project.county || 'N/A'}</p>
-                        <p class="text-gray-400 font-marlinsoftmedium">Status: ${project.status_name || project.status || 'N/A'}</p>
-                        <p class="text-gray-400 font-marlinsoftmedium">Type: ${project.project_type_name || project.project_type || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">County ID: ${project.county_id || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">Status ID: ${project.project_status || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">Type ID: ${project.project_type || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Description: ${project.description || 'No description'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">People Served: ${project.people_served || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Progress: ${project.progress || 'N/A'}</p>
