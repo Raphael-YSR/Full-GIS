@@ -1,11 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // EDIT PROJECT DATA //
-
     const projectId = getProjectIdFromUrl();
     const projectDetailsDiv = document.getElementById('projectDetails');
     const editProjectForm = document.getElementById('editProjectForm');
-    let originalProjectData; // Store the original project data
+    let originalProjectData; 
 
     // Create popup container and add it to the body
     const popupContainer = document.createElement('div');
@@ -36,12 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set up event listener for the close button
     document.getElementById('closePopup').addEventListener('click', () => {
         popupContainer.classList.add('hidden');
+        window.location.href = '/admin';
     });
 
     // Click outside to close
     popupContainer.addEventListener('click', (e) => {
         if (e.target === popupContainer || e.target === popupContainer.firstElementChild) {
             popupContainer.classList.add('hidden');
+            window.location.href = '/admin';
         }
     });
 
@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showPopup(message, title = 'Success') {
         document.getElementById('popupMessage').textContent = message;
         popupContainer.classList.remove('hidden');
+        window.location.href = '/admin';
 
         // Auto-close after 5 seconds
         setTimeout(() => {
@@ -192,15 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
             projectData[key] = value;
         });
 
-        // Add the missing fields from the original project data
-        // Ensure these are present, as they are required by the server PUT endpoint
         projectData.project_name = originalProjectData.project_name;
         projectData.county_id = originalProjectData.county_id;
         projectData.project_type = originalProjectData.project_type;
         projectData.people_served = originalProjectData.people_served; // People served is not required by server validation, but good to include
-
-        // Log the data being sent for debugging
-        console.log('Sending project data for update:', projectData);
 
         try {
             const response = await fetch(`/api/project/${projectId}`, {
