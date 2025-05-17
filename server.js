@@ -192,7 +192,7 @@ const superAdminAuth = (req, res, next) => {
     if (req.session && req.session.user && req.session.user.roleId === 2) {
         return next();
     }
-    // Check if the request is an API request (e.g., from fetch)
+    // Check if the request is an API request (e.e. from fetch)
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
         return res.status(403).json({ error: 'Superadmin privileges required' });
     }
@@ -201,7 +201,7 @@ const superAdminAuth = (req, res, next) => {
 };
 
 
-// 4. Serve protected admin pages by express.static 
+// 4. Serve protected admin pages by express.static
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'docs', 'login.html'));
 });
@@ -272,7 +272,7 @@ app.get('/logout', (req, res) => {
 });
 
 
-// 5. API endpoint to get project locations for the main public map 
+// 5. API endpoint to get project locations for the main public map
 // (does not require auth)
 
 app.get('/api/projects/locations', async (req, res) => {
@@ -418,7 +418,7 @@ app.get('/api/countyBounds', async (req, res) => {
 const isProd = process.env.NODE_ENV === 'production';
 
 // Get Counties
-app.get('/api/counties', requireAuth, async (req, res) => { 
+app.get('/api/counties', requireAuth, async (req, res) => {
     let client;
     try {
         client = await pool.connect();
@@ -435,7 +435,7 @@ app.get('/api/counties', requireAuth, async (req, res) => {
 
 
 // Get Statuses
-app.get('/api/statuses', requireAuth, async (req, res) => { 
+app.get('/api/statuses', requireAuth, async (req, res) => {
     let client;
     try {
         client = await pool.connect();
@@ -451,7 +451,7 @@ app.get('/api/statuses', requireAuth, async (req, res) => {
 });
 
 // Get Types
-app.get('/api/types', requireAuth, async (req, res) => { 
+app.get('/api/types', requireAuth, async (req, res) => {
      let client;
      try {
         client = await pool.connect();
@@ -483,7 +483,7 @@ app.get('/api/departments', requireAuth, async (req, res) => {
 
 
 // 10. projects Search endpoint (protected)
-app.get("/api/search", requireAuth, async (req, res) => { 
+app.get("/api/search", requireAuth, async (req, res) => {
     const query = req.query.q;
     if (!query) {
         return res.status(400).json({ error: "Search query parameter 'q' is required." });
@@ -499,15 +499,17 @@ app.get("/api/search", requireAuth, async (req, res) => {
                 c.county_name AS county,
                 p.progress,
                 s.status AS status,
+                t.type AS project_type_name, -- Include type name
                 p.description
             FROM public.project p
             JOIN public.county c ON p.county_id = c.id
             JOIN public.status s ON p.project_status = s.id
+            JOIN public.type t ON p.project_type = t.id -- Join type table
             WHERE p.project_name ILIKE $1 OR p.description ILIKE $1 -- Search name OR description
             ORDER BY p.project_name -- Add ordering
             LIMIT 50 -- Add a limit to prevent huge responses
             `,
-            [`%${query}%`] 
+            [`%${query}%`]
         );
         res.json(result.rows);
     } catch (err) {
@@ -571,19 +573,23 @@ app.get('/api/project/:id', requireAuth, async (req, res) => {
     let client;
     try {
         client = await pool.connect();
+        // Modified query to join county, status, and type tables to get names
         const result = await client.query(`
             SELECT
                 p.id,
                 p.project_name,
-                p.county_id,
-                p.project_status,
-                p.project_type,
+                c.county_name AS county, -- Get county name
+                s.status AS status,       -- Get status name
+                t.type AS project_type_name, -- Get type name
                 p.description,
                 p.people_served,
                 p.progress,
                 ST_Y(p.hashed_location::geometry) AS latitude,
                 ST_X(p.hashed_location::geometry) AS longitude
             FROM public.project p
+            JOIN public.county c ON p.county_id = c.id
+            JOIN public.status s ON p.project_status = s.id
+            JOIN public.type t ON p.project_type = t.id
             WHERE p.id = $1
         `, [projectId]);
 

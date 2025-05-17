@@ -159,10 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const projectCard = document.createElement('div');
             projectCard.classList.add('project-card');
 
-            // Display project details (County, Status, Type Name)
+            // Display project details (County, Status, Type Name) - uses project_type_name from API search result
             projectCard.innerHTML = `
                 <p class="text-lg font-semibold">${project.project_name}</p>
-                <p class="text-sm text-gray-400">County: ${project.county || 'N/A'} | Status: ${project.status || 'N/A'} | Type: ${project.project_type_name || project.project_type || 'N/A'}</p> `;
+                <p class="text-sm text-gray-400">County: ${project.county || 'N/A'} | Status: ${project.status || 'N/A'} | Type: ${project.project_type_name || 'N/A'}</p> `;
 
             // Add click listener to navigate to the delete project page
             projectCard.addEventListener('click', () => {
@@ -534,13 +534,13 @@ The GIS Admin Team`;
                     throw new Error('Project not found');
                 }
 
-                // Display project details for confirmation
+                // Display project details for confirmation - UPDATED TO SHOW NAMES
                 if (projectDetailsContainer) {
                     projectDetailsContainer.innerHTML = `
                         <h2 class="text-xl font-bold mb-2 font-marlin">${project.project_name}</h2>
-                        <p class="text-gray-400 font-marlinsoftmedium">County ID: ${project.county_id || 'N/A'}</p>
-                        <p class="text-gray-400 font-marlinsoftmedium">Status ID: ${project.project_status || 'N/A'}</p>
-                        <p class="text-gray-400 font-marlinsoftmedium">Type ID: ${project.project_type || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">County: ${project.county || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">Status: ${project.status || 'N/A'}</p>
+                        <p class="text-gray-400 font-marlinsoftmedium">Type: ${project.project_type_name || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Description: ${project.description || 'No description'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">People Served: ${project.people_served || 'N/A'}</p>
                         <p class="text-gray-400 font-marlinsoftmedium">Progress: ${project.progress || 'N/A'}</p>
@@ -820,8 +820,7 @@ The GIS Admin Team`;
 
 
         // Load departments when on the add admin page
-        populateDept(); 
-
+        populateDept();
         // Generate a random password when the page loads
          if(passgenButton) passgenButton.click();
      }
