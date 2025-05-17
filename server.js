@@ -578,9 +578,12 @@ app.get('/api/project/:id', requireAuth, async (req, res) => {
             SELECT
                 p.id,
                 p.project_name,
-                c.county_name AS county, -- Get county name
-                s.status AS status,       -- Get status name
-                t.type AS project_type_name, -- Get type name
+                p.county_id, -- Keep IDs for the PUT request
+                p.project_status, -- Keep IDs for the PUT request
+                p.project_type, -- Keep IDs for the PUT request
+                c.county_name AS county, -- Get county name for display
+                s.status AS status,       -- Get status name for display
+                t.type AS project_type_name, -- Get type name for display
                 p.description,
                 p.people_served,
                 p.progress,
@@ -656,10 +659,20 @@ app.put('/api/project/:id', requireAuth, async (req, res) => {
         description, people_served, progress, latitude, longitude
     } = req.body;
 
-     // Basic Validation
-    if (!project_name || !county_id || !project_status || !project_type || !latitude || !longitude) {
-        return res.status(400).json({ error: 'Missing required fields for update.' });
+     // More specific Validation
+    const missingFields = [];
+    if (!project_name) missingFields.push('project_name');
+    if (county_id == null) missingFields.push('county_id'); // Check for null or undefined
+    if (project_status == null) missingFields.push('project_status'); // Check for null or undefined
+    if (project_type == null) missingFields.push('project_type'); // Check for null or undefined
+    if (latitude == null) missingFields.push('latitude'); // Check for null or undefined
+    if (longitude == null) missingFields.push('longitude'); // Check for null or undefined
+
+
+    if (missingFields.length > 0) {
+        return res.status(400).json({ error: `Missing required fields: ${missingFields.join(', ')}.` });
     }
+
 
     let client;
     try {
@@ -903,14 +916,14 @@ app.post('/api/admins/:id/reset-password', requireAuth, superAdminAuth, async (r
 });
 
 
-// 16. Error Handling Middleware
+// 16. Error Handling Middleware to avoid crashing!
 app.use((err, req, res, next) => {
     console.error("Unhandled error:", err.stack);
     res.status(500).send('Something broke!');
 });
 
 // 17. Start Server
-// Using an async IIFE to ensure DB connection before starting server
+// async IIFE to ensure DB connection before starting server
 (async () => {
     let client;
     try {

@@ -366,8 +366,7 @@ The GIS Admin Team`;
         if(closeModalBtn) {
             closeModalBtn.addEventListener('click', function() {
                 hideModal('successModal');
-                // Decide where to redirect after closing modal, maybe back to search or dashboard
-                // window.location.href = '/superadmin';
+                window.location.href = '/superadmin';
             });
         }
 
@@ -377,8 +376,7 @@ The GIS Admin Team`;
             successModal.addEventListener('click', function(event) {
                 if (event.target === successModal) {
                     hideModal('successModal');
-                    // Decide where to redirect after closing modal
-                    // window.location.href = '/superadmin';
+                    window.location.href = '/superadmin';
                 }
             });
         }
@@ -402,7 +400,7 @@ The GIS Admin Team`;
 
             if (!adminId) {
                 alert('No administrator selected. Redirecting to search page.');
-                window.location.href = '/search-admin'; // Redirect back to search admin
+                window.location.href = '/superadmin'; // Redirect back to search admin
                 return;
             }
 
@@ -790,16 +788,14 @@ The GIS Admin Team`;
         if(closeModalBtn && successModal && adminDetailsPre) { // Check if these elements exist (specific to add-admin modal)
              closeModalBtn.addEventListener('click', function() {
                 hideModal('successModal');
-                 // Decide where to redirect after closing modal, maybe stay on page or go to dashboard
-                // window.location.href = '/superadmin'; // Keeping on the page as per previous turn's implicit behavior
+                window.location.href = '/superadmin'; 
             });
 
              // Also close modal when clicking outside
             successModal.addEventListener('click', function(event) {
                 if (event.target === successModal) {
                     hideModal('successModal');
-                     // Decide where to redirect after closing modal
-                    // window.location.href = '/superadmin'; // Keeping on the page as per previous turn's implicit behavior
+                    window.location.href = '/superadmin';
                 }
             });
 
@@ -809,7 +805,6 @@ The GIS Admin Team`;
                      const textToCopy = adminDetailsPre.textContent;
                      const copySuccess = await copyToClipboard(textToCopy);
                       if (copySuccess) {
-                         // Optionally provide feedback that copy was successful
                          alert('Email message copied to clipboard!');
                      } else {
                          alert('Failed to copy email message.');
