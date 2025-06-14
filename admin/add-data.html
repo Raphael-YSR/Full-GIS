@@ -57,10 +57,13 @@
             cursor: pointer;
         }
 
+
         .coordinates-button img {
-            width: 24px; /* Adjust size as needed */
-            height: 24px; /* Adjust size as needed */
+            width: 20px;
+            height: 20px;
+            filter: brightness(1000%) invert(1);
         }
+
     </style>
 
 </head>
@@ -125,7 +128,7 @@
                 <div>
                     <div class="coordinates-header">
                         <label class="block text-sm font-bold mb-1 font-marlin">COORDINATES</label>
-                        <button type="button" id="pasteCoordinates" class="coordinates-button" title="Paste coordinates from clipboard">
+                        <button type="button" id="pasteCoordinates" class="coordinates-button" title="Paste google coordinates from clipboard">
                             <img src="/admin/images/copy.png" alt="Paste Coordinates">
                         </button>
                     </div>
