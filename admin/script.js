@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     //console.log('DOM content loaded.')
     const addProjectForm = document.getElementById('addProjectForm');
+    const pasteCoordinatesButton = document.getElementById('pasteCoordinates'); // Get the new button
 
     // Create popup container and add it to the body
     const popupContainer = document.createElement('div');
@@ -96,6 +97,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // New functionality: Paste coordinates from clipboard
+    if (pasteCoordinatesButton) {
+        pasteCoordinatesButton.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                const coordinatesArray = text.split(',').map(coord => parseFloat(coord.trim()));
+
+                if (coordinatesArray.length === 2 && !isNaN(coordinatesArray[0]) && !isNaN(coordinatesArray[1])) {
+                    const latitudeInput = document.getElementById('latitude');
+                    const longitudeInput = document.getElementById('longitude');
+
+                    // Truncate to 5 decimal places
+                    latitudeInput.value = coordinatesArray[0].toFixed(5);
+                    longitudeInput.value = coordinatesArray[1].toFixed(5);
+
+                    showPopup('Coordinates pasted successfully!');
+                } else {
+                    showPopup('No valid coordinates found in clipboard. Please ensure it\'s in the format "latitude, longitude".');
+                }
+            } catch (err) {
+                console.error('Failed to read clipboard contents: ', err);
+                showPopup('Failed to read clipboard. Please grant clipboard access or try manually entering.');
+            }
+        });
+    }
+
     // Only call populateDropdowns if the form exists
     if (addProjectForm) {
         populateDropdowns();
@@ -126,9 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     showPopup(`Error adding project: ${errorData.error || 'Unknown error'}`);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                showPopup('An unexpected error occurred. Please try again.');
-            }
+                    console.error('Error:', error);
+                    showPopup('An unexpected error occurred. Please try again.');
+                }
         });
     }
 });
