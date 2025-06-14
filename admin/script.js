@@ -108,11 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const latitudeInput = document.getElementById('latitude');
                     const longitudeInput = document.getElementById('longitude');
 
-                    // Truncate to 5 decimal places
+                    // Truncates to 5 decimal places
                     latitudeInput.value = coordinatesArray[0].toFixed(5);
                     longitudeInput.value = coordinatesArray[1].toFixed(5);
 
-                    showPopup('Coordinates pasted successfully!');
                 } else {
                     showPopup('No valid coordinates found in clipboard. Please ensure it\'s in the format "latitude, longitude".');
                 }
