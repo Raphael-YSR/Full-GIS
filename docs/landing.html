@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tana Water Works Development Agency</title>
+        <!-- Tailwind CSS CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Google Fonts - Roboto -->
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            body {
+                font-family: "Roboto", sans-serif;
+            }
+            /* Custom CSS for carousel navigation items */
+            .carousel-nav-item.active {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+            .carousel-nav-item:hover {
+                background-color: rgba(255, 255, 255, 0.3);
+            }
+            .carousel-nav-item {
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                background-color: rgba(0, 0, 0, 0.3);
+                transition: background-color 0.3s ease;
+            }
+
+            /* Glow bar effect - underline style */
+            .carousel-nav-item .glow-bar {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #38b2ac, #4fd1c7);
+                width: 0%;
+                transition: none;
+                border-radius: 2px;
+            }
+            .carousel-nav-item.active .glow-bar {
+                width: 100%;
+                transition: width 8000ms linear;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-100 text-gray-900">
+        <!-- Header -->
+        <header class="bg-white shadow-md py-4">
+            <div
+                class="container mx-auto px-4 flex justify-between items-center"
+            >
+                <!-- Logo and Global -->
+                <div class="flex items-center space-x-2">
+                    <!-- Updated logo path -->
+                    <img
+                        src="/docs/images/logo.png"
+                        alt="Company Logo"
+                        class="h-10 w-10 rounded-full"
+                    />
+                    <p class="text-lg font-bold">TWWDA</p>
+                    <p class="text-gray-600">Global</p>
+                </div>
+
+                <!-- Top Navigation (Aligned to the right) -->
+                <nav class="hidden md:block">
+                    <ul class="flex space-x-6 text-sm">
+                        <li>
+                            <a
+                                href="#"
+                                class="hover:text-teal-600 transition-colors duration-300"
+                                >About Us</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#"
+                                class="hover:text-teal-600 transition-colors duration-300"
+                                >News & Media</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#"
+                                class="hover:text-teal-600 transition-colors duration-300"
+                                >Careers</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#"
+                                class="hover:text-teal-600 transition-colors duration-300"
+                                >Partner Us</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="#"
+                                class="hover:text-teal-600 transition-colors duration-300"
+                                >Contact Us</a
+                            >
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Search and Language Icons (Placeholder) -->
+                <div class="flex items-center space-x-4">
+                    <button
+                        class="text-gray-600 hover:text-teal-600 transition-colors duration-300"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            ></path>
+                        </svg>
+                    </button>
+                    <button
+                        class="text-gray-600 hover:text-teal-600 transition-colors duration-300"
+                    >
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 018.672 18.85c-1.5.23-2.971-.356-3.795-1.584a3 3 0 01-.817-2.413 5.996 5.996 0 01.817-2.413c.824-1.228 2.295-1.814 3.795-1.584A18.022 18.022 0 0115 14.5m-5-4.5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            ></path>
+                        </svg>
+                    </button>
+                    <!-- Mobile Menu Button -->
+                    <button
+                        class="md:hidden text-gray-600 hover:text-teal-600 transition-colors duration-300"
+                    >
+                        <svg
+                            class="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            ></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation (Desktop Only) with custom divider starting from logo -->
+            <div class="hidden md:block bg-gray-50 mt-4 py-2">
+                <div class="container mx-auto px-4 relative">
+                    <!-- Divider line that starts from the logo position -->
+                    <div
+                        class="absolute top-0 left-4 right-4 border-t border-gray-200"
+                    ></div>
+                    <div class="pt-2">
+                        <ul
+                            class="flex justify-end space-x-8 text-sm font-medium"
+                        >
+                            <li>
+                                <a
+                                    href="#"
+                                    class="text-teal-600 hover:text-teal-800 transition-colors duration-300"
+                                    >Progressing Energy</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-teal-600 transition-colors duration-300"
+                                    >Our Passion</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-teal-600 transition-colors duration-300"
+                                    >Sustainability</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-teal-600 transition-colors duration-300"
+                                    >Investor Relations</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    class="hover:text-teal-600 transition-colors duration-300"
+                                    >Our Stories</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content - Hero Section with Carousel -->
+        <main class="relative w-full h-screen overflow-hidden">
+            <div
+                id="carousel"
+                class="absolute inset-0 flex transition-transform duration-1000 ease-in-out"
+            >
+                <!-- Carousel Item 1 -->
+                <div
+                    class="w-full flex-shrink-0 relative bg-cover bg-center text-white group"
+                    style="
+                        background-image: url(&quot;https://tanawwda.go.ke/wp-content/uploads/2025/02/HE-President-Ruto-greets-citizens-during-his-visit-to-Kamburu-Dam-Water-Supply-Project.jpg&quot;);
+                    "
+                >
+                    <!-- Overlay for darkening on hover -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-0 group-hover:opacity-50 transition-opacity duration-500"
+                    ></div>
+                    <!-- Text overlay, aligned to the left -->
+                    <div
+                        class="relative z-10 container mx-auto px-4 flex flex-col justify-center h-full items-start"
+                    >
+                        <h1 class="text-5xl font-bold mb-4">
+                            Energy Solutions
+                        </h1>
+                        <p class="text-lg mb-8 max-w-xl">
+                            Our role as Malaysia's fully integrated energy
+                            provider is built on a dynamic value chain. Through
+                            our core businesses, we are able to meet increasing
+                            energy demands and contribute to a better tomorrow.
+                        </p>
+                        <a
+                            href="#"
+                            class="inline-flex items-center text-teal-400 hover:text-teal-200 transition-colors duration-300"
+                        >
+                            <svg
+                                class="w-5 h-5 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                ></path>
+                            </svg>
+                            Read more
+                        </a>
+                    </div>
+                </div>
+                <!-- Carousel Item 2 -->
+                <div
+                    class="w-full flex-shrink-0 relative bg-cover bg-center text-white group"
+                    style="
+                        background-image: url(&quot;https://tanawwda.go.ke/wp-content/uploads/2023/12/H.E-President-of-the-Republic-of-Kenya-Dr.-William-Ruto-commissioning-Chogoria-Supply-Project-in-Tharaka-Nithi-County-3.jpg&quot;);
+                    "
+                >
+                    <!-- Overlay for darkening on hover -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-0 group-hover:opacity-50 transition-opacity duration-500"
+                    ></div>
+                    <!-- Text overlay, aligned to the left -->
+                    <div
+                        class="relative z-10 container mx-auto px-4 flex flex-col justify-center h-full items-start"
+                    >
+                        <h1 class="text-5xl font-bold mb-4">
+                            Passionate about Progress
+                        </h1>
+                        <p class="text-lg mb-8 max-w-xl">
+                            Our passion for progress drives us to create better
+                            solutions that benefit people, our partners and the
+                            planet.
+                        </p>
+                        <a
+                            href="#"
+                            class="inline-flex items-center text-teal-400 hover:text-teal-200 transition-colors duration-300"
+                        >
+                            <svg
+                                class="w-5 h-5 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                ></path>
+                            </svg>
+                            Read more
+                        </a>
+                    </div>
+                </div>
+                <!-- Carousel Item 3 -->
+                <div
+                    class="w-full flex-shrink-0 relative bg-cover bg-center text-white group"
+                    style="
+                        background-image: url(&quot;https://tanawwda.go.ke/wp-content/uploads/2025/02/Board-Members-during-a-retreat-November-2024-scaled.jpg&quot;);
+                    "
+                >
+                    <!-- Overlay for darkening on hover -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-0 group-hover:opacity-50 transition-opacity duration-500"
+                    ></div>
+                    <!-- Text overlay, aligned to the left -->
+                    <div
+                        class="relative z-10 container mx-auto px-4 flex flex-col justify-center h-full items-start"
+                    >
+                        <h1 class="text-5xl font-bold mb-4">
+                            Sustainable Value Creation
+                        </h1>
+                        <p class="text-lg mb-8 max-w-xl">
+                            As a progressive energy and solutions partner, we
+                            strive to build trusted relationships with our
+                            stakeholders, and to create a positive impact on
+                            society and the environment.
+                        </p>
+                        <a
+                            href="#"
+                            class="inline-flex items-center text-teal-400 hover:text-teal-200 transition-colors duration-300"
+                        >
+                            <svg
+                                class="w-5 h-5 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                ></path>
+                            </svg>
+                            Learn more
+                        </a>
+                    </div>
+                </div>
+                <!-- Carousel Item 4 -->
+                <div
+                    class="w-full flex-shrink-0 relative bg-cover bg-center text-white group"
+                    style="
+                        background-image: url(&quot;https://tanawwda.go.ke/wp-content/uploads/2025/02/TWWDA-Board-Members-and-the-County-Commissioner-During-a-Tree-planting-activitiy-at-Githwariga-Wetlands-scaled.jpg&quot;);
+                    "
+                >
+                    <!-- Overlay for darkening on hover -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-0 group-hover:opacity-50 transition-opacity duration-500"
+                    ></div>
+                    <!-- Text overlay, aligned to the left -->
+                    <div
+                        class="relative z-10 container mx-auto px-4 flex flex-col justify-center h-full items-start"
+                    >
+                        <h1 class="text-5xl font-bold mb-4">
+                            Carbon Management
+                        </h1>
+                        <p class="text-lg mb-8 max-w-xl">
+                            Our mission is to lead decarbonisation solutions
+                            through Carbon Capture and Storage (CCS) and
+                            Physical Decarbonisation initiatives.
+                        </p>
+                        <a
+                            href="#"
+                            class="inline-flex items-center text-teal-400 hover:text-teal-200 transition-colors duration-300"
+                        >
+                            <svg
+                                class="w-5 h-5 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                ></path>
+                            </svg>
+                            Learn more
+                        </a>
+                    </div>
+                </div>
+                <!-- Carousel Item 5 -->
+                <div
+                    class="w-full flex-shrink-0 relative bg-cover bg-center text-white group"
+                    style="
+                        background-image: url(&quot;https://tanawwda.go.ke/wp-content/uploads/2025/02/TWWDA-CEO-Eng-Philip-Gichuki-at-the-Engineering-Partnership-Convention-2024.jpg&quot;);
+                    "
+                >
+                    <!-- Overlay for darkening on hover -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-0 group-hover:opacity-50 transition-opacity duration-500"
+                    ></div>
+                    <!-- Text overlay, aligned to the left -->
+                    <div
+                        class="relative z-10 container mx-auto px-4 flex flex-col justify-center h-full items-start"
+                    >
+                        <h1 class="text-5xl font-bold mb-4">
+                            Energy Asia 2025
+                        </h1>
+                        <p class="text-lg mb-8 max-w-xl">
+                            Energy Asia is the premier forum championing Asia's
+                            role in the global energy transition. From 16-18
+                            June 2025, leaders and experts will gather to drive
+                            impactful, inclusive solutions for developing
+                            economies and shape Asia's energy future.
+                        </p>
+                        <a
+                            href="#"
+                            class="inline-flex items-center text-teal-400 hover:text-teal-200 transition-colors duration-300"
+                        >
+                            <svg
+                                class="w-5 h-5 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                ></path>
+                            </svg>
+                            Learn more
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel Navigation Dots/Indicators -->
+            <div
+                class="absolute bottom-8 left-0 right-0 z-20 flex justify-center"
+            >
+                <div class="flex space-x-1 text-white">
+                    <div
+                        class="carousel-nav-item py-3 px-6 rounded-lg active"
+                        data-index="0"
+                    >
+                        <span class="text-sm font-medium"
+                            >Energy Solutions</span
+                        >
+                        <div class="glow-bar"></div>
+                    </div>
+                    <div
+                        class="carousel-nav-item py-3 px-6 rounded-lg"
+                        data-index="1"
+                    >
+                        <span class="text-sm font-medium"
+                            >Passionate about Progress</span
+                        >
+                        <div class="glow-bar"></div>
+                    </div>
+                    <div
+                        class="carousel-nav-item py-3 px-6 rounded-lg"
+                        data-index="2"
+                    >
+                        <span class="text-sm font-medium"
+                            >Sustainable Value Creation</span
+                        >
+                        <div class="glow-bar"></div>
+                    </div>
+                    <div
+                        class="carousel-nav-item py-3 px-6 rounded-lg"
+                        data-index="3"
+                    >
+                        <span class="text-sm font-medium"
+                            >Carbon Management</span
+                        >
+                        <div class="glow-bar"></div>
+                    </div>
+                    <div
+                        class="carousel-nav-item py-3 px-6 rounded-lg"
+                        data-index="4"
+                    >
+                        <span class="text-sm font-medium"
+                            >Energy Asia 2025</span
+                        >
+                        <div class="glow-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-gray-300 py-8">
+            <div
+                class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8"
+            >
+                <!-- ISO Certification -->
+                <section class="col-span-1">
+                    <h3 class="text-white text-lg font-bold mb-4">
+                        TWWDA is ISO 9001:2015 certified.
+                    </h3>
+                    <img
+                        src="http://tanawwda.go.ke/wp-content/uploads/2021/01/iso5.png"
+                        alt="ISO Certification"
+                        class="w-32 h-auto rounded-md"
+                    />
+                </section>
+
+                <!-- Important Links 1 -->
+                <section class="col-span-1">
+                    <h3 class="text-white text-lg font-bold mb-4">
+                        Important Links
+                    </h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a
+                                href="http://tanawwda.go.ke/other-water-works-development-agencies/"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >Water Works Development Agencies</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="https://www.wra.go.ke/"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >Water Resources Authority</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://www.waterauthority.go.ke/"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >National Water Harvesting and Storage
+                                Authority</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://www.waterfund.go.ke/"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >Water Sector Trust Fund</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://www.kewi.or.ke/"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >Kenya Water Institute</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://hydrologistsboard.go.ke/"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >Hydrologists Registration Board</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://www.irrigation.go.ke/"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >National Irrigation Authority</a
+                            >
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Important Links 2 -->
+                <section class="col-span-1">
+                    <h3 class="text-white text-lg font-bold mb-4">
+                        Important Links
+                    </h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a
+                                href="https://water.go.ke"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >Ministry of Water and Sanitation</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="https://treasury.go.ke"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >National Treasury and Planning</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://cog.go.ke"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >County Governments</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="https://wasreb.go.ke"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >Water Services Regulatory Board</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://waterreforms.go.ke/"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >Water Sector Reform Programme</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://kwscrp.org/"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >Kenya Water Security and Climate Resilience
+                                Programme</a
+                            >
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Our Contacts -->
+                <section class="col-span-1">
+                    <h3 class="text-white text-lg font-bold mb-4">
+                        Our Contacts
+                    </h3>
+                    <address class="not-italic space-y-1">
+                        <p>MAJI HOUSE ALONG BADEN POWELL ROAD</p>
+                        <p>P.O. BOX, 1292 ∼ 10100.</p>
+                        <p>Phone: +254 724 259 891</p>
+                        <p>+254 61-2032282</p>
+                        <p>
+                            Email:
+                            <a
+                                href="mailto:info@tanawwda.go.ke"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                >info@tanawwda.go.ke</a
+                            >
+                        </p>
+                        <p>
+                            Website:
+                            <a
+                                href="http://www.tanawwda.go.ke"
+                                class="hover:text-teal-400 transition-colors duration-300"
+                                target="_blank"
+                                >www.tanawwda.go.ke</a
+                            >
+                        </p>
+                    </address>
+                </section>
+            </div>
+            <div class="text-center text-gray-500 text-sm mt-8">
+                &copy; 2025 Tana Water Works Development Agency. All rights
+                reserved.
+            </div>
+        </footer>
+
+        <script>
+            const carousel = document.getElementById("carousel");
+            const carouselItems = carousel.children;
+            const navItems = document.querySelectorAll(".carousel-nav-item");
+            let currentIndex = 0;
+            const intervalTime = 8000; // 8 seconds for each slide
+
+            function updateCarousel() {
+                // Reset all glow bars
+                navItems.forEach((item) => {
+                    item.classList.remove("active");
+                    item.querySelector(".glow-bar").style.width = "0%";
+                });
+
+                // Set the transform for the carousel
+                carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+                // Activate the current navigation item and start its glow bar
+                const currentNavItem = navItems[currentIndex];
+                if (currentNavItem) {
+                    currentNavItem.classList.add("active");
+                    // Force reflow to restart animation
+                    void currentNavItem.offsetWidth;
+                    currentNavItem.querySelector(".glow-bar").style.transition =
+                        `width ${intervalTime}ms linear`;
+                    currentNavItem.querySelector(".glow-bar").style.width =
+                        "100%";
+                }
+            }
+
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % carouselItems.length;
+                updateCarousel();
+            }
+
+            // Initial setup
+            updateCarousel();
+            let carouselInterval = setInterval(nextSlide, intervalTime);
+
+            // Add event listeners for navigation items
+            navItems.forEach((item, index) => {
+                item.addEventListener("click", () => {
+                    clearInterval(carouselInterval); // Stop auto-slide
+                    currentIndex = index;
+                    updateCarousel();
+                    carouselInterval = setInterval(nextSlide, intervalTime); // Restart auto-slide
+                });
+            });
+        </script>
+    </body>
+</html>
