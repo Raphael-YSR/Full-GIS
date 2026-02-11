@@ -100,14 +100,11 @@ app.post("/gis/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res
-      .status(400)
-      .redirect("/login?error=Email%20and%20password%20required");
+    return res.status(400).json({ error: "Email and password required" });
   }
 
   let client;
   try {
-    //console.log("Trying to login:", email);
     client = await pool.connect();
 
     const result = await client.query(
@@ -117,13 +114,10 @@ app.post("/gis/login", async (req, res) => {
 
     if (result.rows.length > 0) {
       const user = result.rows[0];
-      //console.log("User found:", user);
 
       if (!user.hashed_pass) {
         console.error(`User ${email} found but has no hashed_pass defined.`);
-        return res
-          .status(500)
-          .redirect("/login?error=Server%20configuration%20error");
+        return res.status(500).json({ error: "Server configuration error" });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.hashed_pass);
@@ -155,25 +149,23 @@ app.post("/gis/login", async (req, res) => {
           });
 
           // Get the return URL or default to /admin
-          const returnTo = req.session.returnTo || "/admin";
+          const returnTo = req.session.returnTo || "/gis/admin";
           delete req.session.returnTo;
 
-          return res.redirect(returnTo);
+          return res.json({ success: true, redirectTo: returnTo });
         } catch (saveErr) {
           console.error("Session save error:", saveErr);
-          return res.status(500).redirect("/login?error=Session%20error");
+          return res.status(500).json({ error: "Session error" });
         }
       } else {
-        //console.log(`Password mismatch for user ${email}`);
-        return res.redirect("/login?error=Incorrect%20email%20or%20password");
+        return res.status(401).json({ error: "Incorrect email or password" });
       }
     } else {
-      //console.log(`User not found: ${email}`);
-      return res.redirect("/login?error=Incorrect%20email%20or%20password");
+      return res.status(401).json({ error: "Incorrect email or password" });
     }
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).redirect("/login?error=Internal%20Server%20Error");
+    return res.status(500).json({ error: "Internal Server Error" });
   } finally {
     if (client) {
       client.release();
@@ -310,12 +302,10 @@ app.get("/gis/projects/locations", async (req, res) => {
       "Error executing query or connecting to DB for project locations:",
       err.stack,
     );
-    res
-      .status(500)
-      .json({
-        error: "Internal Server Error fetching locations",
-        details: err.message,
-      });
+    res.status(500).json({
+      error: "Internal Server Error fetching locations",
+      details: err.message,
+    });
   } finally {
     if (client) {
       client.release();
@@ -452,12 +442,10 @@ app.get("/gis/counties", requireAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching counties:", err);
-    res
-      .status(500)
-      .json({
-        error: "Server error fetching counties.",
-        ...(isProd ? {} : { details: err.message }),
-      });
+    res.status(500).json({
+      error: "Server error fetching counties.",
+      ...(isProd ? {} : { details: err.message }),
+    });
   } finally {
     if (client) client.release();
   }
@@ -474,12 +462,10 @@ app.get("/gis/statuses", requireAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching statuses:", err);
-    res
-      .status(500)
-      .json({
-        error: "Server error fetching Statuses.",
-        ...(isProd ? {} : { details: err.message }),
-      });
+    res.status(500).json({
+      error: "Server error fetching Statuses.",
+      ...(isProd ? {} : { details: err.message }),
+    });
   } finally {
     if (client) client.release();
   }
@@ -496,12 +482,10 @@ app.get("/gis/types", requireAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching types:", err);
-    res
-      .status(500)
-      .json({
-        error: "Server error fetching Types.",
-        ...(isProd ? {} : { details: err.message }),
-      });
+    res.status(500).json({
+      error: "Server error fetching Types.",
+      ...(isProd ? {} : { details: err.message }),
+    });
   } finally {
     if (client) client.release();
   }
@@ -561,12 +545,10 @@ app.get("/gis/search", requireAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Search Database error:", err);
-    res
-      .status(500)
-      .json({
-        error: "Internal server error during search",
-        details: err.message,
-      });
+    res.status(500).json({
+      error: "Internal server error during search",
+      details: err.message,
+    });
   } finally {
     if (client) client.release();
   }
@@ -608,12 +590,10 @@ app.get("/gis/admins/search", requireAuth, superAdminAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Admin Search Database error:", err);
-    res
-      .status(500)
-      .json({
-        error: "Internal server error during admin search",
-        details: err.message,
-      });
+    res.status(500).json({
+      error: "Internal server error during admin search",
+      details: err.message,
+    });
   } finally {
     if (client) client.release();
   }
@@ -844,11 +824,9 @@ app.delete(
 
       // Check if a row was actually deleted
       if (result.rowCount === 0) {
-        return res
-          .status(404)
-          .json({
-            error: `Project with ID ${projectId} not found for deletion.`,
-          });
+        return res.status(404).json({
+          error: `Project with ID ${projectId} not found for deletion.`,
+        });
       }
 
       const deletedProjectName = result.rows[0].project_name;
@@ -859,11 +837,9 @@ app.delete(
       console.error(`Error deleting project ${projectId}:`, err);
       if (err.code === "23503") {
         // Foreign key violation
-        return res
-          .status(409)
-          .json({
-            error: "Cannot delete project because it is referenced elsewhere.",
-          });
+        return res.status(409).json({
+          error: "Cannot delete project because it is referenced elsewhere.",
+        });
       }
       res
         .status(500)
@@ -907,12 +883,10 @@ app.post("/gis/admins", requireAuth, superAdminAuth, async (req, res) => {
       [hashedPassword, email, f_name, l_name, true, department_id, 1], // role_id is always 1 for new admins
     );
 
-    res
-      .status(201)
-      .json({
-        message: `Administrator '${f_name} ${l_name}' has been added!`,
-        admin: result.rows[0],
-      });
+    res.status(201).json({
+      message: `Administrator '${f_name} ${l_name}' has been added!`,
+      admin: result.rows[0],
+    });
   } catch (err) {
     console.error("Error adding administrator:", err);
     if (err.code === "23503") {
@@ -978,22 +952,18 @@ app.delete("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
       ],
     );
 
-    res
-      .status(200)
-      .json({
-        message: `Administrator '${adminName}' (ID: ${adminId}) deleted successfully!`,
-      });
+    res.status(200).json({
+      message: `Administrator '${adminName}' (ID: ${adminId}) deleted successfully!`,
+    });
   } catch (error) {
     console.error("Error deleting administrator:", error);
     // Handle potential foreign key constraint errors if admins are linked elsewhere (e.g., in audit logs)
     if (error.code === "23503") {
       // Foreign key violation
-      return res
-        .status(409)
-        .json({
-          error:
-            "Cannot delete administrator because they are linked to other records (e.g., audit logs). Consider deactivating instead.",
-        });
+      return res.status(409).json({
+        error:
+          "Cannot delete administrator because they are linked to other records (e.g., audit logs). Consider deactivating instead.",
+      });
     }
     res
       .status(500)
