@@ -36,15 +36,15 @@ document.addEventListener("DOMContentLoaded", () => {
     popupContainer.classList.add("hidden");
   });
 
-  // Restore Coordinate Pasting Logic
+  // Coordinate Pasting Logic
   if (pasteCoordinatesButton) {
     pasteCoordinatesButton.addEventListener("click", async () => {
       try {
         const text = await navigator.clipboard.readText();
         const coordMatch = text.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
         if (coordMatch) {
-          document.getElementById("lat").value = coordMatch[1];
-          document.getElementById("lng").value = coordMatch[2];
+          document.getElementById("latitude").value = coordMatch[1];
+          document.getElementById("longitude").value = coordMatch[2];
         } else {
           showPopup(
             "No valid coordinates found in clipboard (Format: lat, lng)",
@@ -60,19 +60,19 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const [counties, types, statuses] = await Promise.all([
         fetch("/gis/counties").then((res) => res.json()),
-        fetch("/gis/project-types").then((res) => res.json()),
-        fetch("/gis/status-options").then((res) => res.json()),
+        fetch("/gis/types").then((res) => res.json()),
+        fetch("/gis/statuses").then((res) => res.json()),
       ]);
 
       const countySelect = document.getElementById("county_id");
       const typeSelect = document.getElementById("project_type");
-      const statusSelect = document.getElementById("status");
+      const statusSelect = document.getElementById("project_status");
 
-      counties.forEach((c) => countySelect.add(new Option(c.name, c.id)));
-      types.forEach((t) => typeSelect.add(new Option(t.type_name, t.id)));
-      statuses.forEach((s) =>
-        statusSelect.add(new Option(s.status_name, s.id)),
+      counties.forEach((c) =>
+        countySelect.add(new Option(c.county_name, c.id)),
       );
+      types.forEach((t) => typeSelect.add(new Option(t.type, t.id)));
+      statuses.forEach((s) => statusSelect.add(new Option(s.status, s.id)));
     } catch (error) {
       console.error("Error populating dropdowns:", error);
     }

@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectId = new URLSearchParams(window.location.search).get("id");
   const editProjectForm = document.getElementById("editProjectForm");
 
-  // Restore Popup Container initialization
+  // Popup Container initialization
   const popupContainer = document.createElement("div");
   popupContainer.className =
     "fixed inset-0 flex items-center justify-center z-50 hidden";
@@ -39,24 +39,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchProjectDetails(id) {
     try {
-      const response = await fetch(`/gis/project/${id}`);
+      const response = await fetch(`/gis/projects/${id}`);
       if (!response.ok) throw new Error("Not found");
       const project = await response.json();
 
-      document.getElementById("lat").value = project.lat;
-      document.getElementById("lng").value = project.lng;
+      document.getElementById("latitude").value = project.latitude;
+      document.getElementById("longitude").value = project.longitude;
       document.getElementById("progress").value = project.progress;
+      document.getElementById("description").value = project.description || "";
+
+      // Display project details at the top
+      const projectDetailsDiv = document.getElementById("projectDetails");
+      if (projectDetailsDiv) {
+        projectDetailsDiv.innerHTML = `
+          <h2 class="text-xl font-bold mb-2">${project.project_name}</h2>
+          <p class="text-gray-400">County: ${project.county_name}</p>
+          <p class="text-gray-400">Type: ${project.type_name}</p>
+        `;
+      }
 
       const statuses = await fetch("/gis/statuses").then((res) => res.json());
-      const statusSelect = document.getElementById("status");
+      const statusSelect = document.getElementById("project_status");
       statusSelect.innerHTML = "";
       statuses.forEach((s) => {
-        const opt = new Option(s.status_name, s.id);
-        if (s.id === project.status) opt.selected = true;
+        const opt = new Option(s.status, s.id);
+        if (s.id === project.project_status) opt.selected = true;
         statusSelect.add(opt);
       });
     } catch (error) {
       console.error("Error fetching details:", error);
+      showPopup("Error loading project details");
     }
   }
 
@@ -67,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
       const projectData = Object.fromEntries(new FormData(editProjectForm));
       try {
-        const response = await fetch(`/gis/project/${projectId}`, {
+        const response = await fetch(`/gis/projects/${projectId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(projectData),
