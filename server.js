@@ -48,7 +48,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
-app.use(express.static("public"));
+app.use(express.static("docs"));
 app.use(cookieParser());
 
 const __filename = fileURLToPath(import.meta.url);
@@ -94,29 +94,29 @@ const isSuperAdmin = (req, res, next) => {
 
 // Landing Page
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "landing.html"));
+  res.sendFile(path.join(__dirname, "docs", "landing.html"));
 });
 
 // Login Page
 app.get("/gis/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "login.html"));
+  res.sendFile(path.join(__dirname, "docs", "login.html"));
 });
 
 // Map Page (Main)
 app.get("/gis", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(path.join(__dirname, "docs", "index.html"));
 });
 
 // Add Data Page (Protected)
 app.get("/add-data", (req, res) => {
   if (!req.session.adminId) return res.redirect("/gis/login");
-  res.sendFile(path.join(__dirname, "public", "add-data.html"));
+  res.sendFile(path.join(__dirname, "docs", "add-data.html"));
 });
 
 // Edit Data Page (Protected)
 app.get("/edit-data", (req, res) => {
   if (!req.session.adminId) return res.redirect("/gis/login");
-  res.sendFile(path.join(__dirname, "public", "edit-data.html"));
+  res.sendFile(path.join(__dirname, "docs", "edit-data.html"));
 });
 
 // --- GIS API ROUTES (Unified /gis prefix) ---
