@@ -60,9 +60,6 @@ app.use(bodyParser.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.static(path.join(__dirname, "docs")));
-app.use("/admin", express.static(path.join(__dirname, "admin")));
-
 // session middleware
 app.use(
   session({
@@ -1052,6 +1049,10 @@ app.post(
     }
   },
 );
+
+// --- Static File Serving (AFTER all routes) ---
+app.use(express.static(path.join(__dirname, "docs")));
+app.use("/admin", express.static(path.join(__dirname, "admin")));
 
 // 16. Error Handling Middleware to avoid crashing!
 app.use((err, req, res, next) => {

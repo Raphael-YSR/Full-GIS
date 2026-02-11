@@ -1,68 +1,113 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delete Project | GIS Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/admin/styles.css">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <style>
-        button {
-            transition: all 0.2s ease;
-        }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Delete Project | GIS Admin Dashboard</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="/admin/styles.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+            integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+        <style>
+            button {
+                transition: all 0.2s ease;
+            }
 
-        button:hover {
-            transform: translateY(-2px);
-        }
+            button:hover {
+                transform: translateY(-2px);
+            }
 
-        .delete-btn:hover {
-            background-color: #ef4444;
-        }
-    </style>
-</head>
-<body class="bg-gray-900 text-white min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-3xl">
-        <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold font-marlin">DELETE PROJECT</h1>
-            <p class="text-gray-400 font-marlinsoftmedium">PERMANENTLY REMOVE PROJECT FROM DATABASE</p>
-        </header>
+            .delete-btn:hover {
+                background-color: #ef4444;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 text-white min-h-screen">
+        <div class="container mx-auto px-4 py-8 max-w-3xl">
+            <header class="mb-8 text-center">
+                <h1 class="text-3xl font-bold font-marlin">DELETE PROJECT</h1>
+                <p class="text-gray-400 font-marlinsoftmedium">
+                    PERMANENTLY REMOVE PROJECT FROM DATABASE
+                </p>
+            </header>
 
-        <div id="projectDetails" class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6">
-            <div class="animate-pulse">
-                <div class="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
-                <div class="h-3 bg-gray-700 rounded w-1/2"></div>
-            </div>
-        </div>
-
-        <div class="bg-gray-800 p-8 rounded-lg shadow-lg">
-            <div class="text-center mb-8">
-                <div class="flex items-center justify-center text-red-500 mb-4">
-                    <svg class="w-8 h-8 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                    <h2 class="text-xl font-bold font-marlin">WARNING: This action cannot be undone</h2>
+            <div
+                id="projectDetails"
+                class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6"
+            >
+                <div class="animate-pulse">
+                    <div class="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                    <div class="h-3 bg-gray-700 rounded w-1/2"></div>
                 </div>
-                <p class="text-gray-400 mb-4 font-marlinsoftmedium">Are you sure you want to permanently delete this project?</p>
             </div>
 
-            <div class="flex items-center justify-center space-x-12 text-base ">
-                <a href="/search-delete" class="w-1/3 bg-gray-600 py-3 px-4 rounded font-medium font-marlin hover:bg-gray-500 text-center">
-                    CANCEL
-                </a>
-                <button id="deleteProjectBtn" class="w-1/3 bg-red-600 py-3 px-4 rounded font-medium font-marlin hover:bg-red-500 delete-btn">
-                    DELETE PROJECT
-                </button>
+            <div class="bg-gray-800 p-8 rounded-lg shadow-lg">
+                <div class="text-center mb-8">
+                    <div
+                        class="flex items-center justify-center text-red-500 mb-4"
+                    >
+                        <svg
+                            class="w-8 h-8 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            ></path>
+                        </svg>
+                        <h2 class="text-xl font-bold font-marlin">
+                            WARNING: This action cannot be undone
+                        </h2>
+                    </div>
+                    <p class="text-gray-400 mb-4 font-marlinsoftmedium">
+                        Are you sure you want to permanently delete this
+                        project?
+                    </p>
+                </div>
+
+                <div
+                    class="flex items-center justify-center space-x-12 text-base"
+                >
+                    <a
+                        href="/gis/search-delete"
+                        class="w-1/3 bg-gray-600 py-3 px-4 rounded font-medium font-marlin hover:bg-gray-500 text-center"
+                    >
+                        CANCEL
+                    </a>
+                    <button
+                        id="deleteProjectBtn"
+                        class="w-1/3 bg-red-600 py-3 px-4 rounded font-medium font-marlin hover:bg-red-500 delete-btn"
+                    >
+                        DELETE PROJECT
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-8 text-center text-base">
+                <a
+                    href="/gis/search-delete"
+                    class="text-gray-400 hover:text-white font-marlin"
+                    >BACK TO SEARCH</a
+                >
+                <span class="mx-2 text-gray-600">|</span>
+                <a
+                    href="/gis/superadmin"
+                    class="text-gray-400 hover:text-white font-marlin"
+                    >BACK TO SUPERADMIN DASHBOARD</a
+                >
             </div>
         </div>
 
-        <div class="mt-8 text-center text-base">
-            <a href="/search-delete" class="text-gray-400 hover:text-white font-marlin">BACK TO SEARCH</a>
-            <span class="mx-2 text-gray-600">|</span>
-            <a href="/superadmin" class="text-gray-400 hover:text-white font-marlin">BACK TO SUPERADMIN DASHBOARD</a>
-        </div>
-    </div>
-
-    <script src="/admin/superadmin.js"></script>
-</body>
+        <script src="/admin/superadmin.js"></script>
+    </body>
 </html>

@@ -47,9 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("lng").value = project.lng;
       document.getElementById("progress").value = project.progress;
 
-      const statuses = await fetch("/gis/status-options").then((res) =>
-        res.json(),
-      );
+      const statuses = await fetch("/gis/statuses").then((res) => res.json());
       const statusSelect = document.getElementById("status");
       statusSelect.innerHTML = "";
       statuses.forEach((s) => {
