@@ -60,6 +60,7 @@ app.use(
       pool: pool,
       tableName: "session",
       schemaName: "admin",
+      createTableIfMissing: true,
     }),
     secret: process.env.SESSION_SECRET || "your-secret-key",
     resave: false,
