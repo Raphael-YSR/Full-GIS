@@ -90,9 +90,37 @@ const isSuperAdmin = (req, res, next) => {
   }
 };
 
+// --- PAGE ROUTES ---
+
+// Landing Page
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "landing.html"));
+});
+
+// Login Page
+app.get("/gis/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
+// Map Page (Main)
+app.get("/gis", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Add Data Page (Protected)
+app.get("/add-data", (req, res) => {
+  if (!req.session.adminId) return res.redirect("/gis/login");
+  res.sendFile(path.join(__dirname, "public", "add-data.html"));
+});
+
+// Edit Data Page (Protected)
+app.get("/edit-data", (req, res) => {
+  if (!req.session.adminId) return res.redirect("/gis/login");
+  res.sendFile(path.join(__dirname, "public", "edit-data.html"));
+});
+
 // --- GIS API ROUTES (Unified /gis prefix) ---
 
-// 1. Get Departments
 app.get("/gis/departments", async (req, res) => {
   try {
     const result = await pool.query(
@@ -104,7 +132,6 @@ app.get("/gis/departments", async (req, res) => {
   }
 });
 
-// 2. Get Counties
 app.get("/gis/counties", async (req, res) => {
   try {
     const result = await pool.query(
@@ -116,7 +143,6 @@ app.get("/gis/counties", async (req, res) => {
   }
 });
 
-// 3. Get Project Types
 app.get("/gis/project-types", async (req, res) => {
   try {
     const result = await pool.query(
@@ -128,7 +154,6 @@ app.get("/gis/project-types", async (req, res) => {
   }
 });
 
-// 4. Get Status Options
 app.get("/gis/status-options", async (req, res) => {
   try {
     const result = await pool.query(
@@ -140,7 +165,6 @@ app.get("/gis/status-options", async (req, res) => {
   }
 });
 
-// 5. Add Project
 app.post("/gis/projects", isAuthenticated, async (req, res) => {
   const {
     project_name,
@@ -182,7 +206,6 @@ app.post("/gis/projects", isAuthenticated, async (req, res) => {
   }
 });
 
-// 6. Search Projects
 app.get("/gis/search", async (req, res) => {
   const query = req.query.q;
   if (!query) return res.json([]);
@@ -202,7 +225,6 @@ app.get("/gis/search", async (req, res) => {
   }
 });
 
-// 7. Get Project for Editing
 app.get("/gis/project/:id", async (req, res) => {
   try {
     const query = `
@@ -222,7 +244,6 @@ app.get("/gis/project/:id", async (req, res) => {
   }
 });
 
-// 8. Update Project
 app.put("/gis/project/:id", isAuthenticated, async (req, res) => {
   const { lat, lng, progress, status } = req.body;
   try {
@@ -248,7 +269,6 @@ app.put("/gis/project/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// 9. Get Project Locations for Map
 app.get("/gis/projects/locations", async (req, res) => {
   try {
     const query = `
@@ -264,7 +284,6 @@ app.get("/gis/projects/locations", async (req, res) => {
   }
 });
 
-// 10. Admin Login
 app.post("/gis/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -294,7 +313,6 @@ app.post("/gis/login", async (req, res) => {
   }
 });
 
-// 11. Superadmin: Create New Admin
 app.post("/gis/superadmin/add-admin", isSuperAdmin, async (req, res) => {
   const { first_name, last_name, email, password, department_id, role } =
     req.body;
@@ -327,7 +345,6 @@ app.post("/gis/superadmin/add-admin", isSuperAdmin, async (req, res) => {
   }
 });
 
-// 12. Check Auth Status
 app.get("/gis/auth/status", (req, res) => {
   if (req.session.adminId) {
     res.json({
@@ -340,7 +357,6 @@ app.get("/gis/auth/status", (req, res) => {
   }
 });
 
-// 13. Logout
 app.post("/gis/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) return res.status(500).json({ error: "Could not log out" });
@@ -349,7 +365,6 @@ app.post("/gis/logout", (req, res) => {
   });
 });
 
-// 14. Superadmin: List All Admins
 app.get("/gis/superadmin/admins", isSuperAdmin, async (req, res) => {
   try {
     const query = `
@@ -365,7 +380,6 @@ app.get("/gis/superadmin/admins", isSuperAdmin, async (req, res) => {
   }
 });
 
-// 15. Superadmin: Reset Password
 app.post("/gis/superadmin/reset-password", isSuperAdmin, async (req, res) => {
   const { adminId, newPassword } = req.body;
   const performingAdminId = req.session.adminId;
