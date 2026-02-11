@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const response = await fetch(
-        `/gis/search?q=${encodeURIComponent(query)}`,
+        `/gis/api/search?q=${encodeURIComponent(query)}`,
       );
       if (response.ok) {
         const results = await response.json();
@@ -20,7 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const card = document.createElement("div");
           card.className = "project-card";
           card.innerHTML = `<h3>${p.project_name}</h3><p>${p.county}</p>`;
-          card.onclick = () => (window.location.href = `/edit-data?id=${p.id}`);
+          card.onclick = () =>
+            (window.location.href = `/gis/edit-data?id=${p.id}`);
           searchResults.appendChild(card);
         });
       }

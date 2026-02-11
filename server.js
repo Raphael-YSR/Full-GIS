@@ -513,7 +513,7 @@ app.get("/gis/departments", requireAuth, async (req, res) => {
 });
 
 // 10. projects Search endpoint (protected)
-app.get("/gis/search", requireAuth, async (req, res) => {
+app.get("/gis/api/search", requireAuth, async (req, res) => {
   const query = req.query.q;
   if (!query) {
     return res
