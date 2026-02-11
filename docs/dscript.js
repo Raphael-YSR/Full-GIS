@@ -476,7 +476,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Fetch the counties GeoJSON
   let countyLayer; //accessed globally
 
-  fetch("/api/countyBounds")
+  fetch("/gis/countyBounds")
     .then((response) => response.json())
     .then((data) => {
       countyLayer = L.geoJSON(data, {
