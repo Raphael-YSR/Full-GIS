@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      // Updated path to /gis/...
       const response = await fetch(
         `/gis/search?q=${encodeURIComponent(query)}`,
       );
