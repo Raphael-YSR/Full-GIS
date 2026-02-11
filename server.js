@@ -206,6 +206,10 @@ app.get("/gis/login", (req, res) => {
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "docs", "landing.html"));
 });
+// To serve the map page
+app.get("/gis", (req, res) => {
+  res.sendFile(path.join(__dirname, "docs", "index.html"));
+});
 // Serve the admin landing page
 app.get("/gis/admin", requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "admin", "administration.html"));
