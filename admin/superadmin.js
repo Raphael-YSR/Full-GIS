@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
               const card = document.createElement("div");
               card.className = "admin-card";
               card.innerHTML = `
-                <h3 class="font-bold">${admin.fname} ${admin.lname}</h3>
+                <h3 class="font-bold">${admin.f_name} ${admin.l_name}</h3>
                 <p class="text-gray-400">${admin.email}</p>
                 <p class="text-sm text-gray-500">${admin.department_name || "No Department"}</p>
               `;
@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (response.ok) {
           const admin = await response.json();
           adminDetailsDiv.innerHTML = `
-            <h2 class="text-xl font-bold mb-2">${admin.fname} ${admin.lname}</h2>
+            <h2 class="text-xl font-bold mb-2">${admin.f_name} ${admin.l_name}</h2>
             <p class="text-gray-400">Email: ${admin.email}</p>
             <p class="text-gray-400">Department: ${admin.department_name || "N/A"}</p>
           `;
@@ -218,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
               const card = document.createElement("div");
               card.className = "admin-card";
               card.innerHTML = `
-                <h3 class="font-bold">${admin.fname} ${admin.lname}</h3>
+                <h3 class="font-bold">${admin.f_name} ${admin.l_name}</h3>
                 <p class="text-gray-400">${admin.email}</p>
                 <p class="text-sm text-gray-500">${admin.department_name || "No Department"}</p>
               `;
@@ -257,9 +257,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (response.ok) {
           const admin = await response.json();
           document.getElementById("adminName").textContent =
-            `${admin.fname} ${admin.lname}`;
+            `${admin.f_name} ${admin.l_name}`;
           document.getElementById("adminFullName").textContent =
-            `${admin.fname} ${admin.lname}`;
+            `${admin.f_name} ${admin.l_name}`;
           document.getElementById("adminEmail").textContent = admin.email;
           document.getElementById("adminDepartment").textContent =
             admin.department_name || "N/A";
