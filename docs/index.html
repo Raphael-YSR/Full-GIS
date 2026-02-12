@@ -17,6 +17,18 @@
         <script src="searchFunction.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geometryutil/0.9.3/leaflet.geometryutil.min.js"></script>
+
+        <style>
+            /* Force all project names to display in CAPS for uniformity */
+            .leaflet-popup-content,
+            .search-results,
+            #searchResultsContainer,
+            .leaflet-tooltip,
+            .project-name,
+            .leaflet-marker-icon {
+                text-transform: uppercase;
+            }
+        </style>
     </head>
     <body>
         <div id="map"></div>
