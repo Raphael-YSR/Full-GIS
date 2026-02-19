@@ -2,6 +2,10 @@
 <html>
     <head>
         <title>TANA WATERS WEB-GIS</title>
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
         <link
             rel="stylesheet"
             href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -19,7 +23,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geometryutil/0.9.3/leaflet.geometryutil.min.js"></script>
 
         <style>
-            /* Force all project names to display in CAPS for uniformity */
+            /* ── Force CAPS (unchanged from original) ── */
             .leaflet-popup-content,
             .search-results,
             #searchResultsContainer,
@@ -28,10 +32,265 @@
             .leaflet-marker-icon {
                 text-transform: uppercase;
             }
+
+            /* ─────────────────────────────────────────────
+               Mobile-only elements: hidden on desktop
+               ───────────────────────────────────────────── */
+            #mobileActionsBtn {
+                display: none;
+            }
+            #mobileActionsMenu {
+                display: none;
+            }
+            #mobileOverlay {
+                display: none;
+            }
+            #searchToggleArrow {
+                display: none;
+            }
+
+            /* ═════════════════════════════════════════════
+               ALL MOBILE OVERRIDES  ≤ 768px
+               Desktop (> 768px): zero changes.
+               ═════════════════════════════════════════════ */
+            @media (max-width: 768px) {
+                /* ── Logo ── */
+                .logo {
+                    width: 40px !important;
+                    height: 40px !important;
+                    top: 10px !important;
+                    left: 12px !important;
+                }
+
+                /* ── Admin button: bigger on mobile ── */
+                .admin-button {
+                    top: 10px !important;
+                    right: 10px !important;
+                }
+                .admin-button .btn {
+                    font-size: 13px !important;
+                    padding: 12px 16px !important;
+                    letter-spacing: 0.06em !important;
+                }
+
+                /* ── Search container: below logo row, 5px radius ── */
+                .search-container {
+                    position: fixed !important;
+                    top: 62px !important;
+                    left: 16px !important;
+                    right: 16px !important;
+                    width: auto !important;
+                    border-radius: 5px !important;
+                    padding: 0 !important;
+                    flex-direction: column !important;
+                    gap: 0 !important;
+                    overflow: visible !important;
+                    background: transparent !important;
+                    border: none !important;
+                }
+
+                /* The actual search bar row */
+                .search-bar-wrapper {
+                    width: 100% !important;
+                    border-radius: 5px !important;
+                    background: #fafafa !important;
+                    border: 1px solid #ccc !important;
+                    padding: 10px 14px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 8px !important;
+                    box-sizing: border-box !important;
+                }
+                .search-bar {
+                    flex: 1 !important;
+                    font-size: 13px !important;
+                    min-width: 0 !important;
+                }
+
+                /* Arrow toggle — separated from the vl with a gap */
+                #searchToggleArrow {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    background: none !important;
+                    border: none !important;
+                    cursor: pointer !important;
+                    padding: 0 !important;
+                    margin-left: 6px !important;
+                    color: #555 !important;
+                    flex-shrink: 0 !important;
+                }
+                #searchToggleArrow svg {
+                    transition: transform 0.22s ease;
+                    display: block;
+                }
+                #searchToggleArrow.open svg {
+                    transform: rotate(180deg);
+                }
+
+                /* Tools row: centered, spaced, hidden by default */
+                .search-options {
+                    display: none !important;
+                    width: 100% !important;
+                    background: #fafafa !important;
+                    border: 1px solid #ccc !important;
+                    border-top: none !important;
+                    border-radius: 0 0 5px 5px !important;
+                    padding: 10px 14px !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    gap: 18px !important;
+                    flex-wrap: wrap !important;
+                    box-sizing: border-box !important;
+                }
+                .search-options.mob-open {
+                    display: flex !important;
+                }
+                .option-icon {
+                    width: 26px !important;
+                    height: 26px !important;
+                    margin: 0 !important;
+                }
+
+                /* Search results — match new side spacing */
+                #searchResultsContainer {
+                    position: fixed !important;
+                    top: 112px !important;
+                    left: 16px !important;
+                    right: 16px !important;
+                    width: auto !important;
+                    border-radius: 0 0 5px 5px !important;
+                }
+
+                /* ── Hide desktop bottom buttons ── */
+                .bottom-buttons {
+                    display: none !important;
+                }
+
+                /* ── ACTIONS button — centered at bottom ── */
+                #mobileActionsBtn {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 6px !important;
+                    position: fixed !important;
+                    bottom: 20px !important;
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    z-index: 1200 !important;
+                    padding: 11px 24px !important;
+                    font-size: 12px !important;
+                    letter-spacing: 0.08em !important;
+                    border-radius: 5px !important;
+                    white-space: nowrap !important;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+                }
+                #mobileActionsBtn svg {
+                    transition: transform 0.22s ease;
+                    flex-shrink: 0;
+                    /* starts pointing UP — menu opens upward */
+                    transform: rotate(180deg);
+                }
+                /* when open, flip to point DOWN (closed state indicator) */
+                #mobileActionsBtn.open svg {
+                    transform: rotate(0deg);
+                }
+
+                /* ── Actions menu — stack of buttons above the ACTIONS btn ── */
+                #mobileActionsMenu {
+                    position: fixed !important;
+                    bottom: 70px !important; /* above the ACTIONS button */
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    z-index: 1200 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    gap: 8px !important;
+                    /* collapsed */
+                    max-height: 0 !important;
+                    overflow: hidden !important;
+                    opacity: 0 !important;
+                    transition:
+                        max-height 0.3s ease,
+                        opacity 0.2s ease !important;
+                    pointer-events: none !important;
+                }
+                #mobileActionsMenu.open {
+                    max-height: 300px !important;
+                    opacity: 1 !important;
+                    pointer-events: all !important;
+                }
+                #mobileActionsMenu .btn {
+                    width: 160px !important;
+                    font-size: 11px !important;
+                    padding: 10px !important;
+                    letter-spacing: 0.07em !important;
+                    border-radius: 5px !important;
+                    text-align: center !important;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+                }
+
+                /* ── Layer popup → bottom drawer ── */
+                .layer-popup {
+                    position: fixed !important;
+                    bottom: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    top: auto !important;
+                    width: 100vw !important;
+                    max-width: 100vw !important;
+                    box-sizing: border-box !important;
+                    max-height: 65vh !important;
+                    border-radius: 14px 14px 0 0 !important;
+                    border-top: 2px solid #314591 !important;
+                    padding: 28px 20px 24px !important;
+                    box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.4) !important;
+                    z-index: 1300 !important;
+                    opacity: 1 !important;
+                    transform: none !important;
+                    transition: none !important;
+                    overflow-x: hidden !important;
+                }
+                .layer-popup::before {
+                    content: "";
+                    position: absolute;
+                    top: 9px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 36px;
+                    height: 4px;
+                    background: #555575;
+                    border-radius: 2px;
+                }
+                .layer-popup.mobile-open {
+                    display: block !important;
+                }
+
+                /* ── Dim overlay ── */
+                #mobileOverlay {
+                    display: block !important;
+                    position: fixed !important;
+                    inset: 0 !important;
+                    z-index: 1250 !important;
+                    background: rgba(0, 0, 0, 0.45) !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+                    transition: opacity 0.2s !important;
+                }
+                #mobileOverlay.visible {
+                    opacity: 1 !important;
+                    pointer-events: all !important;
+                }
+            }
         </style>
     </head>
     <body>
         <div id="map"></div>
+
+        <!-- Dim overlay (mobile only) — tap to close drawer -->
+        <div id="mobileOverlay" onclick="closeMobileLayerPopup()"></div>
+
         <a href="/" target="_blank">
             <img
                 src="images/logo.png"
@@ -40,6 +299,7 @@
                 title="Back to Main Site"
             />
         </a>
+
         <div class="search-container">
             <div class="search-bar-wrapper">
                 <img
@@ -54,8 +314,26 @@
                     placeholder="Search Project..."
                 />
                 <div class="vl"></div>
+                <!-- Mobile-only: ⌄ arrow to reveal/hide the drawing tools -->
+                <button
+                    id="searchToggleArrow"
+                    onclick="toggleMobileTools()"
+                    aria-label="Toggle drawing tools"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
             </div>
-
             <div class="search-options hidden">
                 <img
                     src="images/ruler.png"
@@ -103,25 +381,62 @@
                 <button class="btn">LOGIN AS ADMIN</button>
             </a>
         </div>
+
+        <!-- Desktop bottom buttons — 100% original, untouched -->
         <div class="bottom-buttons">
             <button class="btn" id="export_features">EXPORT</button>
             <button class="btn" id="layers-btn">LAYERS</button>
             <button class="btn" id="print-btn">PRINT MAP</button>
         </div>
 
+        <!-- Mobile: stacked action menu (opens upward) -->
+        <div id="mobileActionsMenu">
+            <button class="btn" id="mob-export">EXPORT</button>
+            <button
+                class="btn"
+                id="mob-layers"
+                onclick="toggleMobileLayerPopup(event)"
+            >
+                LAYERS
+            </button>
+            <button class="btn" id="mob-print">PRINT</button>
+        </div>
+
+        <!-- Mobile: centered ACTIONS trigger button -->
+        <button
+            class="btn"
+            id="mobileActionsBtn"
+            onclick="toggleMobileActions()"
+        >
+            ACTIONS
+            <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </button>
+
+        <!-- Layer popup — desktop & mobile (same element, different position) -->
         <div id="layerPopup" class="layer-popup">
-            <span class="close-btn" onclick="closeLayerPopup()">×</span>
+            <span class="close-btn" onclick="closeLayerPopup()">&#215;</span>
             <div>
                 <label
                     ><input type="checkbox" class="checkbox showNames" /> SHOW
-                    PROJECT NAMES
-                </label>
+                    PROJECT NAMES</label
+                >
             </div>
             <div style="padding-top: 4px">
                 <label
                     ><input type="checkbox" class="checkbox showCounty" /> SHOW
-                    COUNTIES
-                </label>
+                    COUNTIES</label
+                >
             </div>
             <hr />
             <h4>FILTER BY STATUS</h4>
@@ -245,7 +560,7 @@
                 <div class="option">
                     <input type="checkbox" class="checkbox" id="option3" />
                     <label class="option-label" onclick="toggleSubOptions(3)">
-                        PLANNING & DESIGN
+                        PLANNING &amp; DESIGN
                         <span id="icon3" class="expand-icon">+</span>
                     </label>
                 </div>
@@ -318,52 +633,166 @@
                 </div>
                 <div class="layer-options" id="mapLayerOptions">
                     <div class="layer-option">
-                        <label>
-                            <input
+                        <label
+                            ><input
                                 type="radio"
                                 name="mapLayer"
                                 value="carto"
                                 checked
                                 onclick="changeMapLayer('carto')"
                             />
-                            Clean (Light)
-                        </label>
+                            Clean (Light)</label
+                        >
                     </div>
                     <div class="layer-option">
-                        <label>
-                            <input
+                        <label
+                            ><input
                                 type="radio"
                                 name="mapLayer"
                                 value="osm"
                                 onclick="changeMapLayer('osm')"
                             />
-                            OpenStreetMap
-                        </label>
+                            OpenStreetMap</label
+                        >
                     </div>
                     <div class="layer-option">
-                        <label>
-                            <input
+                        <label
+                            ><input
                                 type="radio"
                                 name="mapLayer"
                                 value="googleHybrid"
                                 onclick="changeMapLayer('googleHybrid')"
                             />
-                            Google Hybrid
-                        </label>
+                            Google Hybrid</label
+                        >
                     </div>
                     <div class="layer-option">
-                        <label>
-                            <input
+                        <label
+                            ><input
                                 type="radio"
                                 name="mapLayer"
                                 value="googleSat"
                                 onclick="changeMapLayer('googleSat')"
                             />
-                            Google Satellite
-                        </label>
+                            Google Satellite</label
+                        >
                     </div>
                 </div>
             </div>
         </div>
+
+        <script>
+            /* ═══════════════════════════════════════════════
+               MOBILE — search tools arrow (⌄ / ⌃)
+               Toggles .search-options below the search bar
+               ═══════════════════════════════════════════════ */
+            const searchToggleArrow =
+                document.getElementById("searchToggleArrow");
+            const searchOptions = document.querySelector(".search-options");
+
+            function toggleMobileTools() {
+                const isOpen = searchOptions.classList.contains("mob-open");
+                // remove .hidden (desktop class) so our mob-open can take over
+                searchOptions.classList.remove("hidden");
+                searchOptions.classList.toggle("mob-open", !isOpen);
+                searchToggleArrow.classList.toggle("open", !isOpen);
+                // if closing, restore .hidden so desktop shows nothing
+                if (isOpen) searchOptions.classList.add("hidden");
+            }
+
+            /* ═══════════════════════════════════════════════
+               MOBILE — ACTIONS button (opens stack upward)
+               ⌄ arrow flips to ⌃ when open
+               ═══════════════════════════════════════════════ */
+            const mobileActionsBtn =
+                document.getElementById("mobileActionsBtn");
+            const mobileActionsMenu =
+                document.getElementById("mobileActionsMenu");
+
+            function toggleMobileActions() {
+                const isOpen = mobileActionsMenu.classList.contains("open");
+                mobileActionsMenu.classList.toggle("open", !isOpen);
+                mobileActionsBtn.classList.toggle("open", !isOpen);
+                // close layer drawer if collapsing
+                if (isOpen) closeMobileLayerPopup();
+            }
+
+            /* ═══════════════════════════════════════════════
+               MOBILE — layer popup bottom drawer
+               Stays display:block until tap-outside / Escape
+               ═══════════════════════════════════════════════ */
+            const layerPopup = document.getElementById("layerPopup");
+            const mobileOverlay = document.getElementById("mobileOverlay");
+            let mobileLayerOpen = false;
+
+            function toggleMobileLayerPopup(e) {
+                if (e) e.stopPropagation();
+                mobileLayerOpen
+                    ? closeMobileLayerPopup()
+                    : openMobileLayerPopup();
+            }
+
+            function openMobileLayerPopup() {
+                layerPopup.classList.add("mobile-open");
+                mobileOverlay.classList.add("visible");
+                mobileLayerOpen = true;
+            }
+
+            function closeMobileLayerPopup() {
+                layerPopup.classList.remove("mobile-open");
+                mobileOverlay.classList.remove("visible");
+                mobileLayerOpen = false;
+            }
+
+            /* Taps inside the drawer don't bubble to the overlay */
+            layerPopup.addEventListener("click", function (e) {
+                e.stopPropagation();
+            });
+
+            /* Tapping overlay closes drawer AND collapses actions menu */
+            mobileOverlay.addEventListener("click", function () {
+                closeMobileLayerPopup();
+                mobileActionsMenu.classList.remove("open");
+                mobileActionsBtn.classList.remove("open");
+            });
+
+            /* ═══════════════════════════════════════════════
+               DESKTOP — preserve dscript.js closeLayerPopup
+               ═══════════════════════════════════════════════ */
+            window.closeLayerPopup =
+                window.closeLayerPopup ||
+                function () {
+                    layerPopup.classList.remove("show");
+                    layerPopup.style.display = "none";
+                };
+
+            /* ═══════════════════════════════════════════════
+               MOBILE — mirror Export & Print to desktop IDs
+               so dscript.js event listeners still fire
+               ═══════════════════════════════════════════════ */
+            document
+                .getElementById("mob-export")
+                .addEventListener("click", function () {
+                    document.getElementById("export_features").click();
+                });
+            document
+                .getElementById("mob-print")
+                .addEventListener("click", function () {
+                    document.getElementById("print-btn").click();
+                });
+
+            /* ═══════════════════════════════════════════════
+               ESCAPE — close everything
+               ═══════════════════════════════════════════════ */
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape") {
+                    closeMobileLayerPopup();
+                    mobileActionsMenu.classList.remove("open");
+                    mobileActionsBtn.classList.remove("open");
+                    if (searchOptions.classList.contains("mob-open"))
+                        toggleMobileTools();
+                }
+            });
+        </script>
     </body>
 </html>
