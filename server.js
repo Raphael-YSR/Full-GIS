@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import pgSession from "connect-pg-simple";
 import cookieParser from "cookie-parser";
+import createRouter from "./routes.js";
 
 // --- Load environment variables ---
 dotenv.config();
@@ -30,15 +31,11 @@ const pgStore = pgSession(session);
 // --- Middleware ---
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, etc)
     if (!origin) return callback(null, true);
-
-    // Define allowed origins
     const allowedOrigins = [
       "https://full-gis.onrender.com",
       "http://localhost:3000",
     ];
-
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
@@ -54,13 +51,14 @@ const corsOptions = {
 app.set("trust proxy", 1);
 
 app.use(cors(corsOptions));
-app.use(cookieParser(process.env.SESSION_SECRET)); // Use the same secret as your session
+app.use(cookieParser(process.env.SESSION_SECRET));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// session middleware
+// --- Session ---
 app.use(
   session({
     store: new pgStore({
@@ -71,12 +69,12 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production", // Use secure cookies only in production
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 2, // 2 hours
     },
-    proxy: true, // Set this to true regardless of environment if you're behind a proxy
+    proxy: true,
   }),
 );
 
@@ -85,14 +83,40 @@ pool.on("error", (err, client) => {
   process.exit(-1);
 });
 
-// --- Routes ---
+// --- Auth Middleware ---
+// Defined BEFORE routes so they can be passed into createRouter()
 
-// 0. Confirmation for uptime monitoring
-app.get("/health", (req, res) => {
-  res.status(200).send("OK");
-});
+// 1. Protect admin routes
+const requireAuth = (req, res, next) => {
+  if (req.session && req.session.user) {
+    next();
+  } else {
+    req.session.returnTo = req.originalUrl;
+    res.redirect("/gis/login");
+  }
+};
 
-// 1. Handle login form submission
+// 2. Superadmin only
+const superAdminAuth = (req, res, next) => {
+  if (req.session && req.session.user && req.session.user.roleId === 2) {
+    return next();
+  }
+  if (req.xhr || req.headers.accept.indexOf("json") > -1) {
+    return res.status(403).json({ error: "Superadmin privileges required" });
+  }
+  return res.redirect("/gis/admin?error=superadmin");
+};
+
+// --- Page Routes ---
+// Pass auth middleware into the router factory
+app.use(createRouter(requireAuth, superAdminAuth));
+
+// --- API Routes ---
+
+// 0. Uptime monitoring
+app.get("/health", (req, res) => res.status(200).send("OK"));
+
+// 1. Login form submission
 app.post("/gis/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -103,7 +127,6 @@ app.post("/gis/login", async (req, res) => {
   let client;
   try {
     client = await pool.connect();
-
     const result = await client.query(
       "SELECT * FROM admin.admin WHERE email = $1",
       [email],
@@ -120,14 +143,12 @@ app.post("/gis/login", async (req, res) => {
       const passwordMatch = await bcrypt.compare(password, user.hashed_pass);
 
       if (passwordMatch) {
-        // Set user data in session
         req.session.user = {
           id: user.id,
           email: user.email,
           roleId: user.role_id,
         };
 
-        // Update last login timestamp in background
         client
           .query("UPDATE admin.admin SET last_login = NOW() WHERE id = $1", [
             user.id,
@@ -136,7 +157,6 @@ app.post("/gis/login", async (req, res) => {
             console.error("Failed to update last login time:", err),
           );
 
-        // Save session and wait for completion
         try {
           await new Promise((resolve, reject) => {
             req.session.save((err) => {
@@ -145,10 +165,8 @@ app.post("/gis/login", async (req, res) => {
             });
           });
 
-          // Get the return URL or default to /admin
           const returnTo = req.session.returnTo || "/gis/admin";
           delete req.session.returnTo;
-
           return res.json({ success: true, redirectTo: returnTo });
         } catch (saveErr) {
           console.error("Session save error:", saveErr);
@@ -164,159 +182,89 @@ app.post("/gis/login", async (req, res) => {
     console.error("Login error:", err);
     return res.status(500).json({ error: "Internal Server Error" });
   } finally {
-    if (client) {
-      client.release();
-    }
+    if (client) client.release();
   }
 });
 
-// 2. Middleware to protect admin routes
-const requireAuth = (req, res, next) => {
-  if (req.session && req.session.user) {
-    next();
-  } else {
-    // Store the original URL for redirecting back after login
-    req.session.returnTo = req.originalUrl;
-    res.redirect("/gis/login");
-  }
-};
-
-// 3. Middleware for superadmin authentication
-const superAdminAuth = (req, res, next) => {
-  if (req.session && req.session.user && req.session.user.roleId === 2) {
-    return next();
-  }
-  // Check if the request is an API request (e.e. from fetch)
-  if (req.xhr || req.headers.accept.indexOf("json") > -1) {
-    return res.status(403).json({ error: "Superadmin privileges required" });
-  }
-  // For regular page requests, redirect
-  return res.redirect("/gis/admin?error=superadmin");
-};
-
-// 4. Serve protected admin pages by express.static
-app.get("/gis/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "docs", "login.html"));
-});
-
-// To Serve the landing Page
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "docs", "landing.html"));
-});
-// To serve the map page
-app.get("/gis", (req, res) => {
-  res.sendFile(path.join(__dirname, "docs", "index.html"));
-});
-// Serve the admin landing page
-app.get("/gis/admin", requireAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "administration.html"));
-});
-
-// Serve the add-data page
-app.get("/gis/add-data", requireAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "add-data.html"));
-});
-
-// Serve the search page
-app.get("/gis/search", requireAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "search.html"));
-});
-// Serving the static file here is okay, JS will fetch the specific data.
-app.get("/gis/edit-data", requireAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "edit-data.html"));
-});
-
-// Serve the superadmin dashboard
-app.get("/gis/superadmin", requireAuth, superAdminAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "superadministrator.html"));
-});
-
-app.get("/gis/add-admin", requireAuth, superAdminAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "add-admin.html"));
-});
-
-app.get("/gis/search-delete", requireAuth, superAdminAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "search-delete.html"));
-});
-
-app.get("/gis/delete-project", requireAuth, superAdminAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "delete-project.html"));
-});
-
-app.get("/gis/search-admin", requireAuth, superAdminAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "search-admin.html"));
-});
-
-app.get("/gis/delete-admin", requireAuth, superAdminAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "delete-admin.html"));
-});
-
-app.get("/gis/reset-search", requireAuth, superAdminAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "reset-search.html"));
-});
-
-app.get("/gis/reset-password", requireAuth, superAdminAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "admin", "reset-password.html"));
-});
-
-// Handle logout
+// 2. Logout
 app.get("/gis/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.error("Error destroying session:", err);
       return res.status(500).send("Error logging out");
     }
-    // Redirect to home page or login page after logout
     res.redirect("/gis");
   });
 });
 
-// 5. API endpoint to get project locations for the main public map
-// (does not require auth)
-
+// 3. Public map data
 app.get("/gis/projects/locations", async (req, res) => {
   let client;
   try {
     client = await pool.connect();
     const sql = `
-            SELECT
-                p.project_name,
-                p.description,
-                s.status,
-                p.progress,
-                c.county_name AS county,
-                t.type AS project_type,
-                ST_Y(p.hashed_location::geometry) AS lat, -- Ensure correct casting if needed
-                ST_X(p.hashed_location::geometry) AS lng  -- Ensure correct casting if needed
-            FROM public.project p
-            JOIN public.county c ON p.county_id = c.id
-            JOIN public.status s ON p.project_status = s.id
-            JOIN public.type t ON p.project_type = t.id
-            WHERE
-                p.hashed_location IS NOT NULL
-                AND ST_GeometryType(p.hashed_location::geometry) = 'ST_Point';
-        `;
+      SELECT
+        p.project_name,
+        p.description,
+        s.status,
+        p.progress,
+        c.county_name AS county,
+        t.type AS project_type,
+        ST_Y(p.hashed_location::geometry) AS lat,
+        ST_X(p.hashed_location::geometry) AS lng
+      FROM public.project p
+      JOIN public.county c ON p.county_id = c.id
+      JOIN public.status s ON p.project_status = s.id
+      JOIN public.type t ON p.project_type = t.id
+      WHERE
+        p.hashed_location IS NOT NULL
+        AND ST_GeometryType(p.hashed_location::geometry) = 'ST_Point';
+    `;
     const result = await client.query(sql);
     res.json(result.rows);
   } catch (err) {
-    console.error(
-      "Error executing query or connecting to DB for project locations:",
-      err.stack,
-    );
-    res.status(500).json({
-      error: "Internal Server Error fetching locations",
-      details: err.message,
-    });
+    console.error("Error fetching project locations:", err.stack);
+    res
+      .status(500)
+      .json({
+        error: "Internal Server Error fetching locations",
+        details: err.message,
+      });
   } finally {
-    if (client) {
-      client.release();
-    }
+    if (client) client.release();
+  }
+});
+
+// 4. County boundaries GeoJSON
+app.get("/gis/countyBounds", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, county_name, ST_AsGeoJSON(geom)::json AS geometry
+      FROM public.county
+      WHERE geom IS NOT NULL
+    `);
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "No counties found" });
+    const geojson = {
+      type: "FeatureCollection",
+      features: result.rows.map((row) => ({
+        type: "Feature",
+        geometry: row.geometry,
+        properties: { id: row.id, county_name: row.county_name },
+      })),
+    };
+    res.json(geojson);
+  } catch (err) {
+    console.error("Query Error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
 // --- Protected API Endpoints ---
 
-// 6. API endpoint to add a new project
+const isProd = process.env.NODE_ENV === "production";
+
+// 5. Add project
 app.post("/gis/projects", requireAuth, async (req, res) => {
   const {
     county_id,
@@ -330,7 +278,6 @@ app.post("/gis/projects", requireAuth, async (req, res) => {
     project_name,
   } = req.body;
 
-  // Basic Validation
   if (
     !project_name ||
     !county_id ||
@@ -346,25 +293,18 @@ app.post("/gis/projects", requireAuth, async (req, res) => {
   try {
     const lat = Number(latitude);
     const lon = Number(longitude);
-
-    if (isNaN(lat) || isNaN(lon)) {
+    if (isNaN(lat) || isNaN(lon))
       return res.status(400).json({ error: "Invalid latitude or longitude." });
-    }
-
-    // Ensure coordinates are within valid ranges (optional but good practice)
-    if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+    if (lat < -90 || lat > 90 || lon < -180 || lon > 180)
       return res
         .status(400)
         .json({ error: "Latitude or longitude out of range." });
-    }
 
     const hashed_location = `POINT(${lon} ${lat})`;
-
     client = await pool.connect();
-    // Using parameterized query to prevent SQL injection
     await client.query(
       `INSERT INTO public.project (county_id, project_status, project_type, description, people_served, hashed_location, progress, project_name)
-           VALUES ($1, $2, $3, $4, $5, ST_GeomFromText($6, 4326), $7, $8)`,
+       VALUES ($1, $2, $3, $4, $5, ST_GeomFromText($6, 4326), $7, $8)`,
       [
         county_id,
         project_status,
@@ -376,16 +316,13 @@ app.post("/gis/projects", requireAuth, async (req, res) => {
         project_name,
       ],
     );
-
     res
       .status(201)
-      .json({ message: `Project '${project_name}' has been added!` }); // Use 201 Created status
+      .json({ message: `Project '${project_name}' has been added!` });
   } catch (err) {
     console.error("Error adding project:", err);
-    if (err.code === "23505") {
-      // Unique constraint violation
+    if (err.code === "23505")
       return res.status(409).json({ error: "Project name already exists." });
-    }
     res
       .status(500)
       .json({ error: "Error adding project.", details: err.message });
@@ -394,45 +331,7 @@ app.post("/gis/projects", requireAuth, async (req, res) => {
   }
 });
 
-// 7. API route to serve County Boundaries GeoJSON
-
-app.get("/gis/countyBounds", async (req, res) => {
-  try {
-    const result = await pool.query(`
-        SELECT id, county_name, ST_AsGeoJSON(geom)::json AS geometry
-        FROM public.county
-        WHERE geom IS NOT NULL
-      `);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "No counties found" });
-    }
-
-    // Create GeoJSON with the correct column mappings
-    const geojson = {
-      type: "FeatureCollection",
-      features: result.rows.map((row) => ({
-        type: "Feature",
-        geometry: row.geometry,
-        properties: {
-          id: row.id,
-          county_name: row.county_name,
-        },
-      })),
-    };
-
-    res.json(geojson);
-  } catch (err) {
-    console.error("Query Error:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 8. API endpoints to get supporting data for dropdowns
-
-const isProd = process.env.NODE_ENV === "production";
-
-// Get Counties
+// 6. Get counties
 app.get("/gis/counties", requireAuth, async (req, res) => {
   let client;
   try {
@@ -443,57 +342,62 @@ app.get("/gis/counties", requireAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching counties:", err);
-    res.status(500).json({
-      error: "Server error fetching counties.",
-      ...(isProd ? {} : { details: err.message }),
-    });
+    res
+      .status(500)
+      .json({
+        error: "Server error fetching counties.",
+        ...(isProd ? {} : { details: err.message }),
+      });
   } finally {
     if (client) client.release();
   }
 });
 
-// Get Statuses
+// 7. Get statuses
 app.get("/gis/statuses", requireAuth, async (req, res) => {
   let client;
   try {
     client = await pool.connect();
     const result = await client.query(
       "SELECT id, status FROM public.status ORDER BY status",
-    ); // Added ORDER BY
+    );
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching statuses:", err);
-    res.status(500).json({
-      error: "Server error fetching Statuses.",
-      ...(isProd ? {} : { details: err.message }),
-    });
+    res
+      .status(500)
+      .json({
+        error: "Server error fetching Statuses.",
+        ...(isProd ? {} : { details: err.message }),
+      });
   } finally {
     if (client) client.release();
   }
 });
 
-// Get Types
+// 8. Get types
 app.get("/gis/types", requireAuth, async (req, res) => {
   let client;
   try {
     client = await pool.connect();
     const result = await client.query(
       "SELECT id, type FROM public.type ORDER BY type",
-    ); // Added ORDER BY
+    );
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching types:", err);
-    res.status(500).json({
-      error: "Server error fetching Types.",
-      ...(isProd ? {} : { details: err.message }),
-    });
+    res
+      .status(500)
+      .json({
+        error: "Server error fetching Types.",
+        ...(isProd ? {} : { details: err.message }),
+      });
   } finally {
     if (client) client.release();
   }
 });
 
-// Get Departments
-
+// 9. Get departments
 app.get("/gis/departments", requireAuth, async (req, res) => {
   let client;
   try {
@@ -512,140 +416,104 @@ app.get("/gis/departments", requireAuth, async (req, res) => {
   }
 });
 
-// 10. projects Search endpoint (protected)
-// API endpoint for searching projects (used by JavaScript fetch calls)
+// 10. Search projects
 app.get("/gis/api/search", requireAuth, async (req, res) => {
   const query = req.query.q;
-  if (!query) {
+  if (!query)
     return res
       .status(400)
       .json({ error: "Search query parameter 'q' is required." });
-  }
 
   let client;
   try {
     client = await pool.connect();
     const result = await client.query(
-      `SELECT
-                p.id,
-                p.project_name,
-                c.county_name AS county,
-                p.progress,
-                s.status AS status,
-                t.type AS project_type_name, -- Include type name
-                p.description
-            FROM public.project p
-            JOIN public.county c ON p.county_id = c.id
-            JOIN public.status s ON p.project_status = s.id
-            JOIN public.type t ON p.project_type = t.id -- Join type table
-            WHERE p.project_name ILIKE $1 OR p.description ILIKE $1 -- Search name OR description
-            ORDER BY p.project_name -- Add ordering
-            LIMIT 50 -- Add a limit to prevent huge responses
-            `,
+      `SELECT p.id, p.project_name, c.county_name AS county, p.progress, s.status, t.type AS project_type_name, p.description
+       FROM public.project p
+       JOIN public.county c ON p.county_id = c.id
+       JOIN public.status s ON p.project_status = s.id
+       JOIN public.type t ON p.project_type = t.id
+       WHERE p.project_name ILIKE $1 OR p.description ILIKE $1
+       ORDER BY p.project_name
+       LIMIT 50`,
       [`%${query}%`],
     );
     res.json(result.rows);
   } catch (err) {
     console.error("Search Database error:", err);
-    res.status(500).json({
-      error: "Internal server error during search",
-      details: err.message,
-    });
+    res
+      .status(500)
+      .json({
+        error: "Internal server error during search",
+        details: err.message,
+      });
   } finally {
     if (client) client.release();
   }
 });
 
-// API endpoint to search for administrators (protected)
+// 11. Search admins
 app.get("/gis/admins/search", requireAuth, superAdminAuth, async (req, res) => {
   const query = req.query.q;
-  if (!query) {
+  if (!query)
     return res
       .status(400)
       .json({ error: "Search query parameter 'q' is required." });
-  }
-
-  // Basic validation: prevent searching with very short queries if not handled client-side
-  if (query.length < 2) {
-    return res.status(200).json([]); // Return empty results for short queries
-  }
+  if (query.length < 2) return res.status(200).json([]);
 
   let client;
   try {
     client = await pool.connect();
-    // Search based on first name, last name, or email in the admin table
     const result = await client.query(
-      `SELECT
-                a.id,
-                a.fname AS f_name,
-                a.lname AS l_name,
-                a.email,
-                d.department_name
-            FROM admin.admin a
-            LEFT JOIN admin.department d ON a.department_id = d.id
-            WHERE a.fname ILIKE $1 OR a.lname ILIKE $1 OR a.email ILIKE $1
-            ORDER BY a.lname, a.fname -- Order by last name, then first name
-            LIMIT 50 -- Limit results
-            `,
+      `SELECT a.id, a.fname AS f_name, a.lname AS l_name, a.email, d.department_name
+       FROM admin.admin a
+       LEFT JOIN admin.department d ON a.department_id = d.id
+       WHERE a.fname ILIKE $1 OR a.lname ILIKE $1 OR a.email ILIKE $1
+       ORDER BY a.lname, a.fname
+       LIMIT 50`,
       [`%${query}%`],
     );
     res.json(result.rows);
   } catch (err) {
     console.error("Admin Search Database error:", err);
-    res.status(500).json({
-      error: "Internal server error during admin search",
-      details: err.message,
-    });
+    res
+      .status(500)
+      .json({
+        error: "Internal server error during admin search",
+        details: err.message,
+      });
   } finally {
     if (client) client.release();
   }
 });
 
-// 9. API endpoint to get a SINGLE project by ID (protected)
-
+// 12. Get single project
 app.get("/gis/project/:id", requireAuth, async (req, res) => {
-  const projectId = parseInt(req.params.id, 10); // Ensure ID is an integer
-
-  if (isNaN(projectId)) {
+  const projectId = parseInt(req.params.id, 10);
+  if (isNaN(projectId))
     return res.status(400).json({ error: "Invalid project ID format." });
-  }
 
   let client;
   try {
     client = await pool.connect();
-    // Modified query to join county, status, and type tables to get names
     const result = await client.query(
-      `
-            SELECT
-                p.id,
-                p.project_name,
-                p.county_id, -- Keep IDs for the PUT request
-                p.project_status, -- Keep IDs for the PUT request
-                p.project_type, -- Keep IDs for the PUT request
-                c.county_name AS county, -- Get county name for display
-                s.status AS status,       -- Get status name for display
-                t.type AS project_type_name, -- Get type name for display
-                p.description,
-                p.people_served,
-                p.progress,
-                ST_Y(p.hashed_location::geometry) AS latitude,
-                ST_X(p.hashed_location::geometry) AS longitude
-            FROM public.project p
-            JOIN public.county c ON p.county_id = c.id
-            JOIN public.status s ON p.project_status = s.id
-            JOIN public.type t ON p.project_type = t.id
-            WHERE p.id = $1
-        `,
+      `SELECT p.id, p.project_name, p.county_id, p.project_status, p.project_type,
+              c.county_name AS county, s.status, t.type AS project_type_name,
+              p.description, p.people_served, p.progress,
+              ST_Y(p.hashed_location::geometry) AS latitude,
+              ST_X(p.hashed_location::geometry) AS longitude
+       FROM public.project p
+       JOIN public.county c ON p.county_id = c.id
+       JOIN public.status s ON p.project_status = s.id
+       JOIN public.type t ON p.project_type = t.id
+       WHERE p.id = $1`,
       [projectId],
     );
-
-    if (result.rows.length === 0) {
+    if (result.rows.length === 0)
       return res
         .status(404)
         .json({ error: `Project with ID ${projectId} not found.` });
-    }
-
-    res.json(result.rows[0]); // Return the single project object
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(`Error fetching project ${projectId}:`, err);
     res
@@ -656,33 +524,26 @@ app.get("/gis/project/:id", requireAuth, async (req, res) => {
   }
 });
 
-// 10. API endpoint to get a SINGLE admin by ID (protected)
+// 13. Get single admin
 app.get("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
   let client;
   try {
     client = await pool.connect();
-    const adminId = parseInt(req.params.id, 10); // Ensure ID is an integer
-
-    if (isNaN(adminId)) {
+    const adminId = parseInt(req.params.id, 10);
+    if (isNaN(adminId))
       return res.status(400).json({ error: "Invalid admin ID format." });
-    }
 
-    const query = `
-            SELECT a.*, d.department_name
-            FROM admin.admin a
-            LEFT JOIN admin.department d ON a.department_id = d.id
-            WHERE a.id = $1
-        `;
-
-    const result = await client.query(query, [adminId]);
-
-    if (result.rows.length === 0) {
+    const result = await client.query(
+      `SELECT a.*, d.department_name FROM admin.admin a
+       LEFT JOIN admin.department d ON a.department_id = d.id
+       WHERE a.id = $1`,
+      [adminId],
+    );
+    if (result.rows.length === 0)
       return res.status(404).json({ error: "Administrator not found" });
-    }
 
     const admin = result.rows[0];
     delete admin.hashed_pass;
-
     res.json(admin);
   } catch (error) {
     console.error("Error fetching admin details:", error);
@@ -694,15 +555,12 @@ app.get("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
   }
 });
 
-// 11. API endpoint to update a project
-
+// 14. Update project
 app.put("/gis/project/:id", requireAuth, async (req, res) => {
   const projectId = parseInt(req.params.id, 10);
-  if (isNaN(projectId)) {
+  if (isNaN(projectId))
     return res.status(400).json({ error: "Invalid project ID format." });
-  }
 
-  // Destructure expected fields from req.body
   const {
     project_name,
     county_id,
@@ -715,26 +573,22 @@ app.put("/gis/project/:id", requireAuth, async (req, res) => {
     longitude,
   } = req.body;
 
-  // More specific Validation
   const missingFields = [];
   if (!project_name) missingFields.push("project_name");
-  if (county_id == null) missingFields.push("county_id"); // Check for null or undefined
-  if (project_status == null) missingFields.push("project_status"); // Check for null or undefined
-  if (project_type == null) missingFields.push("project_type"); // Check for null or undefined
-  if (latitude == null) missingFields.push("latitude"); // Check for null or undefined
-  if (longitude == null) missingFields.push("longitude"); // Check for null or undefined
-
-  if (missingFields.length > 0) {
+  if (county_id == null) missingFields.push("county_id");
+  if (project_status == null) missingFields.push("project_status");
+  if (project_type == null) missingFields.push("project_type");
+  if (latitude == null) missingFields.push("latitude");
+  if (longitude == null) missingFields.push("longitude");
+  if (missingFields.length > 0)
     return res
       .status(400)
       .json({ error: `Missing required fields: ${missingFields.join(", ")}.` });
-  }
 
   let client;
   try {
     const lat = Number(latitude);
     const lon = Number(longitude);
-
     if (
       isNaN(lat) ||
       isNaN(lon) ||
@@ -749,23 +603,13 @@ app.put("/gis/project/:id", requireAuth, async (req, res) => {
     }
 
     const hashed_location = `POINT(${lon} ${lat})`;
-
     client = await pool.connect();
     const result = await client.query(
-      `
-            UPDATE public.project
-            SET
-                project_name = $1,
-                county_id = $2,
-                project_status = $3,
-                project_type = $4,
-                description = $5,
-                people_served = $6,
-                progress = $7,
-                hashed_location = ST_GeomFromText($8, 4326)
-            WHERE id = $9
-            RETURNING id -- Optional: return ID to confirm which record was updated
-        `,
+      `UPDATE public.project
+       SET project_name = $1, county_id = $2, project_status = $3, project_type = $4,
+           description = $5, people_served = $6, progress = $7, hashed_location = ST_GeomFromText($8, 4326)
+       WHERE id = $9
+       RETURNING id`,
       [
         project_name,
         county_id,
@@ -778,25 +622,19 @@ app.put("/gis/project/:id", requireAuth, async (req, res) => {
         projectId,
       ],
     );
-
-    // Check if any row was actually updated
-    if (result.rowCount === 0) {
+    if (result.rowCount === 0)
       return res
         .status(404)
         .json({ error: `Project with ID ${projectId} not found for update.` });
-    }
-
     res.json({
       message: `Project '${project_name}' (ID: ${projectId}) updated successfully!`,
     });
   } catch (err) {
     console.error(`Error updating project ${projectId}:`, err);
-    if (err.code === "23505") {
-      // Handle unique constraint violation on update
+    if (err.code === "23505")
       return res
         .status(409)
         .json({ error: "Another project with this name might already exist." });
-    }
     res
       .status(500)
       .json({ error: "Error updating project.", details: err.message });
@@ -805,16 +643,15 @@ app.put("/gis/project/:id", requireAuth, async (req, res) => {
   }
 });
 
-// 12. API endpoint to delete a project
+// 15. Delete project
 app.delete(
   "/gis/project/:id",
   requireAuth,
   superAdminAuth,
   async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
-    if (isNaN(projectId)) {
+    if (isNaN(projectId))
       return res.status(400).json({ error: "Invalid project ID format." });
-    }
 
     let client;
     try {
@@ -823,26 +660,23 @@ app.delete(
         "DELETE FROM public.project WHERE id = $1 RETURNING project_name",
         [projectId],
       );
-
-      // Check if a row was actually deleted
-      if (result.rowCount === 0) {
-        return res.status(404).json({
-          error: `Project with ID ${projectId} not found for deletion.`,
-        });
-      }
-
-      const deletedProjectName = result.rows[0].project_name;
+      if (result.rowCount === 0)
+        return res
+          .status(404)
+          .json({
+            error: `Project with ID ${projectId} not found for deletion.`,
+          });
       res.json({
-        message: `Project '${deletedProjectName}' (ID: ${projectId}) deleted successfully!`,
-      }); // Return 200 OK or 204 No Content
+        message: `Project '${result.rows[0].project_name}' (ID: ${projectId}) deleted successfully!`,
+      });
     } catch (err) {
       console.error(`Error deleting project ${projectId}:`, err);
-      if (err.code === "23503") {
-        // Foreign key violation
-        return res.status(409).json({
-          error: "Cannot delete project because it is referenced elsewhere.",
-        });
-      }
+      if (err.code === "23503")
+        return res
+          .status(409)
+          .json({
+            error: "Cannot delete project because it is referenced elsewhere.",
+          });
       res
         .status(500)
         .json({ error: "Error deleting project.", details: err.message });
@@ -852,12 +686,9 @@ app.delete(
   },
 );
 
-// 13. API TO ADD ADMINS
-
+// 16. Add admin
 app.post("/gis/admins", requireAuth, superAdminAuth, async (req, res) => {
   const { email, password, f_name, l_name, department_id } = req.body;
-
-  // Basic Validation
   if (!email || !password || !f_name || !l_name || !department_id) {
     return res.status(400).json({ error: "Missing required fields." });
   }
@@ -865,36 +696,30 @@ app.post("/gis/admins", requireAuth, superAdminAuth, async (req, res) => {
   let client;
   try {
     client = await pool.connect();
-
-    // Check if the email already exists
     const emailCheckResult = await client.query(
       "SELECT id FROM admin.admin WHERE email = $1",
       [email],
     );
-    if (emailCheckResult.rows.length > 0) {
+    if (emailCheckResult.rows.length > 0)
       return res.status(409).json({ error: "Email address already exists." });
-    }
 
-    // Hash the password securely (using bcrypt is highly recommended)
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
-
+    const hashedPassword = await bcrypt.hash(password, 10);
     const result = await client.query(
       `INSERT INTO admin.admin (hashed_pass, email, fname, lname, is_active, department_id, role_id)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)
-             RETURNING id, email, fname, lname, is_active, department_id, role_id`,
-      [hashedPassword, email, f_name, l_name, true, department_id, 1], // role_id is always 1 for new admins
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, email, fname, lname, is_active, department_id, role_id`,
+      [hashedPassword, email, f_name, l_name, true, department_id, 1],
     );
-
-    res.status(201).json({
-      message: `Administrator '${f_name} ${l_name}' has been added!`,
-      admin: result.rows[0],
-    });
+    res
+      .status(201)
+      .json({
+        message: `Administrator '${f_name} ${l_name}' has been added!`,
+        admin: result.rows[0],
+      });
   } catch (err) {
     console.error("Error adding administrator:", err);
-    if (err.code === "23503") {
-      // Foreign key constraint violation (department_id)
+    if (err.code === "23503")
       return res.status(400).json({ error: "Invalid department ID." });
-    }
     res
       .status(500)
       .json({ error: "Error adding administrator.", details: err.message });
@@ -903,48 +728,37 @@ app.post("/gis/admins", requireAuth, superAdminAuth, async (req, res) => {
   }
 });
 
-// 14. API TO DELETE ADMIN
+// 17. Delete admin
 app.delete("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
   let client;
   try {
     client = await pool.connect();
     const adminId = parseInt(req.params.id, 10);
-
-    if (isNaN(adminId)) {
+    if (isNaN(adminId))
       return res.status(400).json({ error: "Invalid admin ID format." });
-    }
-
-    // Prevent deleting the currently logged-in superadmin
     if (req.session.user && req.session.user.id === adminId) {
       return res
         .status(403)
         .json({ error: "Cannot delete your own superadmin account." });
     }
 
-    // Check if the admin exists and get their name for the response
     const adminCheck = await client.query(
       "SELECT fname, lname FROM admin.admin WHERE id = $1",
       [adminId],
     );
-    if (adminCheck.rows.length === 0) {
+    if (adminCheck.rows.length === 0)
       return res.status(404).json({ error: "Administrator not found" });
-    }
     const adminName = `${adminCheck.rows[0].fname} ${adminCheck.rows[0].lname}`;
 
-    // Perform the deletion
     const result = await client.query(
       "DELETE FROM admin.admin WHERE id = $1 RETURNING id",
       [adminId],
     );
-
-    if (result.rowCount === 0) {
-      // This case should ideally not happen if adminCheck passed, but good for safety
+    if (result.rowCount === 0)
       return res
         .status(404)
         .json({ error: "Administrator not found for deletion." });
-    }
 
-    // Log the deletion action
     await client.query(
       "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
       [
@@ -953,20 +767,20 @@ app.delete("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
         `Deleted admin ID: ${adminId} (${adminName})`,
       ],
     );
-
-    res.status(200).json({
-      message: `Administrator '${adminName}' (ID: ${adminId}) deleted successfully!`,
-    });
+    res
+      .status(200)
+      .json({
+        message: `Administrator '${adminName}' (ID: ${adminId}) deleted successfully!`,
+      });
   } catch (error) {
     console.error("Error deleting administrator:", error);
-    // Handle potential foreign key constraint errors if admins are linked elsewhere (e.g., in audit logs)
-    if (error.code === "23503") {
-      // Foreign key violation
-      return res.status(409).json({
-        error:
-          "Cannot delete administrator because they are linked to other records (e.g., audit logs). Consider deactivating instead.",
-      });
-    }
+    if (error.code === "23503")
+      return res
+        .status(409)
+        .json({
+          error:
+            "Cannot delete administrator because they are linked to other records.",
+        });
     res
       .status(500)
       .json({ error: "An error occurred while deleting the administrator." });
@@ -975,7 +789,7 @@ app.delete("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
   }
 });
 
-// 15. API TO RESET PASSWORD
+// 18. Reset admin password
 app.post(
   "/gis/admins/:id/reset-password",
   requireAuth,
@@ -984,46 +798,32 @@ app.post(
     let client;
     try {
       client = await pool.connect();
-      const { id } = req.params;
-      const { password } = req.body;
-
-      // Validate admin ID
-      const adminId = parseInt(id, 10);
-      if (isNaN(adminId)) {
+      const adminId = parseInt(req.params.id, 10);
+      if (isNaN(adminId))
         return res.status(400).json({ error: "Invalid admin ID format" });
-      }
 
-      // Validate password
-      if (!password || password.length < 8) {
+      const { password } = req.body;
+      if (!password || password.length < 8)
         return res
           .status(400)
           .json({ error: "Password must be at least 8 characters long" });
-      }
 
-      // Check if admin exists
       const adminCheck = await client.query(
         "SELECT id FROM admin.admin WHERE id = $1",
         [adminId],
       );
-      if (adminCheck.rows.length === 0) {
+      if (adminCheck.rows.length === 0)
         return res.status(404).json({ error: "Admin not found" });
-      }
 
-      // Hash the password with bcrypt
       const hashedPassword = await bcrypt.hash(password, 12);
-
-      // Update the admin's password in the database
       const result = await client.query(
         "UPDATE admin.admin SET hashed_pass = $1, last_password_change = NOW() WHERE id = $2 RETURNING id",
         [hashedPassword, adminId],
       );
-
-      if (result.rowCount === 0) {
+      if (result.rowCount === 0)
         return res.status(500).json({ error: "Failed to update password" });
-      }
 
-      // Log the password reset action in the audit log
-      const performingAdminId = req.session.user ? req.session.user.id : null;
+      const performingAdminId = req.session.user?.id;
       if (performingAdminId) {
         await client.query(
           "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
@@ -1033,12 +833,7 @@ app.post(
             `Reset password for admin ID: ${adminId}`,
           ],
         );
-      } else {
-        console.warn(
-          "Audit log: Could not log password reset action, performing admin ID not found in session.",
-        );
       }
-
       res.status(200).json({ message: "Password reset successful" });
     } catch (error) {
       console.error("Error resetting password:", error);
@@ -1055,27 +850,25 @@ app.post(
 app.use(express.static(path.join(__dirname, "docs")));
 app.use("/admin", express.static(path.join(__dirname, "admin")));
 
-// 16. Error Handling Middleware to avoid crashing!
+// --- Error Handling ---
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err.stack);
   res.status(500).send("Something broke!");
 });
 
-// 17. Start Server
-// async IIFE to ensure DB connection before starting server
+// --- Start Server ---
 (async () => {
   let client;
   try {
     client = await pool.connect();
     console.log(">>> Initial database connection successful.");
     client.release();
-
     app.listen(port, () => {
       console.log(`>>> Server listening at ${port}`);
     });
   } catch (err) {
     console.error("FATAL: Initial database connection failed:", err);
     if (client) client.release();
-    process.exit(1); // Exit if DB connection fails on startup
+    process.exit(1);
   }
 })();
