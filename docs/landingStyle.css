@@ -151,6 +151,10 @@ nav.desktop-nav {
     display: flex;
     align-items: center;
     gap: 4px;
+    font-family: inherit; /* Forces buttons to use IBM Plex Sans */
+    font-weight: 500; /* Explicitly sets the weight for both */
+    line-height: 1.2; /* Standardizes the height */
+    -webkit-font-smoothing: antialiased;
 }
 .nav-item:hover {
     border-color: var(--ink);
