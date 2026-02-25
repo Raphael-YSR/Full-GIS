@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>News — Tana Water Works Development Agency</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --green: #5a8a32;
+                --green-dark: #3d6122;
+                --green-light: #eef4e8;
+                --ink: #1a1c1a;
+                --ink-mid: #4a4d49;
+                --ink-light: #8a8e89;
+                --rule: #d0d4cc;
+                --bg: #f5f5f2;
+                --white: #ffffff;
+            }
+            *,
+            *::before,
+            *::after {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: "IBM Plex Sans", sans-serif;
+                background: var(--bg);
+                color: var(--ink);
+                -webkit-font-smoothing: antialiased;
+            }
+
+            /* ── Top bar ── */
+            .article-topbar {
+                background: var(--ink);
+                border-bottom: 3px solid var(--green);
+                padding: 0 24px;
+            }
+            .article-topbar-inner {
+                max-width: 1200px;
+                margin: 0 auto;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .topbar-home {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                text-decoration: none;
+                color: var(--white);
+                font-size: 0.78rem;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+            }
+            .topbar-home svg {
+                flex-shrink: 0;
+            }
+            .topbar-news-link {
+                font-size: 0.75rem;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                color: var(--green);
+                text-decoration: none;
+            }
+            .topbar-news-link:hover {
+                text-decoration: underline;
+            }
+
+            /* ── Hero ── */
+            .article-hero {
+                background: var(--ink);
+                padding: 48px 24px 44px;
+            }
+            .article-hero-inner {
+                max-width: 780px;
+                margin: 0 auto;
+            }
+            .article-hero-date {
+                display: block;
+                font-size: 0.68rem;
+                font-weight: 700;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--green);
+                margin-bottom: 16px;
+            }
+            .article-hero h1 {
+                font-family: "IBM Plex Serif", serif;
+                font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+                font-weight: 600;
+                color: var(--white);
+                line-height: 1.3;
+            }
+
+            /* ── Lead image ── */
+            .article-lead-img-wrap {
+                max-width: 780px;
+                margin: 0 auto;
+                border-left: 2px solid var(--ink);
+                border-right: 2px solid var(--ink);
+                border-bottom: 2px solid var(--ink);
+                overflow: hidden;
+            }
+            .article-lead-img {
+                width: 100%;
+                aspect-ratio: 16/9;
+                object-fit: cover;
+                display: block;
+            }
+
+            /* ── Article body ── */
+            .article-body-wrap {
+                max-width: 780px;
+                margin: 0 auto;
+                padding: 0 24px 80px;
+            }
+
+            .article-content {
+                margin-top: 40px;
+                border-top: 3px solid var(--ink);
+                padding-top: 32px;
+            }
+
+            .article-paragraph {
+                font-size: 1rem;
+                line-height: 1.8;
+                color: var(--ink-mid);
+                margin-bottom: 24px;
+            }
+            .article-paragraph:first-child {
+                font-size: 1.05rem;
+                color: var(--ink);
+                font-weight: 400;
+            }
+
+            /* ── Image gallery ── */
+            .article-gallery {
+                margin: 40px 0;
+                border-top: 2px solid var(--rule);
+                padding-top: 28px;
+            }
+            .gallery-label {
+                font-size: 0.68rem;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--ink-light);
+                margin-bottom: 16px;
+                display: block;
+            }
+            .gallery-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 3px;
+                border: 2px solid var(--ink);
+            }
+            .gallery-item {
+                aspect-ratio: 4/3;
+                overflow: hidden;
+                cursor: pointer;
+                position: relative;
+            }
+            .gallery-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                transition: transform 0.4s ease;
+            }
+            .gallery-item:hover img {
+                transform: scale(1.06);
+            }
+            .gallery-item-overlay {
+                position: absolute;
+                inset: 0;
+                background: rgba(26, 28, 26, 0);
+                transition: background 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .gallery-item:hover .gallery-item-overlay {
+                background: rgba(26, 28, 26, 0.25);
+            }
+
+            /* ── Lightbox ── */
+            .lightbox {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(26, 28, 26, 0.94);
+                z-index: 1000;
+                align-items: center;
+                justify-content: center;
+                padding: 24px;
+            }
+            .lightbox.open {
+                display: flex;
+            }
+            .lightbox-img {
+                max-width: 90vw;
+                max-height: 88vh;
+                object-fit: contain;
+                display: block;
+                border: 2px solid rgba(255, 255, 255, 0.15);
+            }
+            .lightbox-close {
+                position: fixed;
+                top: 20px;
+                right: 24px;
+                background: none;
+                border: none;
+                color: #fff;
+                font-size: 1.8rem;
+                cursor: pointer;
+                line-height: 1;
+                padding: 4px 8px;
+            }
+            .lightbox-nav {
+                position: fixed;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                color: #fff;
+                width: 44px;
+                height: 44px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+                transition: border-color 0.2s;
+            }
+            .lightbox-nav:hover {
+                border-color: #fff;
+            }
+            .lightbox-prev {
+                left: 20px;
+            }
+            .lightbox-next {
+                right: 20px;
+            }
+            .lightbox-counter {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.5);
+                letter-spacing: 0.08em;
+            }
+
+            /* ── Back nav ── */
+            .article-back {
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
+                margin-top: 48px;
+                margin-bottom: 8px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                letter-spacing: 0.07em;
+                text-transform: uppercase;
+                color: var(--white);
+                background: var(--green);
+                text-decoration: none;
+                padding: 10px 18px;
+                border: 2px solid var(--green);
+                transition:
+                    background 0.2s,
+                    border-color 0.2s;
+            }
+            .article-back:hover {
+                background: var(--green-dark);
+                border-color: var(--green-dark);
+            }
+
+            /* ── Other articles ── */
+            .other-articles {
+                margin-top: 60px;
+                border-top: 3px solid var(--ink);
+                padding-top: 28px;
+            }
+            .other-label {
+                font-size: 0.68rem;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--ink-light);
+                margin-bottom: 20px;
+                display: block;
+            }
+            .other-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                border: 2px solid var(--ink);
+            }
+            .other-card {
+                display: flex;
+                gap: 0;
+                text-decoration: none;
+                color: inherit;
+                border-right: 2px solid var(--ink);
+                background: var(--white);
+                transition: background 0.15s;
+            }
+            .other-card:last-child {
+                border-right: none;
+            }
+            .other-card:hover {
+                background: var(--green-light);
+            }
+            .other-card-img {
+                width: 90px;
+                min-width: 90px;
+                border-right: 2px solid var(--ink);
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+            .other-card-img img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                transition: transform 0.4s;
+            }
+            .other-card:hover .other-card-img img {
+                transform: scale(1.06);
+            }
+            .other-card-body {
+                padding: 14px 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                justify-content: center;
+            }
+            .other-card-date {
+                font-size: 0.65rem;
+                font-weight: 700;
+                letter-spacing: 0.09em;
+                text-transform: uppercase;
+                color: var(--ink-light);
+            }
+            .other-card-title {
+                font-size: 0.82rem;
+                font-weight: 600;
+                line-height: 1.4;
+                color: var(--ink);
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            /* Not found */
+            .not-found {
+                text-align: center;
+                padding: 100px 24px;
+            }
+            .not-found h2 {
+                font-family: "IBM Plex Serif", serif;
+                font-size: 1.5rem;
+                margin-bottom: 12px;
+            }
+            .not-found a {
+                color: var(--green);
+            }
+
+            @media (max-width: 700px) {
+                .gallery-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                .other-grid {
+                    grid-template-columns: 1fr;
+                }
+                .other-card {
+                    border-right: none;
+                    border-bottom: 2px solid var(--ink);
+                }
+                .other-card:last-child {
+                    border-bottom: none;
+                }
+                .article-body-wrap {
+                    padding: 0 16px 60px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Top bar -->
+        <div class="article-topbar">
+            <div class="article-topbar-inner">
+                <a href="/" class="topbar-home">
+                    <svg
+                        width="16"
+                        height="16"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                        />
+                    </svg>
+                    TWWDA
+                </a>
+                <a href="/news" class="topbar-news-link">← All News</a>
+            </div>
+        </div>
+
+        <!-- Content injected here -->
+        <div id="article-root"></div>
+
+        <!-- Lightbox -->
+        <div class="lightbox" id="lightbox">
+            <button class="lightbox-close" id="lb-close">×</button>
+            <button class="lightbox-nav lightbox-prev" id="lb-prev">‹</button>
+            <img class="lightbox-img" id="lb-img" src="" alt="" />
+            <button class="lightbox-nav lightbox-next" id="lb-next">›</button>
+            <div class="lightbox-counter" id="lb-counter"></div>
+        </div>
+
+        <script src="/assets/news/newsData.js"></script>
+        <script>
+            (function () {
+                var root = document.getElementById("article-root");
+
+                // Get ID from URL: /news/some-id
+                var pathParts = window.location.pathname.split("/");
+                var articleId = pathParts[pathParts.length - 1];
+
+                if (!articleId || typeof newsArticles === "undefined") {
+                    showNotFound();
+                    return;
+                }
+
+                var article = null;
+                var articleIndex = -1;
+                for (var i = 0; i < newsArticles.length; i++) {
+                    if (newsArticles[i].id === articleId) {
+                        article = newsArticles[i];
+                        articleIndex = i;
+                        break;
+                    }
+                }
+
+                if (!article) {
+                    showNotFound();
+                    return;
+                }
+
+                // Update page title
+                document.title = article.title + " — TWWDA";
+
+                // ── Build paragraphs HTML ──
+                var parasHtml = "";
+                article.paragraphs.forEach(function (p) {
+                    parasHtml += '<p class="article-paragraph">' + p + "</p>";
+                });
+
+                // ── Build gallery ──
+                var galleryHtml = "";
+                if (article.images && article.images.length > 1) {
+                    var galleryItems = "";
+                    article.images.forEach(function (src, idx) {
+                        galleryItems +=
+                            '<div class="gallery-item" data-idx="' +
+                            idx +
+                            '">' +
+                            '<img src="' +
+                            src +
+                            '" alt="Photo ' +
+                            (idx + 1) +
+                            '" loading="lazy" />' +
+                            '<div class="gallery-item-overlay"></div>' +
+                            "</div>";
+                    });
+                    galleryHtml =
+                        '<div class="article-gallery">' +
+                        '<span class="gallery-label">Photos (' +
+                        article.images.length +
+                        ")</span>" +
+                        '<div class="gallery-grid" id="gallery-grid">' +
+                        galleryItems +
+                        "</div>" +
+                        "</div>";
+                }
+
+                // ── Other articles ──
+                var others = newsArticles
+                    .filter(function (a) {
+                        return a.id !== articleId;
+                    })
+                    .slice(0, 2);
+                var othersHtml = "";
+                if (others.length) {
+                    var otherCards = "";
+                    others.forEach(function (a) {
+                        otherCards +=
+                            '<a href="/news/' +
+                            a.id +
+                            '" class="other-card">' +
+                            '<div class="other-card-img"><img src="' +
+                            a.images[0] +
+                            '" alt="' +
+                            a.title +
+                            '" /></div>' +
+                            '<div class="other-card-body">' +
+                            '<span class="other-card-date">' +
+                            a.date +
+                            "</span>" +
+                            '<p class="other-card-title">' +
+                            a.title +
+                            "</p>" +
+                            "</div>" +
+                            "</a>";
+                    });
+                    othersHtml =
+                        '<div class="other-articles">' +
+                        '<span class="other-label">More Articles</span>' +
+                        '<div class="other-grid">' +
+                        otherCards +
+                        "</div>" +
+                        "</div>";
+                }
+
+                // ── Render ──
+                root.innerHTML =
+                    '<div class="article-hero">' +
+                    '<div class="article-hero-inner">' +
+                    '<span class="article-hero-date">' +
+                    article.date +
+                    "</span>" +
+                    "<h1>" +
+                    article.title +
+                    "</h1>" +
+                    "</div>" +
+                    "</div>" +
+                    '<div class="article-lead-img-wrap">' +
+                    '<img class="article-lead-img" src="' +
+                    article.images[0] +
+                    '" alt="' +
+                    article.title +
+                    '" />' +
+                    "</div>" +
+                    '<div class="article-body-wrap">' +
+                    '<a href="/news" class="article-back">' +
+                    '<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>' +
+                    "Back to News" +
+                    "</a>" +
+                    '<div class="article-content">' +
+                    parasHtml +
+                    "</div>" +
+                    galleryHtml +
+                    othersHtml +
+                    "</div>";
+
+                // ── Lightbox ──
+                var images = article.images;
+                var current = 0;
+                var lightbox = document.getElementById("lightbox");
+                var lbImg = document.getElementById("lb-img");
+                var lbCounter = document.getElementById("lb-counter");
+
+                function openLightbox(idx) {
+                    current = idx;
+                    lbImg.src = images[current];
+                    lbCounter.textContent = current + 1 + " / " + images.length;
+                    lightbox.classList.add("open");
+                }
+                function closeLightbox() {
+                    lightbox.classList.remove("open");
+                }
+                function prevImg() {
+                    current = (current - 1 + images.length) % images.length;
+                    openLightbox(current);
+                }
+                function nextImg() {
+                    current = (current + 1) % images.length;
+                    openLightbox(current);
+                }
+
+                document.getElementById("lb-close").onclick = closeLightbox;
+                document.getElementById("lb-prev").onclick = prevImg;
+                document.getElementById("lb-next").onclick = nextImg;
+                lightbox.onclick = function (e) {
+                    if (e.target === lightbox) closeLightbox();
+                };
+
+                document.addEventListener("keydown", function (e) {
+                    if (!lightbox.classList.contains("open")) return;
+                    if (e.key === "ArrowLeft") prevImg();
+                    if (e.key === "ArrowRight") nextImg();
+                    if (e.key === "Escape") closeLightbox();
+                });
+
+                // Attach gallery click after render
+                setTimeout(function () {
+                    var galleryGrid = document.getElementById("gallery-grid");
+                    if (!galleryGrid) return;
+                    galleryGrid
+                        .querySelectorAll(".gallery-item")
+                        .forEach(function (item) {
+                            item.onclick = function () {
+                                openLightbox(parseInt(item.dataset.idx));
+                            };
+                        });
+                }, 50);
+
+                function showNotFound() {
+                    root.innerHTML =
+                        '<div class="not-found">' +
+                        "<h2>Article not found</h2>" +
+                        '<p><a href="/news">← Back to News</a></p>' +
+                        "</div>";
+                }
+            })();
+        </script>
+    </body>
+</html>

@@ -83,6 +83,7 @@ export default function createRouter(requireAuth, superAdminAuth) {
 
   // ── Media Center ───────────────────────────────────────
   router.get("/news", (req, res) => res.sendFile(pub("news.html")));
+  router.get("/news/:id", (req, res) => res.sendFile(pub("news-article.html")));
   router.get("/speeches", (req, res) => res.sendFile(pub("speeches.html")));
   router.get("/publications", (req, res) =>
     res.sendFile(pub("publications.html")),
