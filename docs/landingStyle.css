@@ -1494,7 +1494,6 @@ details.mm-group[open] .chevron {
     position: relative;
     aspect-ratio: 4/3;
     overflow: hidden;
-    border-bottom: 2px solid var(--ink);
     flex-shrink: 0;
     padding: 12px;
 }
@@ -1502,7 +1501,7 @@ details.mm-group[open] .chevron {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.2s ease;
     display: block;
 }
 .nv2-feat:hover .nv2-feat-img {
@@ -1577,7 +1576,6 @@ details.mm-group[open] .chevron {
     align-items: stretch;
     text-decoration: none;
     color: inherit;
-    border-bottom: 2px solid var(--ink);
     transition: background 0.15s;
     flex: 1;
 }
@@ -1589,7 +1587,6 @@ details.mm-group[open] .chevron {
     min-width: 110px;
     flex-shrink: 0;
     overflow: hidden;
-    border-right: 2px solid var(--ink);
     padding: 8px;
 }
 .nv2-side-img {
@@ -1597,10 +1594,10 @@ details.mm-group[open] .chevron {
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.4s;
+    transition: transform 0.2s;
 }
 .nv2-side-card:hover .nv2-side-img {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 .nv2-side-body {
     padding: 14px 16px;
