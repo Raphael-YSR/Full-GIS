@@ -151,11 +151,23 @@ document.addEventListener("DOMContentLoaded", () => {
         const response = await fetch(`/gis/admins/${id}`);
         if (response.ok) {
           const admin = await response.json();
-          adminDetailsDiv.innerHTML = `
-            <h2 class="text-xl font-bold mb-2">${admin.f_name} ${admin.l_name}</h2>
-            <p class="text-gray-400">Email: ${admin.email}</p>
-            <p class="text-gray-400">Department: ${admin.department_name || "N/A"}</p>
-          `;
+
+          // Use logical OR (||) to provide fallbacks if the names are missing
+          const firstName = admin.f_name || "Admin";
+          const lastName = admin.l_name || "";
+          const fullName = `${firstName} ${lastName}`.trim();
+
+          document.getElementById("adminName").textContent = fullName;
+          document.getElementById("adminFullName").textContent = fullName;
+          document.getElementById("adminEmail").textContent =
+            admin.email || "N/A";
+          document.getElementById("adminDepartment").textContent =
+            admin.department_name || "N/A";
+
+          document.getElementById("adminLastLogin").textContent =
+            admin.last_login
+              ? new Date(admin.last_login).toLocaleString()
+              : "Never";
         }
       } catch (error) {
         console.error("Error fetching admin details:", error);

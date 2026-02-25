@@ -522,11 +522,13 @@ app.get("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
       return res.status(400).json({ error: "Invalid admin ID format." });
 
     const result = await client.query(
-      `SELECT a.*, d.department_name FROM admin.admin a
-       LEFT JOIN admin.department d ON a.department_id = d.id
-       WHERE a.id = $1`,
-      [adminId],
+      `SELECT a.id, a.f_name, a.l_name, a.email, a.last_login, d.department_name
+         FROM admin.admin a
+         LEFT JOIN admin.departments d ON a.department_id = d.id
+         WHERE a.id = $1`,
+      [req.params.id],
     );
+
     if (result.rows.length === 0)
       return res.status(404).json({ error: "Administrator not found" });
 
@@ -700,56 +702,39 @@ app.post("/gis/admins", requireAuth, superAdminAuth, async (req, res) => {
 
 // 17. Delete admin
 app.delete("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
+  const adminId = parseInt(req.params.id, 10);
+
+  // Prevent superadmin from deleting themselves
+  if (adminId === req.session.user.id) {
+    return res
+      .status(400)
+      .json({ error: "You cannot delete your own account." });
+  }
+
   let client;
   try {
     client = await pool.connect();
-    const adminId = parseInt(req.params.id, 10);
-    if (isNaN(adminId))
-      return res.status(400).json({ error: "Invalid admin ID format." });
-    if (req.session.user && req.session.user.id === adminId) {
-      return res
-        .status(403)
-        .json({ error: "Cannot delete your own superadmin account." });
-    }
-
-    const adminCheck = await client.query(
-      "SELECT fname, lname FROM admin.admin WHERE id = $1",
-      [adminId],
-    );
-    if (adminCheck.rows.length === 0)
-      return res.status(404).json({ error: "Administrator not found" });
-    const adminName = `${adminCheck.rows[0].fname} ${adminCheck.rows[0].lname}`;
-
     const result = await client.query(
-      "DELETE FROM admin.admin WHERE id = $1 RETURNING id",
+      "DELETE FROM admin.admin WHERE id = $1 RETURNING f_name, l_name",
       [adminId],
     );
-    if (result.rowCount === 0)
-      return res
-        .status(404)
-        .json({ error: "Administrator not found for deletion." });
 
+    if (result.rowCount === 0)
+      return res.status(404).json({ error: "Administrator not found." });
+
+    // Log the action
     await client.query(
-      "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
+      "INSERT INTO admin.audit_log (admin_id, action, details) VALUES ($1, $2, $3)",
       [
         req.session.user.id,
-        "ADMIN_DELETED",
-        `Deleted admin ID: ${adminId} (${adminName})`,
+        "DELETE_ADMIN",
+        `Deleted admin: ${result.rows[0].f_name} ${result.rows[0].l_name}`,
       ],
     );
-    res.status(200).json({
-      message: `Administrator '${adminName}' (ID: ${adminId}) deleted successfully!`,
-    });
-  } catch (error) {
-    console.error("Error deleting administrator:", error);
-    if (error.code === "23503")
-      return res.status(409).json({
-        error:
-          "Cannot delete administrator because they are linked to other records.",
-      });
-    res
-      .status(500)
-      .json({ error: "An error occurred while deleting the administrator." });
+
+    res.json({ message: "Administrator account deleted successfully." });
+  } catch (err) {
+    res.status(500).json({ error: "Database error during deletion." });
   } finally {
     if (client) client.release();
   }
