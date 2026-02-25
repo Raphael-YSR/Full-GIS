@@ -115,6 +115,13 @@ export default function createRouter(requireAuth, superAdminAuth) {
   router.get("/gis/login", (req, res) => res.sendFile(docs("login.html")));
 
   /* ════════════════════════════════════
+      DATA
+     ════════════════════════════════════ */
+  router.get("/news-data.js", (req, res) =>
+    res.sendFile(path.join(__dirname, "newsData.js")),
+  );
+
+  /* ════════════════════════════════════
      PROTECTED GIS ADMIN PAGES
      Auth middleware injected from server.js
      ════════════════════════════════════ */
