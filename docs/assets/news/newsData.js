@@ -1,5 +1,30 @@
 const newsArticles = [
   {
+    id: "afdb-supervision-2025",
+    date: "September 26, 2025",
+    title:
+      "AfDB Undertakes Supervision Mission on Water and Sanitation Projects in Kenya",
+    paragraphs: [
+      "The African Development Bank Group (AfDB) successfully undertook a two-day supervision mission of projects jointly funded by the Government of Kenya and the Bank. The projects are being implemented by Tana Water Works Development Agency (TWWDA) and Northern Water Works Development Agency (NWWDA) under the Kenya Towns Sustainable Water Supply and Sanitation Program.",
+      "The mission, which began with a detailed progress briefing from the implementing agencies, provided an opportunity to review milestones achieved and address emerging challenges in the delivery of water and sanitation infrastructure.",
+      "As part of the program, the delegation carried out a field visit to Marsabit Water and Sewerage Projects.",
+      "Marsabit Water Supply (Bakuli Dam): The project is substantially complete and already supplying over 1,200 m³ of clean water daily to community members. This intervention is a critical step toward reducing water scarcity in the region and improving residents’ quality of life.",
+      "Marsabit Sewerage Project: Currently 90% complete, this flagship initiative is designed to enhance access to improved sanitation services for the people of Marsabit. Once finalized, it will ensure safer waste management and contribute to a healthier environment for the growing urban population.",
+      "Through collaborative efforts between the Government of Kenya, AfDB, and implementing Agencies, significant progress continues to be made in strengthening water supply and sanitation systems across the country.",
+      "These projects underscore a shared commitment to delivering sustainable water and sanitation solutions that improve livelihoods, safeguard public health, and support socio-economic development in Kenya’s towns.",
+    ],
+    images: [
+      "https://tanawwda.go.ke/wp-content/uploads/2025/10/556161582_1096815129293397_221480069354126728_n.jpg",
+      "https://tanawwda.go.ke/wp-content/uploads/2025/10/556105907_1096824579292452_8749885522741132982_n.jpg",
+      "https://tanawwda.go.ke/wp-content/uploads/2025/10/556103173_1096816359293274_10012144665578924_n.jpg",
+      "https://tanawwda.go.ke/wp-content/uploads/2025/10/555900980_1096820465959530_6704378625064402836_n.jpg",
+      "https://tanawwda.go.ke/wp-content/uploads/2025/10/555596134_1096824029292507_9047576982221000245_n.jpg",
+      "https://tanawwda.go.ke/wp-content/uploads/2025/10/554992206_1096814092626834_6901808568556293710_n.jpg",
+      "https://tanawwda.go.ke/wp-content/uploads/2025/10/554394506_1096812865960290_2579075577193714125_n.jpg",
+      "https://tanawwda.go.ke/wp-content/uploads/2025/10/554077135_1096824759292434_1592112366860889494_n.jpg",
+    ],
+  },
+  {
     id: "cs-ps-twwda-inspections-2025",
     date: "September 20, 2025",
     title:

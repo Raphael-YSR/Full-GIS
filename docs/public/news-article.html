@@ -264,8 +264,8 @@
                 display: inline-flex;
                 align-items: center;
                 gap: 7px;
-                margin-top: 48px;
-                margin-bottom: 8px;
+                margin-top: 36px;
+                margin-bottom: 36px;
                 font-size: 0.75rem;
                 font-weight: 700;
                 letter-spacing: 0.07em;
@@ -432,7 +432,7 @@
             <div class="lightbox-counter" id="lb-counter"></div>
         </div>
 
-        <script src="/assets/news/newsData.js"></script>
+        <script src="../assets/news/newsData.js"></script>
         <script>
             (function () {
                 var root = document.getElementById("article-root");
@@ -556,14 +556,14 @@
                     '" />' +
                     "</div>" +
                     '<div class="article-body-wrap">' +
-                    '<a href="/news" class="article-back">' +
-                    '<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>' +
-                    "Back to News" +
-                    "</a>" +
                     '<div class="article-content">' +
                     parasHtml +
                     "</div>" +
                     galleryHtml +
+                    '<a href="/news" class="article-back">' +
+                    '<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>' +
+                    "Back to News" +
+                    "</a>" +
                     othersHtml +
                     "</div>";
 
