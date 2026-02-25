@@ -224,12 +224,10 @@ app.get("/gis/projects/locations", async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching project locations:", err.stack);
-    res
-      .status(500)
-      .json({
-        error: "Internal Server Error fetching locations",
-        details: err.message,
-      });
+    res.status(500).json({
+      error: "Internal Server Error fetching locations",
+      details: err.message,
+    });
   } finally {
     if (client) client.release();
   }
@@ -342,12 +340,10 @@ app.get("/gis/counties", requireAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching counties:", err);
-    res
-      .status(500)
-      .json({
-        error: "Server error fetching counties.",
-        ...(isProd ? {} : { details: err.message }),
-      });
+    res.status(500).json({
+      error: "Server error fetching counties.",
+      ...(isProd ? {} : { details: err.message }),
+    });
   } finally {
     if (client) client.release();
   }
@@ -364,12 +360,10 @@ app.get("/gis/statuses", requireAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching statuses:", err);
-    res
-      .status(500)
-      .json({
-        error: "Server error fetching Statuses.",
-        ...(isProd ? {} : { details: err.message }),
-      });
+    res.status(500).json({
+      error: "Server error fetching Statuses.",
+      ...(isProd ? {} : { details: err.message }),
+    });
   } finally {
     if (client) client.release();
   }
@@ -386,12 +380,10 @@ app.get("/gis/types", requireAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Error fetching types:", err);
-    res
-      .status(500)
-      .json({
-        error: "Server error fetching Types.",
-        ...(isProd ? {} : { details: err.message }),
-      });
+    res.status(500).json({
+      error: "Server error fetching Types.",
+      ...(isProd ? {} : { details: err.message }),
+    });
   } finally {
     if (client) client.release();
   }
@@ -441,12 +433,10 @@ app.get("/gis/api/search", requireAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Search Database error:", err);
-    res
-      .status(500)
-      .json({
-        error: "Internal server error during search",
-        details: err.message,
-      });
+    res.status(500).json({
+      error: "Internal server error during search",
+      details: err.message,
+    });
   } finally {
     if (client) client.release();
   }
@@ -476,12 +466,10 @@ app.get("/gis/admins/search", requireAuth, superAdminAuth, async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Admin Search Database error:", err);
-    res
-      .status(500)
-      .json({
-        error: "Internal server error during admin search",
-        details: err.message,
-      });
+    res.status(500).json({
+      error: "Internal server error during admin search",
+      details: err.message,
+    });
   } finally {
     if (client) client.release();
   }
@@ -562,33 +550,27 @@ app.put("/gis/project/:id", requireAuth, async (req, res) => {
     return res.status(400).json({ error: "Invalid project ID format." });
 
   const {
-    project_name,
-    county_id,
     project_status,
-    project_type,
     description,
-    people_served,
     progress,
     latitude,
     longitude,
+    // Removed project_name, county_id, and project_type because they aren't in your form
   } = req.body;
 
-  const missingFields = [];
-  if (!project_name) missingFields.push("project_name");
-  if (county_id == null) missingFields.push("county_id");
-  if (project_status == null) missingFields.push("project_status");
-  if (project_type == null) missingFields.push("project_type");
-  if (latitude == null) missingFields.push("latitude");
-  if (longitude == null) missingFields.push("longitude");
-  if (missingFields.length > 0)
-    return res
-      .status(400)
-      .json({ error: `Missing required fields: ${missingFields.join(", ")}.` });
+  // 1. Validate only what we need
+  if (!project_status || !latitude || !longitude) {
+    return res.status(400).json({
+      error:
+        "Missing required fields: Status, Latitude, and Longitude are mandatory.",
+    });
+  }
 
   let client;
   try {
     const lat = Number(latitude);
     const lon = Number(longitude);
+
     if (
       isNaN(lat) ||
       isNaN(lon) ||
@@ -604,40 +586,34 @@ app.put("/gis/project/:id", requireAuth, async (req, res) => {
 
     const hashed_location = `POINT(${lon} ${lat})`;
     client = await pool.connect();
+
+    // 2. Updated SQL: Only update the fields that the admin is allowed to change in the form
     const result = await client.query(
       `UPDATE public.project
-       SET project_name = $1, county_id = $2, project_status = $3, project_type = $4,
-           description = $5, people_served = $6, progress = $7, hashed_location = ST_GeomFromText($8, 4326)
-       WHERE id = $9
-       RETURNING id`,
+       SET project_status = $1,
+           description = $2,
+           progress = $3,
+           hashed_location = ST_GeomFromText($4, 4326)
+       WHERE id = $5
+       RETURNING id, project_name`,
       [
-        project_name,
-        county_id,
         project_status,
-        project_type,
         description || null,
-        people_served || null,
-        progress || null,
+        progress || 0,
         hashed_location,
         projectId,
       ],
     );
+
     if (result.rowCount === 0)
-      return res
-        .status(404)
-        .json({ error: `Project with ID ${projectId} not found for update.` });
+      return res.status(404).json({ error: "Project not found." });
+
     res.json({
-      message: `Project '${project_name}' (ID: ${projectId}) updated successfully!`,
+      message: `Project '${result.rows[0].project_name}' updated successfully!`,
     });
   } catch (err) {
     console.error(`Error updating project ${projectId}:`, err);
-    if (err.code === "23505")
-      return res
-        .status(409)
-        .json({ error: "Another project with this name might already exist." });
-    res
-      .status(500)
-      .json({ error: "Error updating project.", details: err.message });
+    res.status(500).json({ error: "Internal server error during update." });
   } finally {
     if (client) client.release();
   }
@@ -661,22 +637,18 @@ app.delete(
         [projectId],
       );
       if (result.rowCount === 0)
-        return res
-          .status(404)
-          .json({
-            error: `Project with ID ${projectId} not found for deletion.`,
-          });
+        return res.status(404).json({
+          error: `Project with ID ${projectId} not found for deletion.`,
+        });
       res.json({
         message: `Project '${result.rows[0].project_name}' (ID: ${projectId}) deleted successfully!`,
       });
     } catch (err) {
       console.error(`Error deleting project ${projectId}:`, err);
       if (err.code === "23503")
-        return res
-          .status(409)
-          .json({
-            error: "Cannot delete project because it is referenced elsewhere.",
-          });
+        return res.status(409).json({
+          error: "Cannot delete project because it is referenced elsewhere.",
+        });
       res
         .status(500)
         .json({ error: "Error deleting project.", details: err.message });
@@ -710,12 +682,10 @@ app.post("/gis/admins", requireAuth, superAdminAuth, async (req, res) => {
        RETURNING id, email, fname, lname, is_active, department_id, role_id`,
       [hashedPassword, email, f_name, l_name, true, department_id, 1],
     );
-    res
-      .status(201)
-      .json({
-        message: `Administrator '${f_name} ${l_name}' has been added!`,
-        admin: result.rows[0],
-      });
+    res.status(201).json({
+      message: `Administrator '${f_name} ${l_name}' has been added!`,
+      admin: result.rows[0],
+    });
   } catch (err) {
     console.error("Error adding administrator:", err);
     if (err.code === "23503")
@@ -767,20 +737,16 @@ app.delete("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
         `Deleted admin ID: ${adminId} (${adminName})`,
       ],
     );
-    res
-      .status(200)
-      .json({
-        message: `Administrator '${adminName}' (ID: ${adminId}) deleted successfully!`,
-      });
+    res.status(200).json({
+      message: `Administrator '${adminName}' (ID: ${adminId}) deleted successfully!`,
+    });
   } catch (error) {
     console.error("Error deleting administrator:", error);
     if (error.code === "23503")
-      return res
-        .status(409)
-        .json({
-          error:
-            "Cannot delete administrator because they are linked to other records.",
-        });
+      return res.status(409).json({
+        error:
+          "Cannot delete administrator because they are linked to other records.",
+      });
     res
       .status(500)
       .json({ error: "An error occurred while deleting the administrator." });
