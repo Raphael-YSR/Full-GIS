@@ -3,3 +3,7 @@ node_modules/
 testconnection/
 .vscode/
 .zed
+
+
+
+docs\assets\news\newsDataRaw.js
