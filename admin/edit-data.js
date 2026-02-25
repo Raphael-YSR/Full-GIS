@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchProjectDetails(id) {
     try {
-      const response = await fetch(`/gis/projects/${id}`);
+      const response = await fetch(`/gis/project/${id}`);
       if (!response.ok) throw new Error("Not found");
       const project = await response.json();
 
