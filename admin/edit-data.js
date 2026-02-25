@@ -53,8 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (projectDetailsDiv) {
         projectDetailsDiv.innerHTML = `
           <h2 class="text-xl font-bold mb-2">${project.project_name}</h2>
-          <p class="text-gray-400">County: ${project.county_name}</p>
-          <p class="text-gray-400">Type: ${project.type_name}</p>
+          <p class="text-gray-400">County: ${project.county}</p>
+          <p class="text-gray-400">Type: ${project.project_type_name}</p>
         `;
       }
 
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
       const projectData = Object.fromEntries(new FormData(editProjectForm));
       try {
-        const response = await fetch(`/gis/projects/${projectId}`, {
+        const response = await fetch(`/gis/project/${projectId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(projectData),
