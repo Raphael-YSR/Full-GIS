@@ -524,7 +524,7 @@ app.get("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
     const result = await client.query(
       `SELECT a.id, a.f_name, a.l_name, a.email, a.last_login, d.department_name
          FROM admin.admin a
-         LEFT JOIN admin.departments d ON a.department_id = d.id
+         LEFT JOIN admin.department d ON a.department_id = d.id
          WHERE a.id = $1`,
       [req.params.id],
     );
