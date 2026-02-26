@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tenders — Tana Water Works Development Agency</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../landingStyle.css" />
+        <style>
+            .page-banner {
+                background: var(--ink);
+                border-bottom: 3px solid var(--green);
+                padding: 36px 0;
+            }
+            .page-banner-inner {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 0 24px;
+            }
+            .page-banner-eyebrow {
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--green-mid);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            .page-banner-eyebrow::before {
+                content: "";
+                display: block;
+                width: 20px;
+                height: 1.5px;
+                background: var(--green);
+            }
+            .page-banner h1 {
+                font-family: "IBM Plex Serif", serif;
+                font-size: clamp(26px, 4vw, 40px);
+                font-weight: 600;
+                color: #f0f2ef;
+                line-height: 1.2;
+            }
+            .breadcrumb {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 12px;
+                font-size: 11.5px;
+                color: #5a5e5a;
+            }
+            .breadcrumb a {
+                color: #5a5e5a;
+                text-decoration: none;
+                transition: color 0.15s;
+            }
+            .breadcrumb a:hover {
+                color: var(--green-mid);
+            }
+            .breadcrumb-sep {
+                color: #3a3e3a;
+            }
+            .breadcrumb-current {
+                color: var(--green-mid);
+            }
+
+            .page-wrap {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 48px 24px 64px;
+            }
+            .section-heading {
+                font-family: "IBM Plex Serif", serif;
+                font-size: 22px;
+                font-weight: 600;
+                color: #2a3a92;
+                margin-bottom: 10px;
+            }
+            .section-rule {
+                height: 2px;
+                background: linear-gradient(to right, #87c74b, transparent);
+                margin-bottom: 36px;
+            }
+
+            .content-intro {
+                background: var(--white);
+                border: 2px solid var(--rule);
+                border-left: 4px solid var(--green);
+                padding: 24px 32px;
+                margin-bottom: 40px;
+                font-size: 15px;
+                line-height: 1.8;
+                color: var(--ink-mid);
+            }
+
+            /* ── Document cards ── */
+            .docs-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+                margin-bottom: 48px;
+            }
+            @media (max-width: 640px) {
+                .docs-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .doc-card {
+                background: var(--white);
+                border: 2px solid var(--rule);
+                padding: 28px 28px 24px;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                transition:
+                    border-color 0.2s,
+                    box-shadow 0.2s;
+            }
+            .doc-card:hover {
+                border-color: var(--green);
+                box-shadow: 0 4px 16px rgba(135, 199, 75, 0.1);
+            }
+
+            .doc-card-top {
+                display: flex;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .doc-icon {
+                width: 48px;
+                height: 48px;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #fff0f0;
+                border: 2px solid #ffd0d0;
+            }
+            .doc-icon svg {
+                width: 24px;
+                height: 24px;
+            }
+
+            .doc-meta {
+                flex: 1;
+            }
+            .doc-type {
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: #c0392b;
+                margin-bottom: 5px;
+            }
+            .doc-title {
+                font-family: "IBM Plex Serif", serif;
+                font-size: 15.5px;
+                font-weight: 600;
+                color: var(--ink);
+                line-height: 1.35;
+            }
+            .doc-desc {
+                font-size: 13px;
+                line-height: 1.7;
+                color: var(--ink-mid);
+                margin: 0;
+            }
+
+            .doc-download {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                align-self: flex-start;
+                background: var(--ink);
+                color: var(--green-mid);
+                border: 1.5px solid #2a3a2a;
+                padding: 9px 20px;
+                font-size: 11.5px;
+                font-weight: 600;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                text-decoration: none;
+                transition:
+                    background 0.2s,
+                    color 0.2s,
+                    border-color 0.2s;
+            }
+            .doc-download:hover {
+                background: var(--green);
+                color: var(--ink);
+                border-color: var(--green);
+            }
+            .doc-download svg {
+                width: 13px;
+                height: 13px;
+                stroke: currentColor;
+                fill: none;
+                stroke-width: 2;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+
+            /* ── Philosophy strip ── */
+            .philosophy-strip {
+                background: var(--ink);
+                border-left: 4px solid var(--green);
+                padding: 24px 32px;
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+            .philosophy-label {
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--green-mid);
+                white-space: nowrap;
+            }
+            .philosophy-quote {
+                font-family: "IBM Plex Serif", serif;
+                font-size: 17px;
+                color: #e8ebe5;
+                line-height: 1.4;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- TOP BAR -->
+        <div class="topbar">
+            <div class="topbar-inner">
+                <a
+                    href="/corruption"
+                    style="display: flex; align-items: center; gap: 6px"
+                >
+                    <svg
+                        width="13"
+                        height="13"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                    </svg>
+                    Corruption
+                </a>
+                <div class="topbar-sep"></div>
+
+                <a href="/contact-us">Feedback</a>
+                <a href="/working-with-us">Vacancies</a>
+                <a href="http://mail.tanawwda.go.ke/" target="_blank"
+                    >Staff Mail</a
+                >
+                <div class="topbar-sep"></div>
+                <div class="topbar-social">
+                    <a
+                        href="https://web.facebook.com/tanawaterworksagency/"
+                        target="_blank"
+                        title="Facebook"
+                    >
+                        <svg
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                            />
+                        </svg>
+                    </a>
+                    <a
+                        href="https://twitter.com/tanawwda"
+                        target="_blank"
+                        title="Twitter/X"
+                    >
+                        <svg
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                            />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- HEADER -->
+        <header class="site-header" id="site-header">
+            <div class="header-inner">
+                <div class="logo-wrap">
+                    <a href="/"
+                        ><img
+                            src="https://tanawwda.go.ke/wp-content/uploads/2021/04/banner.png"
+                            alt="Tana Water Works Development Agency"
+                    /></a>
+                </div>
+                <nav class="desktop-nav">
+                    <a href="/" class="nav-item">Home</a>
+                    <div class="dropdown-wrap">
+                        <button class="nav-item">
+                            About Us
+                            <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+                        <div class="dropdown-panel">
+                            <a href="/background">Background</a>
+                            <a href="/vision-mission"
+                                >Vision, Mission &amp; Core Values</a
+                            >
+                            <a href="/mandate">Mandate / Functions</a>
+                            <a href="/board-of-directors">Board of Directors</a>
+                            <a href="/management">Management</a>
+                            <a href="/organogram">Organogram</a>
+                            <a href="/strategic-plan">Strategic Plan</a>
+                            <a href="/service-charter">Our Service Charter</a>
+                            <a href="/quality-policy">TWWDA Quality Policy</a>
+                        </div>
+                    </div>
+                    <div class="dropdown-wrap">
+                        <button class="nav-item">
+                            Projects
+                            <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+                        <div class="dropdown-panel wide">
+                            <div class="dp-section">Our Projects</div>
+                            <div class="dp-grid">
+                                <div class="dp-col">
+                                    <a href="/projects/embu">Embu County</a>
+                                    <a href="/projects/kirinyaga"
+                                        >Kirinyaga County</a
+                                    >
+                                    <a href="/projects/meru">Meru County</a>
+                                    <a href="/projects/nyeri">Nyeri County</a>
+                                    <a href="/projects/tharaka"
+                                        >Tharaka Nithi County</a
+                                    >
+                                </div>
+                                <div class="dp-col">
+                                    <div
+                                        class="dp-section"
+                                        style="border-top: none"
+                                    >
+                                        Other Agencies
+                                    </div>
+                                    <a href="/projects/garissa"
+                                        >Garissa County</a
+                                    >
+                                    <a href="/projects/isiolo">Isiolo County</a>
+                                    <a href="/projects/mandera"
+                                        >Mandera County</a
+                                    >
+                                    <a href="/projects/marsabit"
+                                        >Marsabit County</a
+                                    >
+                                    <a href="/projects/muranga"
+                                        >Muranga County</a
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/gis" class="nav-item" target="_blank">Web-GIS</a>
+                    <div class="dropdown-wrap">
+                        <button class="nav-item">
+                            Media Center
+                            <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+                        <div class="dropdown-panel">
+                            <a href="/news">News</a
+                            ><a href="/speeches">Speeches</a>
+                            <a href="/publications">Publications</a>
+                            <a href="/access-to-information"
+                                >Access to Information</a
+                            >
+                            <a href="/events">Events</a
+                            ><a href="/photo-gallery">Photo Gallery</a>
+                            <a href="/video-gallery">Video Gallery</a
+                            ><a href="/downloads">Downloads</a>
+                        </div>
+                    </div>
+                    <a href="/tenders" class="nav-item active-link">Tenders</a>
+                    <a href="/contact-us" class="nav-item">Contact Us</a>
+                    <div class="header-search" id="desktop-search">
+                        <input
+                            type="text"
+                            placeholder="Search…"
+                            aria-label="Search"
+                        />
+                        <button aria-label="Submit search">
+                            <svg
+                                width="14"
+                                height="14"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                </nav>
+                <button
+                    class="hamburger"
+                    id="mobile-menu-btn"
+                    aria-label="Open menu"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"
+                        />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- PAGE BANNER -->
+        <div class="page-banner">
+            <div class="page-banner-inner">
+                <h1>Tenders</h1>
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="/">Home</a><span class="breadcrumb-sep">›</span>
+                    <span class="breadcrumb-current">Tenders</span>
+                </nav>
+            </div>
+        </div>
+
+        <!-- PAGE CONTENT -->
+        <main class="page-wrap">
+            <!-- Publication documents -->
+            <h2 class="section-heading">Tenders</h2>
+            <div class="section-rule"></div>
+
+            <div class="content-intro"
+                <p
+                The Tenders section provides access to official procurement
+                notices issued by the Tana Water Works Development Agency. All
+                tenders are published in accordance with the Public Procurement
+                and Asset Disposal Act, 2015. Interested bidders are encouraged
+                to review each notice carefully and submit their bids within the
+                stipulated deadlines.
+            </div>
+
+            <div
+                class="docs-grid"
+                id="tenders-container"
+                style="margin-bottom: 48px"
+            ></div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="site-footer">
+            <div class="footer-main">
+                <div class="footer-col">
+                    <div class="footer-col-label">Certification</div>
+                    <div class="footer-iso-badge">
+                        <img
+                            src="https://tanawwda.go.ke/wp-content/uploads/2021/01/iso5.png"
+                            alt="ISO 9001:2015"
+                        />
+                        <p class="footer-iso-text">
+                            <strong>TWWDA is ISO 9001:2015 certified.</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-label">Important Links</div>
+                    <ul class="footer-links">
+                        <li>
+                            <a href="/about-us"
+                                >Water Works Development Agencies</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://www.wra.go.ke/" target="_blank"
+                                >Water Resources Authority</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://www.waterauthority.go.ke/"
+                                target="_blank"
+                                >National Water Harvesting &amp; Storage
+                                Authority</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://www.waterfund.go.ke/"
+                                target="_blank"
+                                >Water Sector Trust Fund</a
+                            >
+                        </li>
+                        <li>
+                            <a href="http://www.kewi.or.ke/" target="_blank"
+                                >Kenya Water Institute</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://hydrologistsboard.go.ke/"
+                                target="_blank"
+                                >Hydrologists Registration Board</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://www.irrigation.go.ke/"
+                                target="_blank"
+                                >National Irrigation Authority</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-label">Government Links</div>
+                    <ul class="footer-links">
+                        <li>
+                            <a href="https://water.go.ke" target="_blank"
+                                >Ministry of Water and Sanitation</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://treasury.go.ke" target="_blank"
+                                >National Treasury and Planning</a
+                            >
+                        </li>
+                        <li>
+                            <a href="http://cog.go.ke" target="_blank"
+                                >County Governments</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://wasreb.go.ke" target="_blank"
+                                >Water Services Regulatory Board</a
+                            >
+                        </li>
+                        <li>
+                            <a href="http://waterreforms.go.ke/" target="_blank"
+                                >Water Sector Reform Programme</a
+                            >
+                        </li>
+                        <li>
+                            <a href="http://kwscrp.org/" target="_blank"
+                                >Kenya Water Security &amp; Climate
+                                Resilience</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-label">Our Contacts</div>
+                    <div class="footer-contacts">
+                        <div class="footer-contact-item">
+                            <svg
+                                class="footer-contact-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                            </svg>
+                            <span class="footer-contact-text"
+                                >Maji House, along Baden Powell Road<br />P.O.
+                                Box 1292 – 10100, Nyeri, Kenya</span
+                            >
+                        </div>
+                        <div class="footer-contact-item">
+                            <svg
+                                class="footer-contact-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                />
+                            </svg>
+                            <span class="footer-contact-text"
+                                >+254 724 259 891<br />+254 61-2032282</span
+                            >
+                        </div>
+                        <div class="footer-contact-item">
+                            <svg
+                                class="footer-contact-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                />
+                            </svg>
+                            <span class="footer-contact-text"
+                                ><a href="mailto:info@tanawwda.go.ke"
+                                    >info@tanawwda.go.ke</a
+                                ></span
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span class="footer-copyright"
+                    >Copyright &copy; 2026 Tana Water Works Development
+                    Agency.</span
+                >
+                <div class="footer-bottom-links">
+                    <a
+                        href="http://tanawwda.go.ke/wp-content/uploads/2025/10/Water-and-Sanitation-Sub-Sector-Report-18-09-2025.pdf"
+                        >Sub-Sector Report</a
+                    >
+                    <a href="/contact-us">Feedback</a>
+                    <a href="/working-with-us">Vacancies</a>
+                    <a href="http://mail.tanawwda.go.ke/" target="_blank"
+                        >Staff Mail</a
+                    >
+                </div>
+            </div>
+        </footer>
+
+        <!-- MOBILE MENU -->
+        <div
+            class="mobile-menu"
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
+        >
+            <div class="mm-head">
+                <img
+                    src="https://tanawwda.go.ke/wp-content/uploads/2021/04/banner.png"
+                    alt="Tana Water Works Development Agency"
+                />
+                <button
+                    class="mm-close"
+                    id="mobile-menu-close"
+                    aria-label="Close menu"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    </svg>
+                </button>
+            </div>
+            <div class="mm-search">
+                <form action="/" method="get">
+                    <input
+                        type="text"
+                        name="s"
+                        placeholder="Search…"
+                        aria-label="Search"
+                    />
+                </form>
+            </div>
+            <nav class="mm-nav">
+                <a href="/" class="mm-link">Home</a>
+                <details class="mm-group" open>
+                    <summary>
+                        About Us
+                        <svg
+                            class="chevron"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+                    </summary>
+                    <div class="mm-sub">
+                        <a href="/background">Background</a>
+                        <a href="/vision-mission"
+                            >Vision, Mission &amp; Core Values</a
+                        >
+                        <a href="/mandate">Mandate / Functions</a>
+                        <a href="/board-of-directors">Board of Directors</a>
+                        <a href="/management">Management</a>
+                        <a href="/organogram">Organogram</a>
+                        <a href="/strategic-plan">Strategic Plan</a>
+                        <a href="/service-charter">Our Service Charter</a>
+                        <a href="/quality-policy">TWWDA Quality Policy</a>
+                    </div>
+                </details>
+                <details class="mm-group">
+                    <summary>
+                        Projects
+                        <svg
+                            class="chevron"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+                    </summary>
+                    <div class="mm-sub">
+                        <div class="mm-sub-label">Our Projects</div>
+                        <a href="/projects/embu">Embu County</a
+                        ><a href="/projects/kirinyaga">Kirinyaga County</a>
+                        <a href="/projects/meru">Meru County</a
+                        ><a href="/projects/nyeri">Nyeri County</a>
+                        <a href="/projects/tharaka">Tharaka Nithi County</a>
+                        <div class="mm-sub-label" style="margin-top: 6px">
+                            Other Agencies
+                        </div>
+                        <a href="/projects/garissa">Garissa County</a
+                        ><a href="/projects/isiolo">Isiolo County</a>
+                        <a href="/projects/mandera">Mandera County</a
+                        ><a href="/projects/marsabit">Marsabit County</a>
+                        <a href="/projects/muranga">Muranga County</a>
+                    </div>
+                </details>
+                <a href="/gis" class="mm-link" target="_blank">Web-GIS</a>
+                <details class="mm-group">
+                    <summary>
+                        Media Center
+                        <svg
+                            class="chevron"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 18l6-6-6-6"
+                            />
+                        </svg>
+                    </summary>
+                    <div class="mm-sub">
+                        <a href="/news">News</a><a href="/speeches">Speeches</a>
+                        <a href="/publications">Publications</a>
+                        <a href="/access-to-information"
+                            >Access to Information</a
+                        >
+                        <a href="/events">Events</a
+                        ><a href="/photo-gallery">Photo Gallery</a>
+                        <a href="/video-gallery">Video Gallery</a
+                        ><a href="/downloads">Downloads</a>
+                    </div>
+                </details>
+                <a href="/tenders" class="mm-link">Tenders</a>
+                <a href="/contact-us" class="mm-link">Contact Us</a>
+            </nav>
+        </div>
+
+        <script>
+            const header = document.getElementById("site-header");
+            const desktopSearch = document.getElementById("desktop-search");
+            function syncSearch() {
+                desktopSearch.style.display =
+                    window.innerWidth >= 1024 ? "block" : "none";
+            }
+            syncSearch();
+            window.addEventListener("resize", syncSearch);
+            window.addEventListener("scroll", () => {
+                header.classList.toggle("scrolled", window.scrollY > 50);
+            });
+            const mobileMenu = document.getElementById("mobile-menu");
+            const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+            const mobileMenuClose =
+                document.getElementById("mobile-menu-close");
+            function openMenu() {
+                mobileMenu.classList.add("open");
+                document.body.style.overflow = "hidden";
+            }
+            function closeMenu() {
+                mobileMenu.classList.remove("open");
+                document.body.style.overflow = "";
+            }
+            mobileMenuBtn.addEventListener("click", openMenu);
+            mobileMenuClose.addEventListener("click", closeMenu);
+            mobileMenu.addEventListener("click", (e) => {
+                if (e.target === mobileMenu) closeMenu();
+            });
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") closeMenu();
+            });
+        </script>
+
+        <script src="../assets/tenders/tenders.js"></script>
+        <script>
+            const container = document.getElementById("tenders-container");
+
+            tenders.forEach((doc) => {
+                const card = document.createElement("div");
+                card.className = "doc-card";
+
+                card.innerHTML = `
+                    <div class="doc-card-top">
+                    <div class="doc-icon" style="background:#f0f4ff; border-color:#c8d0f0; flex-direction:column; gap:2px;">
+                        <span style="font-size:15px; font-weight:700; color:#2a3a92; line-height:1;">${new Date(doc.dateISO).getDate()}</span>
+                        <span style="font-size:8px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#2a3a92;">${new Date(doc.dateISO).toLocaleString("default", { month: "short" })}</span>
+                        <span style="font-size:8px; color:#6a7ab0;">${new Date(doc.dateISO).getFullYear()}</span>
+                    </div>
+                        <div class="doc-meta">
+                            <div class="doc-type">Tender Notice · ${doc.date}</div>
+                            <div class="doc-title">${doc.title}</div>
+                        </div>
+                    </div>
+                    <a href="/tenders/${doc.id}" class="doc-download">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                        VIEW TENDER
+                    </a>
+                `;
+
+                container.appendChild(card);
+            });
+        </script>
+    </body>
+</html>

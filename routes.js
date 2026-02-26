@@ -82,6 +82,7 @@ export default function createRouter(requireAuth, superAdminAuth) {
   );
 
   // ── Media Center ───────────────────────────────────────
+  router.get("/media", (req, res) => res.sendFile(pub("media.html")));
   router.get("/news", (req, res) => res.sendFile(pub("news.html")));
   router.get("/news/:id", (req, res) => res.sendFile(pub("news-article.html")));
   router.get("/speeches", (req, res) => res.sendFile(pub("speeches.html")));
@@ -102,6 +103,9 @@ export default function createRouter(requireAuth, superAdminAuth) {
 
   // ── Standalone nav links ────────────────────────────────
   router.get("/tenders", (req, res) => res.sendFile(pub("tenders.html")));
+  router.get("/tenders/:id", (req, res) =>
+    res.sendFile(pub("tendersPage.html")),
+  );
   router.get("/contact-us", (req, res) => res.sendFile(pub("contact-us.html")));
   router.get("/working-with-us", (req, res) =>
     res.sendFile(pub("working-with-us.html")),
