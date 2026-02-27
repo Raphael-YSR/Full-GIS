@@ -1,7 +1,3 @@
-//publications
-//
-// The full TWWDA Service Charter in English, outlining service commitments, standards, and the rights of citizens when engaging with the Agency.
-
 const publications = [
   {
     title: "TWWDA Customer Satisfaction Survey",
@@ -104,44 +100,3 @@ const publications = [
     link: "https://tanawwda.go.ke/wp-content/uploads/2024/07/8H.-TWWDA-Aggregate-P.P.-2023-2024-APPRVD-SUPL-ESTS-NO.1.pdf",
   },
 ];
-
-/*  TWWDA Customer Satisfaction Survey
-  TWWDA 2023-2027 STRATEGIC PLAN
-  ESIA Report for Runyenjes Water Supply Project
-  ESIA Report for Chogoria Water Supply Project -Last Mile Connectivity
-  ESIA Report for Chogoria Sewerage Project-Last Mile Connectivity Project
-  ESIA Report for Chuka Water Project-Last Mile Connectivity
-  ESIA Report for Chuka Sewerage Project-Last Mile Connectivity
-  ESIA Report for Meru Sewerage Project-Last Mile Connectivity Project
-  ESIA Report for Kerugoya Kutus Water Project, Last Mile
-  ESIA Report for Kerugoya Kutus Sewer Project, Last Mile Connectivity
-  RAP Report for Chuka Sewerage Project-Last Mile Connectivity
-  RAP Report for Chuka Water Project-Last Mile Connectivity
-  RAP Report for Runyenjes Water Supply Project
-  RAP Report for Chogoria Water Supply Project-Last Mile Connectivity
-  RAP Report for Meru Sewerage Project-Last Mile Connectivity
-  RAP Report for Chogoria Sewer Last Mile Connectivity Project
-  RAP Report for Kerugoya Kutus Water Supply Project-Last Mile Connectivity
-  RAP Report for Kerugoya Kutus Sewerage-Last Mile Connectivity
-  2023-2024 TWWDA Procurement plan
-
-
-Its a collection of PDFs
-
-http://tanawwda.go.ke/wp-content/uploads/2022/05/Customer-Satisfaction-Survey-2022.pdf
-http://tanawwda.go.ke/wp-content/uploads/2025/01/TANA-WATER-WORKS-DEVELOPMENT-AGENCY-STRATEGIC-PLAN-16th-JAN-2025-2-1.pdf
-https://tanawwda.go.ke/wp-content/uploads/2024/05/ESIA-Report-for-Runyenjes-Water-Supply-Project-1-1.pdf
-http://tanawwda.go.ke/wp-content/uploads/2024/05/ESIA-Report-for-Chogoria-Water-Supply-Project-Last-Mile-Connectivity_3.pdf
-http://tanawwda.go.ke/wp-content/uploads/2024/05/ESIA-Report-for-Chogoria-Sewerage-Project-Last-Mile-Connectivity-Project_2.pdf
-https://tanawwda.go.ke/wp-content/uploads/2024/05/ESIA-Report-for-Chuka-Water-Project-Last-Mile-Connectivity_2.pdf
-https://tanawwda.go.ke/wp-content/uploads/2024/05/ESIA-Report-for-Chuka-Sewerage-Project-Last-Mile-Connectivity_2.pdf
-https://tanawwda.go.ke/wp-content/uploads/2024/05/ESIA-Report-for-Meru-Sewerage-Project-Last-Mile-Connectivity-Project_2.pdf
-https://tanawwda.go.ke/wp-content/uploads/2024/05/ESIA-Report-for-Kerugoya-Kutus-Water-Project-Last-Mile.pdf
-http://tanawwda.go.ke/wp-content/uploads/2024/05/ESIA-Report-for-Kerugoya-Kutus-Sewer-Project-Last-Mile-Connectivity.pdf
-http://tanawwda.go.ke/wp-content/uploads/2024/05/RAP-Report-for-Chogoria-Water-Supply-Project-Last-Mile-Connectivity.pdf
-http://tanawwda.go.ke/wp-content/uploads/2024/05/RAP-Report-for-Meru-Sewerage-Project-Last-Mile-Connectivity.pdf
-https://tanawwda.go.ke/wp-content/uploads/2024/06/RAP-Report-for-Chogoria-Sewer-Last-Mile-Connectivity-Project.pdf
-http://tanawwda.go.ke/wp-content/uploads/2024/06/RAP-Report-for-Kerugoya-Kutus-Water-Supply-Project-Last-Mile-Connectivity.pdf
-http://tanawwda.go.ke/wp-content/uploads/2024/06/RAP-Report-for-Kerugoya-Kutus-Sewerage-Last-Mile-Connectivity.pdf
-https://tanawwda.go.ke/wp-content/uploads/2024/07/8H.-TWWDA-Aggregate-P.P.-2023-2024-APPRVD-SUPL-ESTS-NO.1.pdf
-*/
