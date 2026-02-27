@@ -522,7 +522,7 @@ app.get("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
       return res.status(400).json({ error: "Invalid admin ID format." });
 
     const result = await client.query(
-      `SELECT a.id, a.f_name, a.l_name, a.email, a.last_login, d.department_name
+      `SELECT a.id, a.fname AS f_name, a.lname AS l_name, a.email, a.last_login, d.department_name
          FROM admin.admin a
          LEFT JOIN admin.department d ON a.department_id = d.id
          WHERE a.id = $1`,
