@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function fetchProjectDetails(id) {
     try {
-      const response = await fetch(`/gis/project/${id}`);
+      const response = await fetch(`/gis/projects/${id}`);
       if (!response.ok) throw new Error("Not found");
       const project = await response.json();
 
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       event.preventDefault();
       const projectData = Object.fromEntries(new FormData(editProjectForm));
       try {
-        const response = await fetch(`/gis/project/${projectId}`, {
+        const response = await fetch(`/gis/projects/${projectId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(projectData),

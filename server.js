@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import pgSession from "connect-pg-simple";
 import cookieParser from "cookie-parser";
+import rateLimit from "express-rate-limit";
 import createRouter from "./routes.js";
 
 // --- Load environment variables ---
@@ -49,6 +50,17 @@ const corsOptions = {
 };
 
 app.set("trust proxy", 1);
+
+// --- Rate Limiting ---
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // max 10 attempts per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: "Too many login attempts. Please try again in 15 minutes.",
+  },
+});
 
 app.use(cors(corsOptions));
 app.use(cookieParser(process.env.SESSION_SECRET));
@@ -117,7 +129,7 @@ app.use(createRouter(requireAuth, superAdminAuth));
 app.get("/health", (req, res) => res.status(200).send("OK"));
 
 // 1. Login form submission
-app.post("/gis/login", async (req, res) => {
+app.post("/gis/login", loginLimiter, async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -128,7 +140,7 @@ app.post("/gis/login", async (req, res) => {
   try {
     client = await pool.connect();
     const result = await client.query(
-      "SELECT * FROM admin.admin WHERE email = $1",
+      "SELECT id, email, hashed_pass, role_id, fname, lname FROM admin.admin WHERE email = $1",
       [email],
     );
 
@@ -390,7 +402,7 @@ app.get("/gis/types", requireAuth, async (req, res) => {
 });
 
 // 9. Get departments
-app.get("/gis/departments", requireAuth, async (req, res) => {
+app.get("/gis/departments", requireAuth, superAdminAuth, async (req, res) => {
   let client;
   try {
     client = await pool.connect();
@@ -400,9 +412,10 @@ app.get("/gis/departments", requireAuth, async (req, res) => {
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("Error fetching departments:", err);
-    res
-      .status(500)
-      .json({ error: "Error fetching departments.", details: err.message });
+    res.status(500).json({
+      error: "Error fetching departments.",
+      ...(isProd ? {} : { details: err.message }),
+    });
   } finally {
     if (client) client.release();
   }
@@ -468,7 +481,7 @@ app.get("/gis/admins/search", requireAuth, superAdminAuth, async (req, res) => {
     console.error("Admin Search Database error:", err);
     res.status(500).json({
       error: "Internal server error during admin search",
-      details: err.message,
+      ...(isProd ? {} : { details: err.message }),
     });
   } finally {
     if (client) client.release();
@@ -476,7 +489,7 @@ app.get("/gis/admins/search", requireAuth, superAdminAuth, async (req, res) => {
 });
 
 // 12. Get single project
-app.get("/gis/project/:id", requireAuth, async (req, res) => {
+app.get("/gis/projects/:id", requireAuth, async (req, res) => {
   const projectId = parseInt(req.params.id, 10);
   if (isNaN(projectId))
     return res.status(400).json({ error: "Invalid project ID format." });
@@ -539,14 +552,17 @@ app.get("/gis/admins/:id", requireAuth, superAdminAuth, async (req, res) => {
     console.error("Error fetching admin details:", error);
     res
       .status(500)
-      .json({ error: "An error occurred while fetching admin details" });
+      .json({
+        error: "An error occurred while fetching admin details",
+        ...(isProd ? {} : { details: error.message }),
+      });
   } finally {
     if (client) client.release();
   }
 });
 
 // 14. Update project
-app.put("/gis/project/:id", requireAuth, async (req, res) => {
+app.put("/gis/projects/:id", requireAuth, async (req, res) => {
   const projectId = parseInt(req.params.id, 10);
   if (isNaN(projectId))
     return res.status(400).json({ error: "Invalid project ID format." });
@@ -623,7 +639,7 @@ app.put("/gis/project/:id", requireAuth, async (req, res) => {
 
 // 15. Delete project
 app.delete(
-  "/gis/project/:id",
+  "/gis/projects/:id",
   requireAuth,
   superAdminAuth,
   async (req, res) => {
@@ -790,7 +806,10 @@ app.post(
       console.error("Error resetting password:", error);
       res
         .status(500)
-        .json({ error: "An error occurred while resetting the password" });
+        .json({
+          error: "An error occurred while resetting the password",
+          ...(isProd ? {} : { details: error.message }),
+        });
     } finally {
       if (client) client.release();
     }

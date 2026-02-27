@@ -4,6 +4,7 @@ testconnection/
 .vscode/
 .zed
 
-
+package.json
+package-lock.json
 
 docs\assets\news\newsDataRaw.js
