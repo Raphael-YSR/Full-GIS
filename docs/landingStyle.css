@@ -581,7 +581,7 @@ nav.desktop-nav {
     filter: grayscale(10%);
 }
 .wwd-item:hover img {
-    transform: scale(1.04);
+    transform: scale(1.01);
     filter: grayscale(0%);
 }
 .wwd-caption {
@@ -1534,7 +1534,7 @@ details.mm-group[open] .chevron {
     display: block;
 }
 .nv2-feat:hover .nv2-feat-img {
-    transform: scale(1.04);
+    transform: scale(1.01);
 }
 .nv2-latest-badge {
     position: absolute;
@@ -1626,7 +1626,7 @@ details.mm-group[open] .chevron {
     transition: transform 0.2s;
 }
 .nv2-side-card:hover .nv2-side-img {
-    transform: scale(1.02);
+    transform: scale(1.01);
 }
 .nv2-side-body {
     padding: 14px 16px;
