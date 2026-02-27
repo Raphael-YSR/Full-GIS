@@ -53,6 +53,7 @@ body {
     color: #c8ccc6;
     text-decoration: none;
     transition: color 0.15s;
+    white-space: nowrap;
 }
 .topbar a:hover {
     color: var(--green-mid);
@@ -84,6 +85,34 @@ body {
 .topbar-social svg {
     width: 14px;
     height: 14px;
+}
+
+/* ── TOPBAR MOBILE ── */
+@media (max-width: 1023px) {
+    .topbar-inner {
+        justify-content: space-between;
+        padding: 0 16px;
+        gap: 0;
+    }
+    /* Hide everything except corruption, staff mail, and socials */
+    .topbar-inner > a:not([href*="corruption"]):not([href*="mail.tanawwda"]),
+    .topbar-sep {
+        display: none;
+    }
+    /* Give each visible item equal width so Staff Mail is truly centered */
+    .topbar-inner > a[href*="corruption"] {
+        flex: 1;
+        justify-content: flex-start;
+    }
+    .topbar-inner > a[href*="mail.tanawwda"] {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+    }
+    .topbar-social {
+        flex: 1;
+        justify-content: flex-end;
+    }
 }
 
 /* ════════════════════════════════════
