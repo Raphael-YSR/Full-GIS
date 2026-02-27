@@ -243,6 +243,16 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
           ],
         ),
       );
+      await withDb((client) =>
+        client.query(
+          "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
+          [
+            req.session.user.id,
+            "ADD_PROJECT",
+            `Added project: '${project_name}'`,
+          ],
+        ),
+      );
       res
         .status(201)
         .json({ message: `Project '${project_name}' has been added!` });
@@ -309,6 +319,16 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
       );
       if (rows.length === 0)
         return res.status(404).json({ error: "Project not found." });
+      await withDb((client) =>
+        client.query(
+          "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
+          [
+            req.session.user.id,
+            "UPDATE_PROJECT",
+            `Updated project: '${rows[0].project_name}' (ID: ${projectId})`,
+          ],
+        ),
+      );
       res.json({
         message: `Project '${rows[0].project_name}' updated successfully!`,
       });
@@ -342,6 +362,16 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
           return res.status(404).json({
             error: `Project with ID ${projectId} not found for deletion.`,
           });
+        await withDb((client) =>
+          client.query(
+            "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
+            [
+              req.session.user.id,
+              "DELETE_PROJECT",
+              `Deleted project: '${rows[0].project_name}' (ID: ${projectId})`,
+            ],
+          ),
+        );
         res.json({
           message: `Project '${rows[0].project_name}' (ID: ${projectId}) deleted successfully!`,
         });

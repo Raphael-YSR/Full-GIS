@@ -125,6 +125,16 @@ export default function createAdminRouter(requireAuth, superAdminAuth) {
           [hashedPassword, email, f_name, l_name, true, department_id, 1],
         ),
       );
+      await withDb((client) =>
+        client.query(
+          "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
+          [
+            req.session.user.id,
+            "ADD_ADMIN",
+            `Added administrator: '${f_name} ${l_name}' (${email})`,
+          ],
+        ),
+      );
       res.status(201).json({
         message: `Administrator '${f_name} ${l_name}' has been added!`,
         admin: rows[0],
@@ -168,7 +178,7 @@ export default function createAdminRouter(requireAuth, superAdminAuth) {
         // Audit log
         await withDb((client) =>
           client.query(
-            "INSERT INTO admin.audit_log (admin_id, action, details) VALUES ($1, $2, $3)",
+            "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
             [
               req.session.user.id,
               "DELETE_ADMIN",
