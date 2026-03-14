@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Projects — Tana Water Works Development Agency</title>
+        <link rel="icon" type="image/png" href="../images/logo.png" />
+        <link rel="shortcut icon" type="image/png" href="../images/logo.png" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../landingStyle.css" />
+        <style>
+            /* ── Page banner ── */
+            .page-banner {
+                background: var(--ink);
+                border-bottom: 3px solid var(--green);
+                padding: 40px 0;
+            }
+            .page-banner-inner {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 0 24px;
+            }
+            .page-banner-eyebrow {
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--green-mid);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            .page-banner-eyebrow::before {
+                content: "";
+                display: block;
+                width: 20px;
+                height: 1.5px;
+                background: var(--green);
+            }
+            .page-banner h1 {
+                font-family: "IBM Plex Serif", serif;
+                font-size: clamp(26px, 4vw, 40px);
+                font-weight: 600;
+                color: #f0f2ef;
+                line-height: 1.2;
+            }
+            .page-banner-sub {
+                margin-top: 8px;
+                font-size: 14px;
+                color: #5a5e5a;
+                font-weight: 300;
+            }
+            .breadcrumb {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 12px;
+                font-size: 11.5px;
+                color: #5a5e5a;
+            }
+            .breadcrumb a {
+                color: #5a5e5a;
+                text-decoration: none;
+                transition: color 0.15s;
+            }
+            .breadcrumb a:hover {
+                color: var(--green-mid);
+            }
+            .breadcrumb-sep {
+                color: #3a3e3a;
+            }
+            .breadcrumb-current {
+                color: var(--green-mid);
+            }
+
+            /* ── Page wrap ── */
+            .page-wrap {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 52px 24px 80px;
+            }
+
+            /* ── Region headers ── */
+            .region-block {
+                margin-bottom: 56px;
+            }
+            .region-label {
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--ink-light, #8a8e89);
+                margin-bottom: 6px;
+            }
+            .region-title {
+                font-family: "IBM Plex Serif", serif;
+                font-size: 20px;
+                font-weight: 600;
+                color: var(--ink);
+                margin-bottom: 4px;
+            }
+            .region-rule {
+                height: 2px;
+                background: linear-gradient(
+                    to right,
+                    var(--green),
+                    transparent
+                );
+                margin-bottom: 24px;
+            }
+
+            /* ── County cards grid ── */
+            .county-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 2px;
+                border: 2px solid var(--ink);
+            }
+
+            .county-card {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                padding: 24px 22px 20px;
+                background: var(--white, #fff);
+                border-right: 2px solid var(--ink);
+                border-bottom: 2px solid var(--ink);
+                text-decoration: none;
+                color: inherit;
+                transition: background 0.15s;
+                min-height: 130px;
+            }
+            .county-card:hover {
+                background: var(--green-light, #eef4e8);
+            }
+
+            .county-card-name {
+                font-family: "IBM Plex Serif", serif;
+                font-size: 17px;
+                font-weight: 600;
+                color: var(--ink);
+                line-height: 1.3;
+                margin-bottom: 8px;
+            }
+            .county-card-region {
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--ink-light, #8a8e89);
+                margin-bottom: 16px;
+            }
+            .county-card-cta {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 10.5px;
+                font-weight: 700;
+                letter-spacing: 0.09em;
+                text-transform: uppercase;
+                color: var(--green);
+            }
+            .county-card-cta svg {
+                transition: transform 0.2s;
+            }
+            .county-card:hover .county-card-cta svg {
+                transform: translateX(3px);
+            }
+
+            @media (max-width: 640px) {
+                .county-grid {
+                    grid-template-columns: 1fr 1fr;
+                }
+            }
+            @media (max-width: 400px) {
+                .county-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- TOP BAR (matches rest of site) -->
+        <div class="topbar">
+            <div class="topbar-inner">
+                <a
+                    href="/corruption"
+                    style="display: flex; align-items: center; gap: 6px"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        style="color: #9ca3af"
+                    >
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                        />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                    <span
+                        style="
+                            font-size: 11px;
+                            color: #9ca3af;
+                            font-weight: 600;
+                            letter-spacing: 0.05em;
+                        "
+                        >REPORT CORRUPTION</span
+                    >
+                </a>
+                <nav class="topbar-links">
+                    <a href="/tenders">Tenders</a>
+                    <a href="/contact-us">Contact</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- NAV -->
+        <nav class="main-nav" id="mainNav">
+            <div class="nav-inner">
+                <a href="/" class="nav-logo">
+                    <img
+                        src="../images/logo.png"
+                        alt="TWWDA"
+                        class="nav-logo-img"
+                    />
+                    <div class="nav-logo-text">
+                        <span class="nav-logo-title">TWWDA</span>
+                        <span class="nav-logo-sub"
+                            >Tana Water Works Development Agency</span
+                        >
+                    </div>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="/about-us" class="nav-link">About</a>
+                    <a href="/projects" class="nav-link nav-link-active"
+                        >Projects</a
+                    >
+                    <a href="/news" class="nav-link">News</a>
+                    <a href="/tenders" class="nav-link">Tenders</a>
+                    <a href="/contact-us" class="nav-link">Contact</a>
+                    <a href="/gis" class="nav-cta">GIS MAP</a>
+                </div>
+                <button
+                    class="nav-hamburger"
+                    id="navHamburger"
+                    aria-label="Menu"
+                >
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- PAGE BANNER -->
+        <div class="page-banner">
+            <div class="page-banner-inner">
+                <div class="page-banner-eyebrow">Projects</div>
+                <h1>Projects by County</h1>
+                <p class="page-banner-sub">
+                    Water and sanitation infrastructure across the Tana
+                    catchment region.
+                </p>
+                <nav class="breadcrumb">
+                    <a href="/">Home</a>
+                    <span class="breadcrumb-sep">/</span>
+                    <span class="breadcrumb-current">Projects</span>
+                </nav>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="page-wrap">
+            <!-- Mount Kenya Region -->
+            <div class="region-block">
+                <div class="region-label">Region</div>
+                <div class="region-title">Mount Kenya &amp; Central</div>
+                <div class="region-rule"></div>
+                <div class="county-grid">
+                    <a href="/projects/county/embu" class="county-card">
+                        <div>
+                            <div class="county-card-name">Embu County</div>
+                            <div class="county-card-region">Mount Kenya</div>
+                        </div>
+                        <span class="county-card-cta"
+                            >View Projects
+                            <svg
+                                width="13"
+                                height="13"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                /></svg
+                        ></span>
+                    </a>
+                    <a href="/projects/county/kirinyaga" class="county-card">
+                        <div>
+                            <div class="county-card-name">Kirinyaga County</div>
+                            <div class="county-card-region">Mount Kenya</div>
+                        </div>
+                        <span class="county-card-cta"
+                            >View Projects
+                            <svg
+                                width="13"
+                                height="13"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                /></svg
+                        ></span>
+                    </a>
+                    <a href="/projects/county/meru" class="county-card">
+                        <div>
+                            <div class="county-card-name">Meru County</div>
+                            <div class="county-card-region">Mount Kenya</div>
+                        </div>
+                        <span class="county-card-cta"
+                            >View Projects
+                            <svg
+                                width="13"
+                                height="13"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                /></svg
+                        ></span>
+                    </a>
+                    <a href="/projects/county/nyeri" class="county-card">
+                        <div>
+                            <div class="county-card-name">Nyeri County</div>
+                            <div class="county-card-region">Mount Kenya</div>
+                        </div>
+                        <span class="county-card-cta"
+                            >View Projects
+                            <svg
+                                width="13"
+                                height="13"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                /></svg
+                        ></span>
+                    </a>
+                    <a
+                        href="/projects/county/tharaka-nithi"
+                        class="county-card"
+                    >
+                        <div>
+                            <div class="county-card-name">
+                                Tharaka Nithi County
+                            </div>
+                            <div class="county-card-region">Mount Kenya</div>
+                        </div>
+                        <span class="county-card-cta"
+                            >View Projects
+                            <svg
+                                width="13"
+                                height="13"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                /></svg
+                        ></span>
+                    </a>
+                    <a href="/projects/county/muranga" class="county-card">
+                        <div>
+                            <div class="county-card-name">Murang'a County</div>
+                            <div class="county-card-region">Central</div>
+                        </div>
+                        <span class="county-card-cta"
+                            >View Projects
+                            <svg
+                                width="13"
+                                height="13"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                /></svg
+                        ></span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Northern Region -->
+            <div class="region-block">
+                <div class="region-label">Region</div>
+                <div class="region-title">Northern &amp; North Eastern</div>
+                <div class="region-rule"></div>
+                <div class="county-grid">
+                    <a href="/projects/county/garissa" class="county-card">
+                        <div>
+                            <div class="county-card-name">Garissa County</div>
+                            <div class="county-card-region">North Eastern</div>
+                        </div>
+                        <span class="county-card-cta"
+                            >View Projects
+                            <svg
+                                width="13"
+                                height="13"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                /></svg
+                        ></span>
+                    </a>
+                    <a href="/projects/county/isiolo" class="county-card">
+                        <div>
+                            <div class="county-card-name">Isiolo County</div>
+                            <div class="county-card-region">Northern</div>
+                        </div>
+                        <span class="county-card-cta"
+                            >View Projects
+                            <svg
+                                width="13"
+                                height="13"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                /></svg
+                        ></span>
+                    </a>
+                    <a href="/projects/county/mandera" class="county-card">
+                        <div>
+                            <div class="county-card-name">Mandera County</div>
+                            <div class="county-card-region">North Eastern</div>
+                        </div>
+                        <span class="county-card-cta"
+                            >View Projects
+                            <svg
+                                width="13"
+                                height="13"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                /></svg
+                        ></span>
+                    </a>
+                    <a href="/projects/county/marsabit" class="county-card">
+                        <div>
+                            <div class="county-card-name">Marsabit County</div>
+                            <div class="county-card-region">Northern</div>
+                        </div>
+                        <span class="county-card-cta"
+                            >View Projects
+                            <svg
+                                width="13"
+                                height="13"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                stroke-width="2.5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                                /></svg
+                        ></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <img
+                        src="../images/logo.png"
+                        alt="TWWDA"
+                        class="footer-logo"
+                    />
+                    <p class="footer-tagline">
+                        Delivering water security across the Tana catchment
+                        region.
+                    </p>
+                </div>
+                <div class="footer-links-group">
+                    <span class="footer-group-label">Projects</span>
+                    <a href="/projects/county/embu">Embu County</a>
+                    <a href="/projects/county/kirinyaga">Kirinyaga County</a>
+                    <a href="/projects/county/meru">Meru County</a>
+                    <a href="/projects/county/nyeri">Nyeri County</a>
+                    <a href="/projects/county/tharaka-nithi">Tharaka Nithi</a>
+                    <a href="/projects/county/muranga">Murang'a County</a>
+                </div>
+                <div class="footer-links-group">
+                    <span class="footer-group-label">More Counties</span>
+                    <a href="/projects/county/garissa">Garissa County</a>
+                    <a href="/projects/county/isiolo">Isiolo County</a>
+                    <a href="/projects/county/mandera">Mandera County</a>
+                    <a href="/projects/county/marsabit">Marsabit County</a>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // Hamburger menu
+            const hamburger = document.getElementById("navHamburger");
+            const navLinks = document.getElementById("navLinks");
+            if (hamburger) {
+                hamburger.addEventListener("click", () => {
+                    navLinks.classList.toggle("open");
+                    hamburger.classList.toggle("open");
+                });
+            }
+        </script>
+    </body>
+</html>

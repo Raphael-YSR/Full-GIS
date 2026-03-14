@@ -50,35 +50,11 @@ export default function createRouter(requireAuth, superAdminAuth) {
 
   // ── Projects ───────────────────────────────────────────
   router.get("/projects", (req, res) => res.sendFile(pub("projects.html")));
-  router.get("/projects/embu", (req, res) =>
-    res.sendFile(pub("projects-embu.html")),
+  router.get("/projects/county/:slug", (req, res) =>
+    res.sendFile(pub("projects-county.html")),
   );
-  router.get("/projects/kirinyaga", (req, res) =>
-    res.sendFile(pub("projects-kirinyaga.html")),
-  );
-  router.get("/projects/meru", (req, res) =>
-    res.sendFile(pub("projects-meru.html")),
-  );
-  router.get("/projects/nyeri", (req, res) =>
-    res.sendFile(pub("projects-nyeri.html")),
-  );
-  router.get("/projects/tharaka", (req, res) =>
-    res.sendFile(pub("projects-tharaka.html")),
-  );
-  router.get("/projects/garissa", (req, res) =>
-    res.sendFile(pub("projects-garissa.html")),
-  );
-  router.get("/projects/isiolo", (req, res) =>
-    res.sendFile(pub("projects-isiolo.html")),
-  );
-  router.get("/projects/mandera", (req, res) =>
-    res.sendFile(pub("projects-mandera.html")),
-  );
-  router.get("/projects/marsabit", (req, res) =>
-    res.sendFile(pub("projects-marsabit.html")),
-  );
-  router.get("/projects/muranga", (req, res) =>
-    res.sendFile(pub("projects-muranga.html")),
+  router.get("/projects/:id", (req, res) =>
+    res.sendFile(pub("projects-each.html")),
   );
 
   // ── Media Center ───────────────────────────────────────

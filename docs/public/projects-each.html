@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Project — Tana Water Works Development Agency</title>
+        <link rel="icon" type="image/png" href="../images/logo.png" />
+        <link rel="shortcut icon" type="image/png" href="../images/logo.png" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../landingStyle.css" />
+        <style>
+            :root {
+                --green: #5a8a32;
+                --green-dark: #3d6122;
+                --green-light: #eef4e8;
+                --ink: #1a1c1a;
+                --ink-mid: #4a4d49;
+                --ink-light: #8a8e89;
+                --rule: #d0d4cc;
+                --bg: #f5f5f2;
+                --white: #ffffff;
+            }
+            *,
+            *::before,
+            *::after {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: "IBM Plex Sans", sans-serif;
+                background: var(--bg);
+                color: var(--ink);
+                -webkit-font-smoothing: antialiased;
+            }
+
+            /* ── Top bar ── */
+            .article-topbar {
+                background: var(--ink);
+                border-bottom: 3px solid var(--green);
+                padding: 0 24px;
+            }
+            .article-topbar-inner {
+                max-width: 1200px;
+                margin: 0 auto;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .topbar-home {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                text-decoration: none;
+                color: var(--white);
+                font-size: 0.78rem;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+            }
+            .topbar-back-link {
+                font-size: 0.75rem;
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                color: var(--green);
+                text-decoration: none;
+            }
+            .topbar-back-link:hover {
+                text-decoration: underline;
+            }
+
+            /* ── Hero ── */
+            .article-hero {
+                background: var(--ink);
+                padding: 48px 24px 44px;
+            }
+            .article-hero-inner {
+                max-width: 780px;
+                margin: 0 auto;
+            }
+            .hero-meta-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 16px;
+                flex-wrap: wrap;
+            }
+            .hero-label {
+                font-size: 0.68rem;
+                font-weight: 700;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--green);
+            }
+            .hero-badge {
+                font-size: 0.62rem;
+                font-weight: 700;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                padding: 3px 10px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: rgba(255, 255, 255, 0.6);
+            }
+            .article-hero h1 {
+                font-family: "IBM Plex Serif", serif;
+                font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+                font-weight: 600;
+                color: var(--white);
+                line-height: 1.3;
+                margin-bottom: 28px;
+            }
+
+            /* ── Stats strip ── */
+            .stats-strip {
+                display: flex;
+                gap: 0;
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                margin-top: 4px;
+            }
+            .stat-item {
+                flex: 1;
+                padding: 12px 16px;
+                border-right: 1px solid rgba(255, 255, 255, 0.12);
+            }
+            .stat-item:last-child {
+                border-right: none;
+            }
+            .stat-label {
+                font-size: 0.6rem;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: rgba(255, 255, 255, 0.35);
+                margin-bottom: 4px;
+            }
+            .stat-value {
+                font-size: 0.88rem;
+                font-weight: 600;
+                color: var(--white);
+            }
+
+            /* ── Progress bar ── */
+            .progress-wrap {
+                margin-top: 24px;
+            }
+            .progress-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                margin-bottom: 8px;
+            }
+            .progress-label {
+                font-size: 0.65rem;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: rgba(255, 255, 255, 0.4);
+            }
+            .progress-pct {
+                font-size: 0.88rem;
+                font-weight: 600;
+                color: var(--green);
+            }
+            .progress-track {
+                height: 4px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 2px;
+                overflow: hidden;
+            }
+            .progress-fill {
+                height: 100%;
+                background: var(--green);
+                border-radius: 2px;
+                transition: width 0.8s ease;
+            }
+
+            /* ── Lead image ── */
+            .article-lead-img-wrap {
+                max-width: 780px;
+                margin: 0 auto;
+                overflow: hidden;
+                border-bottom: 2px solid var(--ink);
+            }
+            .article-lead-img {
+                width: 100%;
+                aspect-ratio: 16/9;
+                object-fit: cover;
+                display: block;
+            }
+
+            /* ── Article body ── */
+            .article-body-wrap {
+                max-width: 780px;
+                margin: 0 auto;
+                padding: 0 24px 80px;
+            }
+            .article-content {
+                margin-top: 40px;
+                border-top: 3px solid var(--ink);
+                padding-top: 32px;
+            }
+
+            /* ── Content blocks ── */
+            .block-paragraph {
+                font-size: 1rem;
+                line-height: 1.8;
+                color: var(--ink-mid);
+                margin-bottom: 24px;
+            }
+            .block-paragraph:first-child {
+                font-size: 1.05rem;
+                color: var(--ink);
+                font-weight: 400;
+            }
+            .block-image {
+                width: 100%;
+                margin: 32px 0;
+                border: 2px solid var(--ink);
+                display: block;
+                cursor: pointer;
+                transition: opacity 0.2s;
+            }
+            .block-image:hover {
+                opacity: 0.9;
+            }
+
+            /* ── Gallery ── */
+            .article-gallery {
+                margin: 40px 0;
+                border-top: 2px solid var(--rule);
+                padding-top: 28px;
+            }
+            .gallery-label {
+                font-size: 0.68rem;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--ink-light);
+                margin-bottom: 16px;
+                display: block;
+            }
+            .gallery-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 3px;
+                border: 2px solid var(--ink);
+            }
+            .gallery-item {
+                aspect-ratio: 4/3;
+                overflow: hidden;
+                cursor: pointer;
+                position: relative;
+            }
+            .gallery-item img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                transition: transform 0.4s ease;
+            }
+            .gallery-item:hover img {
+                transform: scale(1.06);
+            }
+            .gallery-item-overlay {
+                position: absolute;
+                inset: 0;
+                background: rgba(26, 28, 26, 0);
+                transition: background 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .gallery-item:hover .gallery-item-overlay {
+                background: rgba(26, 28, 26, 0.25);
+            }
+
+            /* ── Lightbox ── */
+            .lightbox {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(26, 28, 26, 0.94);
+                z-index: 1000;
+                align-items: center;
+                justify-content: center;
+                padding: 24px;
+            }
+            .lightbox.open {
+                display: flex;
+            }
+            .lightbox-img {
+                max-width: 90vw;
+                max-height: 88vh;
+                object-fit: contain;
+                display: block;
+                border: 2px solid rgba(255, 255, 255, 0.15);
+            }
+            .lightbox-close {
+                position: fixed;
+                top: 20px;
+                right: 24px;
+                background: none;
+                border: none;
+                color: #fff;
+                font-size: 1.8rem;
+                cursor: pointer;
+                line-height: 1;
+                padding: 4px 8px;
+            }
+            .lightbox-nav {
+                position: fixed;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                color: #fff;
+                width: 44px;
+                height: 44px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+                transition: border-color 0.2s;
+            }
+            .lightbox-nav:hover {
+                border-color: #fff;
+            }
+            .lightbox-prev {
+                left: 20px;
+            }
+            .lightbox-next {
+                right: 20px;
+            }
+            .lightbox-counter {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.5);
+                letter-spacing: 0.08em;
+            }
+
+            /* ── Back nav ── */
+            .article-back {
+                display: inline-flex;
+                align-items: center;
+                gap: 7px;
+                margin-top: 36px;
+                margin-bottom: 36px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                letter-spacing: 0.07em;
+                text-transform: uppercase;
+                color: var(--white);
+                background: var(--green);
+                text-decoration: none;
+                padding: 10px 18px;
+                border: 2px solid var(--green);
+                transition:
+                    background 0.2s,
+                    border-color 0.2s;
+            }
+            .article-back:hover {
+                background: var(--green-dark);
+                border-color: var(--green-dark);
+            }
+
+            /* ── Loading / error states ── */
+            .state-wrap {
+                max-width: 780px;
+                margin: 80px auto;
+                padding: 0 24px;
+                text-align: center;
+            }
+            .state-wrap h2 {
+                font-family: "IBM Plex Serif", serif;
+                font-size: 1.4rem;
+                margin-bottom: 12px;
+                color: var(--ink);
+            }
+            .state-wrap p {
+                color: var(--ink-light);
+                font-size: 0.9rem;
+            }
+            .state-wrap a {
+                color: var(--green);
+            }
+
+            /* Skeleton loader */
+            .skeleton {
+                background: linear-gradient(
+                    90deg,
+                    #e0e0dc 25%,
+                    #eeecea 50%,
+                    #e0e0dc 75%
+                );
+                background-size: 200% 100%;
+                animation: shimmer 1.4s infinite;
+                border-radius: 2px;
+            }
+            @keyframes shimmer {
+                0% {
+                    background-position: 200% 0;
+                }
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+            .skel-hero {
+                height: 220px;
+                margin-bottom: 0;
+            }
+            .skel-img {
+                aspect-ratio: 16/9;
+                width: 100%;
+            }
+            .skel-line {
+                height: 14px;
+                margin-bottom: 12px;
+                border-radius: 3px;
+            }
+            .skel-line.short {
+                width: 60%;
+            }
+            .skel-line.med {
+                width: 85%;
+            }
+
+            /* ── No article notice ── */
+            .no-article-notice {
+                margin: 32px 0;
+                padding: 20px 24px;
+                border-left: 4px solid var(--green);
+                background: var(--green-light);
+                font-size: 0.88rem;
+                color: var(--ink-mid);
+            }
+
+            @media (max-width: 700px) {
+                .stats-strip {
+                    flex-wrap: wrap;
+                }
+                .stat-item {
+                    flex: 1 1 50%;
+                }
+                .gallery-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                .article-body-wrap {
+                    padding: 0 16px 60px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="topbar">
+            <div class="topbar-inner">
+                <a
+                    href="/corruption"
+                    style="display: flex; align-items: center; gap: 6px"
+                >
+                    <svg
+                        width="13"
+                        height="13"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                    </svg>
+                    Corruption
+                </a>
+                <div class="topbar-sep"></div>
+
+                <a href="/contact-us">Feedback</a>
+                <a href="/working-with-us">Vacancies</a>
+                <a href="http://mail.tanawwda.go.ke/" target="_blank"
+                    >Staff Mail</a
+                >
+                <div class="topbar-sep"></div>
+                <div class="topbar-social">
+                    <a
+                        href="https://web.facebook.com/tanawaterworksagency/"
+                        target="_blank"
+                        title="Facebook"
+                    >
+                        <svg
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                            />
+                        </svg>
+                    </a>
+                    <a
+                        href="https://twitter.com/tanawwda"
+                        target="_blank"
+                        title="Twitter/X"
+                    >
+                        <svg
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                            />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- HEADER -->
+        <header class="site-header" id="site-header">
+            <div class="header-inner">
+                <div class="logo-wrap">
+                    <a href="/"
+                        ><img
+                            src="https://tanawwda.go.ke/wp-content/uploads/2021/04/banner.png"
+                            alt="Tana Water Works Development Agency"
+                    /></a>
+                </div>
+                <nav class="desktop-nav">
+                    <a href="/" class="nav-item">Home</a>
+                    <div class="dropdown-wrap">
+                        <button class="nav-item">
+                            About Us
+                            <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+                        <div class="dropdown-panel">
+                            <a href="/background">Background</a>
+                            <a href="/vision-mission"
+                                >Vision, Mission &amp; Core Values</a
+                            >
+                            <a href="/mandate">Mandate / Functions</a>
+                            <a href="/board-of-directors">Board of Directors</a>
+                            <a href="/management">Management</a>
+                            <a href="/organogram">Organogram</a>
+                            <a href="/strategic-plan">Strategic Plan</a>
+                            <a href="/service-charter">Our Service Charter</a>
+                            <a href="/quality-policy">TWWDA Quality Policy</a>
+                        </div>
+                    </div>
+                    <div class="dropdown-wrap">
+                        <button class="nav-item active-link">
+                            Projects
+                            <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+                        <div class="dropdown-panel wide">
+                            <div class="dp-section">Our Projects</div>
+                            <div class="dp-grid">
+                                <div class="dp-col">
+                                    <a href="/projects/embu">Embu County</a>
+                                    <a href="/projects/kirinyaga"
+                                        >Kirinyaga County</a
+                                    >
+                                    <a href="/projects/meru">Meru County</a>
+                                    <a href="/projects/nyeri">Nyeri County</a>
+                                    <a href="/projects/tharaka"
+                                        >Tharaka Nithi County</a
+                                    >
+                                </div>
+                                <div class="dp-col">
+                                    <div
+                                        class="dp-section"
+                                        style="border-top: none"
+                                    >
+                                        Other Agencies
+                                    </div>
+                                    <a href="/projects/garissa"
+                                        >Garissa County</a
+                                    >
+                                    <a href="/projects/isiolo">Isiolo County</a>
+                                    <a href="/projects/mandera"
+                                        >Mandera County</a
+                                    >
+                                    <a href="/projects/marsabit"
+                                        >Marsabit County</a
+                                    >
+                                    <a href="/projects/muranga"
+                                        >Muranga County</a
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/gis" class="nav-item" target="_blank">Web-GIS</a>
+                    <div class="dropdown-wrap">
+                        <button class="nav-item">
+                            Media Center
+                            <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+                        <div class="dropdown-panel">
+                            <a href="/news">News</a
+                            ><a href="/speeches">Speeches</a>
+                            <a href="/publications">Publications</a>
+                            <a href="/access-to-information"
+                                >Access to Information</a
+                            >
+                            <a href="/events">Events</a
+                            ><a href="/photo-gallery">Photo Gallery</a>
+                            <a href="/video-gallery">Video Gallery</a
+                            ><a href="/downloads">Downloads</a>
+                        </div>
+                    </div>
+                    <a href="/tenders" class="nav-item">Tenders</a>
+                    <a href="/contact-us" class="nav-item">Contact Us</a>
+                </nav>
+
+                <div style="display: flex; align-items: center; gap: 12px">
+                    <div class="header-search" id="desktop-search">
+                        <input
+                            type="text"
+                            placeholder="Search…"
+                            aria-label="Search"
+                        />
+                        <button aria-label="Submit search">
+                            <svg
+                                width="14"
+                                height="14"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                    <button
+                        class="hamburger"
+                        id="mobile-menu-btn"
+                        aria-label="Open menu"
+                    >
+                        <svg
+                            width="20"
+                            height="20"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic content injected here -->
+        <div id="article-root">
+            <!-- Skeleton while loading -->
+            <div id="skeleton-ui">
+                <div class="skel-hero skeleton"></div>
+                <div style="max-width: 780px; margin: 0 auto; padding: 0 24px">
+                    <div class="skel-img skeleton" style="margin-top: 0"></div>
+                    <div style="margin-top: 40px">
+                        <div class="skel-line skeleton"></div>
+                        <div class="skel-line med skeleton"></div>
+                        <div class="skel-line skeleton"></div>
+                        <div class="skel-line short skeleton"></div>
+                        <div style="margin-top: 24px">
+                            <div class="skel-line skeleton"></div>
+                            <div class="skel-line med skeleton"></div>
+                            <div class="skel-line short skeleton"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lightbox -->
+        <div class="lightbox" id="lightbox">
+            <button class="lightbox-close" id="lb-close">×</button>
+            <button class="lightbox-nav lightbox-prev" id="lb-prev">‹</button>
+            <img class="lightbox-img" id="lb-img" src="" alt="" />
+            <button class="lightbox-nav lightbox-next" id="lb-next">›</button>
+            <div class="lightbox-counter" id="lb-counter"></div>
+        </div>
+
+        <script>
+            (function () {
+                var root = document.getElementById("article-root");
+                var skeleton = document.getElementById("skeleton-ui");
+
+                // ── Get project ID from URL: /projects/42 ──
+                var pathParts = window.location.pathname
+                    .split("/")
+                    .filter(Boolean);
+                var projectId = pathParts[pathParts.length - 1];
+
+                if (!projectId || isNaN(parseInt(projectId))) {
+                    showError("Invalid project URL.", true);
+                    return;
+                }
+
+                // ── Fetch article from API ──
+                fetch("/projects/" + projectId + "/article")
+                    .then(function (res) {
+                        if (!res.ok)
+                            throw new Error(
+                                res.status === 404
+                                    ? "not_found"
+                                    : "server_error",
+                            );
+                        return res.json();
+                    })
+                    .then(function (data) {
+                        render(data);
+                    })
+                    .catch(function (err) {
+                        if (err.message === "not_found") {
+                            showError("This project could not be found.", true);
+                        } else {
+                            showError(
+                                "Failed to load project. Please try again later.",
+                                false,
+                            );
+                        }
+                    });
+
+                // ── Render ──
+                function render(d) {
+                    document.title = d.project_name + " — TWWDA";
+
+                    var paragraphBlocks = (d.blocks || []).filter(function (b) {
+                        return b.block_type === "paragraph";
+                    });
+                    var imageBlocks = (d.blocks || []).filter(function (b) {
+                        return b.block_type === "image";
+                    });
+
+                    // Stats strip
+                    var stats = "";
+                    if (d.county) stats += statItem("County", d.county);
+                    if (d.project_type)
+                        stats += statItem("Type", d.project_type);
+                    if (d.status) stats += statItem("Status", d.status);
+                    if (d.people_served)
+                        stats += statItem(
+                            "People Served",
+                            Number(d.people_served).toLocaleString(),
+                        );
+
+                    // Progress bar
+                    var pct =
+                        d.progress != null
+                            ? Math.min(100, Math.max(0, parseInt(d.progress)))
+                            : null;
+                    var progressHtml = "";
+                    if (pct !== null) {
+                        progressHtml =
+                            '<div class="progress-wrap">' +
+                            '<div class="progress-header">' +
+                            '<span class="progress-label">Completion</span>' +
+                            '<span class="progress-pct">' +
+                            pct +
+                            "%</span>" +
+                            "</div>" +
+                            '<div class="progress-track">' +
+                            '<div class="progress-fill" style="width:0%" data-target="' +
+                            pct +
+                            '%"></div>' +
+                            "</div>" +
+                            "</div>";
+                    }
+
+                    // Hero image
+                    var heroHtml = "";
+                    if (d.hero_image_url) {
+                        heroHtml =
+                            '<div class="article-lead-img-wrap">' +
+                            '<img class="article-lead-img" src="' +
+                            esc(d.hero_image_url) +
+                            '" alt="' +
+                            esc(d.project_name) +
+                            '" />' +
+                            "</div>";
+                    }
+
+                    // Content blocks — paragraphs and inline images in sort_order
+                    var contentHtml = "";
+                    if (d.blocks && d.blocks.length > 0) {
+                        d.blocks.forEach(function (block) {
+                            if (block.block_type === "paragraph") {
+                                contentHtml +=
+                                    '<p class="block-paragraph">' +
+                                    esc(block.content) +
+                                    "</p>";
+                            } else if (block.block_type === "image") {
+                                contentHtml +=
+                                    '<img class="block-image" src="' +
+                                    esc(block.content) +
+                                    '" ' +
+                                    'alt="Project photo" loading="lazy" data-lightbox />';
+                            }
+                        });
+                    } else if (!d.article_id) {
+                        contentHtml =
+                            '<div class="no-article-notice">' +
+                            "Detailed article content for this project has not been published yet. " +
+                            "Check back soon for updates." +
+                            "</div>";
+                    }
+
+                    // Gallery (all image blocks collected for lightbox)
+                    var galleryImages = imageBlocks.map(function (b) {
+                        return b.content;
+                    });
+                    if (d.hero_image_url)
+                        galleryImages.unshift(d.hero_image_url);
+
+                    // Published date
+                    var dateStr = "";
+                    if (d.published_at) {
+                        var dt = new Date(d.published_at);
+                        dateStr = dt.toLocaleDateString("en-KE", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                        });
+                    }
+
+                    // Assemble HTML
+                    root.innerHTML =
+                        '<div class="article-hero">' +
+                        '<div class="article-hero-inner">' +
+                        '<div class="hero-meta-row">' +
+                        '<span class="hero-label">Projects</span>' +
+                        (d.county
+                            ? '<span class="hero-badge">' +
+                              esc(d.county) +
+                              "</span>"
+                            : "") +
+                        (d.project_type
+                            ? '<span class="hero-badge">' +
+                              esc(d.project_type) +
+                              "</span>"
+                            : "") +
+                        "</div>" +
+                        "<h1>" +
+                        esc(d.project_name) +
+                        "</h1>" +
+                        (stats
+                            ? '<div class="stats-strip">' + stats + "</div>"
+                            : "") +
+                        progressHtml +
+                        "</div>" +
+                        "</div>" +
+                        heroHtml +
+                        '<div class="article-body-wrap">' +
+                        '<div class="article-content">' +
+                        (dateStr
+                            ? '<p style="font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:24px;">' +
+                              dateStr +
+                              "</p>"
+                            : "") +
+                        contentHtml +
+                        "</div>" +
+                        '<a href="/projects" class="article-back">' +
+                        '<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>' +
+                        "All Projects" +
+                        "</a>" +
+                        "</div>";
+
+                    // Animate progress bar after render
+                    requestAnimationFrame(function () {
+                        var fill = root.querySelector(".progress-fill");
+                        if (fill) {
+                            setTimeout(function () {
+                                fill.style.width = fill.dataset.target;
+                            }, 100);
+                        }
+                    });
+
+                    // ── Lightbox setup ──
+                    var lbImages = galleryImages;
+                    var current = 0;
+                    var lightbox = document.getElementById("lightbox");
+                    var lbImg = document.getElementById("lb-img");
+                    var lbCounter = document.getElementById("lb-counter");
+
+                    function openLightbox(idx) {
+                        current = idx;
+                        lbImg.src = lbImages[current];
+                        lbCounter.textContent =
+                            current + 1 + " / " + lbImages.length;
+                        lightbox.classList.add("open");
+                    }
+                    function closeLightbox() {
+                        lightbox.classList.remove("open");
+                    }
+                    function prevImg() {
+                        current =
+                            (current - 1 + lbImages.length) % lbImages.length;
+                        openLightbox(current);
+                    }
+                    function nextImg() {
+                        current = (current + 1) % lbImages.length;
+                        openLightbox(current);
+                    }
+
+                    document.getElementById("lb-close").onclick = closeLightbox;
+                    document.getElementById("lb-prev").onclick = prevImg;
+                    document.getElementById("lb-next").onclick = nextImg;
+                    lightbox.onclick = function (e) {
+                        if (e.target === lightbox) closeLightbox();
+                    };
+                    document.addEventListener("keydown", function (e) {
+                        if (!lightbox.classList.contains("open")) return;
+                        if (e.key === "ArrowLeft") prevImg();
+                        if (e.key === "ArrowRight") nextImg();
+                        if (e.key === "Escape") closeLightbox();
+                    });
+
+                    // Attach click handlers to inline block images
+                    setTimeout(function () {
+                        root.querySelectorAll(
+                            ".block-image[data-lightbox]",
+                        ).forEach(function (img) {
+                            img.addEventListener("click", function () {
+                                var idx = lbImages.indexOf(img.src);
+                                openLightbox(idx >= 0 ? idx : 0);
+                            });
+                        });
+                    }, 50);
+                }
+
+                // ── Helpers ──
+                function statItem(label, value) {
+                    return (
+                        '<div class="stat-item">' +
+                        '<div class="stat-label">' +
+                        label +
+                        "</div>" +
+                        '<div class="stat-value">' +
+                        esc(String(value)) +
+                        "</div>" +
+                        "</div>"
+                    );
+                }
+
+                function esc(str) {
+                    return String(str)
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;");
+                }
+
+                function showError(msg, isNotFound) {
+                    root.innerHTML =
+                        '<div class="state-wrap">' +
+                        "<h2>" +
+                        (isNotFound
+                            ? "Project Not Found"
+                            : "Something went wrong") +
+                        "</h2>" +
+                        "<p>" +
+                        msg +
+                        "</p>" +
+                        '<p style="margin-top:16px;"><a href="/projects">← Back to Projects</a></p>' +
+                        "</div>";
+                }
+            })();
+        </script>
+    </body>
+</html>

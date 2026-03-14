@@ -16,6 +16,7 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
       const rows = await withDb((client) =>
         client.query(`
           SELECT
+            p.id,
             p.project_name,
             p.description,
             s.status,
@@ -226,11 +227,12 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
         .json({ error: "Latitude or longitude out of range." });
 
     try {
-      await withDb((client) =>
+      const projectRows = await withDb((client) =>
         client.query(
           `INSERT INTO public.project
              (county_id, project_status, project_type, description, people_served, hashed_location, progress, project_name)
-           VALUES ($1, $2, $3, $4, $5, ST_GeomFromText($6, 4326), $7, $8)`,
+           VALUES ($1, $2, $3, $4, $5, ST_GeomFromText($6, 4326), $7, $8)
+           RETURNING id`,
           [
             county_id,
             project_status,
@@ -243,6 +245,7 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
           ],
         ),
       );
+      const newProjectId = projectRows[0].id;
       await withDb((client) =>
         client.query(
           "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
@@ -255,7 +258,10 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
       );
       res
         .status(201)
-        .json({ message: `Project '${project_name}' has been added!` });
+        .json({
+          message: `Project '${project_name}' has been added!`,
+          id: newProjectId,
+        });
     } catch (err) {
       console.error("Error adding project:", err);
       if (err.code === "23505")
@@ -388,6 +394,258 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
       }
     },
   );
+
+  // ─────────────────────────────────────────────────────────────
+  // ARTICLE ROUTES
+  // ─────────────────────────────────────────────────────────────
+
+  // GET /projects/:id/article — Public: fetch full article + blocks
+  router.get("/projects/:id/article", async (req, res) => {
+    const projectId = parseInt(req.params.id, 10);
+    if (isNaN(projectId))
+      return res.status(400).json({ error: "Invalid project ID." });
+
+    try {
+      // Fetch project core info + article meta in one query
+      const projectRows = await withDb((client) =>
+        client.query(
+          `SELECT
+             p.id,
+             p.project_name,
+             p.description,
+             p.people_served,
+             p.progress,
+             c.county_name AS county,
+             s.status,
+             t.type AS project_type,
+             pa.id AS article_id,
+             pa.hero_image_url,
+             pa.published_at,
+             pa.updated_at
+           FROM public.project p
+           JOIN public.county c ON p.county_id = c.id
+           JOIN public.status s ON p.project_status = s.id
+           JOIN public.type t ON p.project_type = t.id
+           LEFT JOIN public.project_article pa ON pa.project_id = p.id
+           WHERE p.id = $1`,
+          [projectId],
+        ),
+      );
+
+      if (projectRows.length === 0)
+        return res.status(404).json({ error: "Project not found." });
+
+      const project = projectRows[0];
+
+      // If no article exists yet, return project info with empty article
+      if (!project.article_id) {
+        return res.json({
+          ...project,
+          article_id: null,
+          hero_image_url: null,
+          blocks: [],
+        });
+      }
+
+      // Fetch ordered content blocks
+      const blocks = await withDb((client) =>
+        client.query(
+          `SELECT id, block_type, content, sort_order
+           FROM public.project_content_block
+           WHERE article_id = $1
+           ORDER BY sort_order ASC`,
+          [project.article_id],
+        ),
+      );
+
+      res.json({ ...project, blocks });
+    } catch (err) {
+      console.error(`Error fetching article for project ${projectId}:`, err);
+      res.status(500).json({
+        error: "Error fetching project article.",
+        ...(isProd ? {} : { details: err.message }),
+      });
+    }
+  });
+
+  // POST /projects/:id/article — Protected: create article + blocks
+  router.post("/projects/:id/article", requireAuth, async (req, res) => {
+    const projectId = parseInt(req.params.id, 10);
+    if (isNaN(projectId))
+      return res.status(400).json({ error: "Invalid project ID." });
+
+    const { hero_image_url, blocks } = req.body;
+    // blocks: [{ block_type: 'paragraph'|'image', content: '...', sort_order: 0 }, ...]
+
+    try {
+      // Verify project exists
+      const projectRows = await withDb((client) =>
+        client.query(
+          "SELECT id, project_name FROM public.project WHERE id = $1",
+          [projectId],
+        ),
+      );
+      if (projectRows.length === 0)
+        return res.status(404).json({ error: "Project not found." });
+
+      // Check if article already exists for this project
+      const existing = await withDb((client) =>
+        client.query(
+          "SELECT id FROM public.project_article WHERE project_id = $1",
+          [projectId],
+        ),
+      );
+      if (existing.length > 0)
+        return res
+          .status(409)
+          .json({
+            error:
+              "Article already exists for this project. Use PUT to update.",
+          });
+
+      // Insert article
+      const articleRows = await withDb((client) =>
+        client.query(
+          `INSERT INTO public.project_article (project_id, hero_image_url)
+           VALUES ($1, $2)
+           RETURNING id`,
+          [projectId, hero_image_url || null],
+        ),
+      );
+      const articleId = articleRows[0].id;
+
+      // Insert content blocks if provided
+      if (Array.isArray(blocks) && blocks.length > 0) {
+        for (const block of blocks) {
+          if (
+            !block.content ||
+            !["paragraph", "image"].includes(block.block_type)
+          )
+            continue;
+          await withDb((client) =>
+            client.query(
+              `INSERT INTO public.project_content_block (article_id, block_type, content, sort_order)
+               VALUES ($1, $2, $3, $4)`,
+              [
+                articleId,
+                block.block_type,
+                block.content,
+                block.sort_order ?? 0,
+              ],
+            ),
+          );
+        }
+      }
+
+      await withDb((client) =>
+        client.query(
+          "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
+          [
+            req.session.user.id,
+            "ADD_ARTICLE",
+            `Added article for project: '${projectRows[0].project_name}' (ID: ${projectId})`,
+          ],
+        ),
+      );
+
+      res
+        .status(201)
+        .json({
+          message: "Article created successfully.",
+          article_id: articleId,
+        });
+    } catch (err) {
+      console.error(`Error creating article for project ${projectId}:`, err);
+      res.status(500).json({
+        error: "Error creating article.",
+        ...(isProd ? {} : { details: err.message }),
+      });
+    }
+  });
+
+  // PUT /projects/:id/article — Protected: replace article content entirely
+  router.put("/projects/:id/article", requireAuth, async (req, res) => {
+    const projectId = parseInt(req.params.id, 10);
+    if (isNaN(projectId))
+      return res.status(400).json({ error: "Invalid project ID." });
+
+    const { hero_image_url, blocks } = req.body;
+
+    try {
+      // Get the article for this project
+      const articleRows = await withDb((client) =>
+        client.query(
+          `SELECT pa.id FROM public.project_article pa
+           JOIN public.project p ON p.id = pa.project_id
+           WHERE pa.project_id = $1`,
+          [projectId],
+        ),
+      );
+      if (articleRows.length === 0)
+        return res
+          .status(404)
+          .json({ error: "No article found for this project." });
+
+      const articleId = articleRows[0].id;
+
+      // Update hero image
+      await withDb((client) =>
+        client.query(
+          `UPDATE public.project_article SET hero_image_url = $1 WHERE id = $2`,
+          [hero_image_url || null, articleId],
+        ),
+      );
+
+      // Replace all blocks: delete existing, re-insert
+      await withDb((client) =>
+        client.query(
+          "DELETE FROM public.project_content_block WHERE article_id = $1",
+          [articleId],
+        ),
+      );
+
+      if (Array.isArray(blocks) && blocks.length > 0) {
+        for (const block of blocks) {
+          if (
+            !block.content ||
+            !["paragraph", "image"].includes(block.block_type)
+          )
+            continue;
+          await withDb((client) =>
+            client.query(
+              `INSERT INTO public.project_content_block (article_id, block_type, content, sort_order)
+               VALUES ($1, $2, $3, $4)`,
+              [
+                articleId,
+                block.block_type,
+                block.content,
+                block.sort_order ?? 0,
+              ],
+            ),
+          );
+        }
+      }
+
+      await withDb((client) =>
+        client.query(
+          "INSERT INTO admin.audit_log (admin_id, action, details, date) VALUES ($1, $2, $3, NOW())",
+          [
+            req.session.user.id,
+            "UPDATE_ARTICLE",
+            `Updated article for project ID: ${projectId}`,
+          ],
+        ),
+      );
+
+      res.json({ message: "Article updated successfully." });
+    } catch (err) {
+      console.error(`Error updating article for project ${projectId}:`, err);
+      res.status(500).json({
+        error: "Error updating article.",
+        ...(isProd ? {} : { details: err.message }),
+      });
+    }
+  });
 
   return router;
 }

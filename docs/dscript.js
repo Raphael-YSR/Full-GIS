@@ -160,17 +160,30 @@ document.addEventListener("DOMContentLoaded", function () {
              </div>
          `;
 
-    // Truncate description if needed
-    const maxDescLength = 150;
-    let description = project.description || "No description available";
-    let readMoreBtn = "";
-
-    if (description.length > maxDescLength) {
-      const shortDesc = description.substring(0, maxDescLength) + "...";
-      // Use backticks for template literals and escape the description properly
-      readMoreBtn = `<div style="margin-top: 5px;"><button class="btn read-more-btn" style="font-size: 10px; padding: 3px 8px;" onclick="toggleFullDescription(this, \`${encodeURIComponent(description)}\`)">READ MORE</button></div>`;
-      description = shortDesc;
-    }
+    // Article button — links to public project article page
+    const articleBtnHtml = project.id
+      ? `<a href="/projects/${project.id}"
+            target="_blank"
+            style="
+              display: block;
+              margin-top: 14px;
+              padding: 8px 14px;
+              background: #4CAF50;
+              color: white;
+              text-decoration: none;
+              text-align: center;
+              font-size: 11px;
+              font-weight: 700;
+              letter-spacing: 0.1em;
+              border-radius: 4px;
+              transition: background 0.2s;
+            "
+            onmouseover="this.style.background='#3d8b3d'"
+            onmouseout="this.style.background='#4CAF50'"
+          >
+            VIEW PROJECT ARTICLE →
+          </a>`
+      : "";
 
     content.innerHTML = `
             <h3 style="margin-top: 0; margin-bottom: 15px;">${
@@ -183,33 +196,16 @@ document.addEventListener("DOMContentLoaded", function () {
             }</h3>
             <div><strong>STATUS:</strong> ${project.status || "N/A"}</div>
             <div><strong>COUNTY:</strong> ${project.county || "N/A"}</div>
-            <div style="margin-top: 10px;"><strong>DESCRIPTION:</strong></div>
-            <div class="project-description">${description}</div>
-            ${readMoreBtn}
             <div style="margin-top: 10px;"><strong>PROGRESS:</strong></div>
             ${progressBarHtml}
+            ${articleBtnHtml}
         `;
 
     projectDetailPopup.style.display = "block";
-    // Use requestAnimationFrame to ensure the display style is applied before adding the class
     requestAnimationFrame(() => {
       projectDetailPopup.classList.add("show");
     });
   }
-
-  window.toggleFullDescription = function (button, encodedDesc) {
-    // Decode using backticks if necessary or adjust based on how it's encoded
-    const description = decodeURIComponent(encodedDesc);
-    const descElement = button.parentElement.previousElementSibling;
-
-    if (button.textContent === "READ MORE") {
-      descElement.textContent = description;
-      button.textContent = "READ LESS";
-    } else {
-      descElement.textContent = description.substring(0, 150) + "...";
-      button.textContent = "READ MORE";
-    }
-  };
 
   // --- Filter Initialization ---
   const statusMapping = {

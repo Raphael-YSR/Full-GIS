@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Projects — Tana Water Works Development Agency</title>
+        <link rel="icon" type="image/png" href="../images/logo.png" />
+        <link rel="shortcut icon" type="image/png" href="../images/logo.png" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../landingStyle.css" />
+        <style>
+            /* ── Page banner ── */
+            .page-banner {
+                background: var(--ink);
+                border-bottom: 3px solid var(--green);
+                padding: 40px 0;
+            }
+            .page-banner-inner {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 0 24px;
+            }
+            .page-banner-eyebrow {
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--green-mid);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            .page-banner-eyebrow::before {
+                content: "";
+                display: block;
+                width: 20px;
+                height: 1.5px;
+                background: var(--green);
+            }
+            .page-banner h1 {
+                font-family: "IBM Plex Serif", serif;
+                font-size: clamp(24px, 4vw, 38px);
+                font-weight: 600;
+                color: #f0f2ef;
+                line-height: 1.2;
+            }
+            .page-banner-sub {
+                margin-top: 8px;
+                font-size: 14px;
+                color: #5a5e5a;
+                font-weight: 300;
+            }
+            .breadcrumb {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 12px;
+                font-size: 11.5px;
+                color: #5a5e5a;
+            }
+            .breadcrumb a {
+                color: #5a5e5a;
+                text-decoration: none;
+                transition: color 0.15s;
+            }
+            .breadcrumb a:hover {
+                color: var(--green-mid);
+            }
+            .breadcrumb-sep {
+                color: #3a3e3a;
+            }
+            .breadcrumb-current {
+                color: var(--green-mid);
+            }
+
+            /* ── Page wrap ── */
+            .page-wrap {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 52px 24px 80px;
+            }
+
+            /* ── Filter / count bar ── */
+            .list-meta {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 28px;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            .list-count {
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--ink-light, #8a8e89);
+            }
+            .list-count span {
+                color: var(--green);
+            }
+
+            /* ── Project cards grid ── */
+            .projects-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                border: 2px solid var(--ink);
+            }
+
+            .project-card {
+                display: flex;
+                flex-direction: column;
+                background: var(--white, #fff);
+                border-right: 2px solid var(--ink);
+                border-bottom: 2px solid var(--ink);
+                transition: background 0.15s;
+                text-decoration: none;
+                color: inherit;
+            }
+            .project-card:nth-child(3n) {
+                border-right: none;
+            }
+            .project-card:hover {
+                background: var(--green-light, #eef4e8);
+            }
+
+            /* Hero image */
+            .card-img-wrap {
+                aspect-ratio: 16/10;
+                overflow: hidden;
+                border-bottom: 2px solid var(--ink);
+                flex-shrink: 0;
+                background: #e8ece4;
+                position: relative;
+            }
+            .card-img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                transition: transform 0.3s ease;
+            }
+            .project-card:hover .card-img {
+                transform: scale(1.02);
+            }
+
+            /* Placeholder when no image */
+            .card-img-placeholder {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #eef4e8;
+            }
+            .card-img-placeholder svg {
+                width: 36px;
+                height: 36px;
+                color: #a0c878;
+            }
+
+            /* Status badge */
+            .card-status-badge {
+                position: absolute;
+                top: 0;
+                left: 0;
+                font-size: 9px;
+                font-weight: 700;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                padding: 4px 12px;
+            }
+            .badge-complete {
+                background: #166534;
+                color: #bbf7d0;
+            }
+            .badge-ongoing {
+                background: #1e3a5f;
+                color: #bfdbfe;
+            }
+            .badge-planned {
+                background: #713f12;
+                color: #fde68a;
+            }
+            .badge-stalled {
+                background: #7f1d1d;
+                color: #fecaca;
+            }
+            .badge-default {
+                background: #1a1c1a;
+                color: #d0d4cc;
+            }
+
+            /* Card body */
+            .card-body {
+                padding: 20px 22px 22px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                flex: 1;
+            }
+            .card-type {
+                font-size: 9.5px;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--green);
+            }
+            .card-title {
+                font-family: "IBM Plex Serif", serif;
+                font-size: 15.5px;
+                font-weight: 600;
+                line-height: 1.4;
+                color: var(--ink);
+            }
+            .card-description {
+                font-size: 12.5px;
+                color: var(--ink-mid, #4a4d49);
+                line-height: 1.65;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            /* Progress bar */
+            .card-progress {
+                margin-top: 4px;
+            }
+            .card-progress-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                margin-bottom: 5px;
+            }
+            .card-progress-label {
+                font-size: 9px;
+                font-weight: 700;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--ink-light, #8a8e89);
+            }
+            .card-progress-pct {
+                font-size: 11px;
+                font-weight: 600;
+                color: var(--green);
+            }
+            .card-progress-track {
+                height: 3px;
+                background: #e0e4dc;
+                border-radius: 2px;
+                overflow: hidden;
+            }
+            .card-progress-fill {
+                height: 100%;
+                background: var(--green);
+                border-radius: 2px;
+            }
+
+            /* People served */
+            .card-people {
+                font-size: 11px;
+                color: var(--ink-light, #8a8e89);
+                margin-top: 2px;
+            }
+            .card-people strong {
+                color: var(--ink);
+            }
+
+            /* CTA */
+            .card-cta {
+                margin-top: auto;
+                padding-top: 14px;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 10.5px;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: var(--green);
+            }
+            .card-cta svg {
+                transition: transform 0.2s;
+            }
+            .project-card:hover .card-cta svg {
+                transform: translateX(3px);
+            }
+
+            /* ── Empty / error states ── */
+            .state-box {
+                grid-column: 1 / -1;
+                padding: 64px 24px;
+                text-align: center;
+                border-right: none;
+                border-bottom: none;
+            }
+            .state-box h3 {
+                font-family: "IBM Plex Serif", serif;
+                font-size: 1.2rem;
+                color: var(--ink);
+                margin-bottom: 8px;
+            }
+            .state-box p {
+                color: var(--ink-light, #8a8e89);
+                font-size: 13px;
+            }
+
+            /* ── Skeleton ── */
+            .skeleton-card {
+                display: flex;
+                flex-direction: column;
+                background: var(--white, #fff);
+                border-right: 2px solid var(--ink);
+                border-bottom: 2px solid var(--ink);
+            }
+            .skeleton-card:nth-child(3n) {
+                border-right: none;
+            }
+            .skel {
+                background: linear-gradient(
+                    90deg,
+                    #e8ece4 25%,
+                    #f0f4ec 50%,
+                    #e8ece4 75%
+                );
+                background-size: 200% 100%;
+                animation: shimmer 1.4s infinite;
+                border-radius: 2px;
+            }
+            .skel-img {
+                aspect-ratio: 16/10;
+                width: 100%;
+                border-radius: 0;
+                border-bottom: 2px solid var(--ink);
+            }
+            .skel-body {
+                padding: 20px 22px 22px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .skel-line {
+                height: 12px;
+            }
+            .skel-line.w-1-3 {
+                width: 33%;
+            }
+            .skel-line.w-2-3 {
+                width: 66%;
+            }
+            .skel-line.w-full {
+                width: 100%;
+            }
+            @keyframes shimmer {
+                0% {
+                    background-position: 200% 0;
+                }
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+
+            @media (max-width: 900px) {
+                .projects-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+                .project-card:nth-child(3n) {
+                    border-right: 2px solid var(--ink);
+                }
+                .project-card:nth-child(2n) {
+                    border-right: none;
+                }
+                .skeleton-card:nth-child(3n) {
+                    border-right: 2px solid var(--ink);
+                }
+                .skeleton-card:nth-child(2n) {
+                    border-right: none;
+                }
+            }
+            @media (max-width: 560px) {
+                .projects-grid {
+                    grid-template-columns: 1fr;
+                }
+                .project-card,
+                .skeleton-card {
+                    border-right: none !important;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- TOP BAR -->
+        <div class="topbar">
+            <div class="topbar-inner">
+                <a
+                    href="/corruption"
+                    style="display: flex; align-items: center; gap: 6px"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        style="color: #9ca3af"
+                    >
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                        />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                    <span
+                        style="
+                            font-size: 11px;
+                            color: #9ca3af;
+                            font-weight: 600;
+                            letter-spacing: 0.05em;
+                        "
+                        >REPORT CORRUPTION</span
+                    >
+                </a>
+                <nav class="topbar-links">
+                    <a href="/tenders">Tenders</a>
+                    <a href="/contact-us">Contact</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- NAV -->
+        <nav class="main-nav" id="mainNav">
+            <div class="nav-inner">
+                <a href="/" class="nav-logo">
+                    <img
+                        src="../images/logo.png"
+                        alt="TWWDA"
+                        class="nav-logo-img"
+                    />
+                    <div class="nav-logo-text">
+                        <span class="nav-logo-title">TWWDA</span>
+                        <span class="nav-logo-sub"
+                            >Tana Water Works Development Agency</span
+                        >
+                    </div>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="/about-us" class="nav-link">About</a>
+                    <a href="/projects" class="nav-link nav-link-active"
+                        >Projects</a
+                    >
+                    <a href="/news" class="nav-link">News</a>
+                    <a href="/tenders" class="nav-link">Tenders</a>
+                    <a href="/contact-us" class="nav-link">Contact</a>
+                    <a href="/gis" class="nav-cta">GIS MAP</a>
+                </div>
+                <button
+                    class="nav-hamburger"
+                    id="navHamburger"
+                    aria-label="Menu"
+                >
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- PAGE BANNER — populated by JS -->
+        <div class="page-banner">
+            <div class="page-banner-inner">
+                <div class="page-banner-eyebrow">Projects</div>
+                <h1 id="banner-title">Loading...</h1>
+                <p class="page-banner-sub" id="banner-sub"></p>
+                <nav class="breadcrumb">
+                    <a href="/">Home</a>
+                    <span class="breadcrumb-sep">/</span>
+                    <a href="/projects">Projects</a>
+                    <span class="breadcrumb-sep">/</span>
+                    <span class="breadcrumb-current" id="breadcrumb-county"
+                        >—</span
+                    >
+                </nav>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="page-wrap">
+            <div class="list-meta">
+                <div class="list-count" id="list-count">&nbsp;</div>
+                <a
+                    href="/projects"
+                    style="
+                        font-size: 11px;
+                        font-weight: 600;
+                        letter-spacing: 0.08em;
+                        text-transform: uppercase;
+                        color: var(--green);
+                        text-decoration: none;
+                    "
+                    >← All Counties</a
+                >
+            </div>
+
+            <div class="projects-grid" id="projects-grid">
+                <!-- Skeleton cards -->
+                <div class="skeleton-card">
+                    <div class="skel skel-img"></div>
+                    <div class="skel-body">
+                        <div class="skel skel-line w-1-3"></div>
+                        <div class="skel skel-line w-full"></div>
+                        <div class="skel skel-line w-2-3"></div>
+                    </div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skel skel-img"></div>
+                    <div class="skel-body">
+                        <div class="skel skel-line w-1-3"></div>
+                        <div class="skel skel-line w-full"></div>
+                        <div class="skel skel-line w-2-3"></div>
+                    </div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skel skel-img"></div>
+                    <div class="skel-body">
+                        <div class="skel skel-line w-1-3"></div>
+                        <div class="skel skel-line w-full"></div>
+                        <div class="skel skel-line w-2-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                // ── Get county slug from URL: /projects/county/embu ──
+                var parts = window.location.pathname.split("/").filter(Boolean);
+                var slug = parts[parts.length - 1]; // last segment
+
+                if (!slug) {
+                    showError("Invalid URL.");
+                    return;
+                }
+
+                var countyDisplay = slug
+                    .replace(/-/g, " ")
+                    .replace(/\b\w/g, function (c) {
+                        return c.toUpperCase();
+                    });
+
+                // Update banner immediately with slug-derived name
+                document.getElementById("banner-title").textContent =
+                    countyDisplay + " County";
+                document.getElementById("breadcrumb-county").textContent =
+                    countyDisplay + " County";
+                document.title = countyDisplay + " County Projects — TWWDA";
+
+                // ── Fetch projects ──
+                fetch("/projects/county/" + slug)
+                    .then(function (res) {
+                        if (res.status === 404) throw new Error("not_found");
+                        if (!res.ok) throw new Error("server_error");
+                        return res.json();
+                    })
+                    .then(function (projects) {
+                        render(projects, countyDisplay);
+                    })
+                    .catch(function (err) {
+                        if (err.message === "not_found") {
+                            showError(
+                                'No county found matching "' +
+                                    countyDisplay +
+                                    '".',
+                            );
+                        } else {
+                            showError(
+                                "Failed to load projects. Please try again.",
+                            );
+                        }
+                    });
+
+                function render(projects, countyName) {
+                    var grid = document.getElementById("projects-grid");
+                    var countEl = document.getElementById("list-count");
+                    var sub = document.getElementById("banner-sub");
+
+                    // Update banner sub
+                    if (projects.length > 0) {
+                        var countyFull =
+                            projects[0].county || countyName + " County";
+                        document.getElementById("banner-title").textContent =
+                            countyFull;
+                        document.getElementById(
+                            "breadcrumb-county",
+                        ).textContent = countyFull;
+                        document.title = countyFull + " Projects — TWWDA";
+                        sub.textContent =
+                            projects.length +
+                            " project" +
+                            (projects.length !== 1 ? "s" : "") +
+                            " in this county.";
+                    } else {
+                        sub.textContent =
+                            "No projects found for this county yet.";
+                    }
+
+                    countEl.innerHTML =
+                        "<span>" +
+                        projects.length +
+                        "</span> Project" +
+                        (projects.length !== 1 ? "s" : "");
+
+                    if (projects.length === 0) {
+                        grid.innerHTML =
+                            '<div class="state-box">' +
+                            "<h3>No projects yet</h3>" +
+                            "<p>Projects for this county have not been added yet. Check back soon.</p>" +
+                            "</div>";
+                        return;
+                    }
+
+                    grid.innerHTML = "";
+                    projects.forEach(function (p) {
+                        grid.appendChild(buildCard(p));
+                    });
+                }
+
+                function buildCard(p) {
+                    var card = document.createElement("a");
+                    card.href = "/projects/" + p.id;
+                    card.className = "project-card";
+
+                    var pct =
+                        p.progress != null
+                            ? Math.min(100, Math.max(0, parseInt(p.progress)))
+                            : null;
+                    var statusLower = (p.status || "").toLowerCase().trim();
+                    var badgeClass = "badge-default";
+                    if (statusLower.includes("complete"))
+                        badgeClass = "badge-complete";
+                    else if (
+                        statusLower.includes("ongoing") ||
+                        statusLower.includes("progress")
+                    )
+                        badgeClass = "badge-ongoing";
+                    else if (statusLower.includes("plan"))
+                        badgeClass = "badge-planned";
+                    else if (
+                        statusLower.includes("stall") ||
+                        statusLower.includes("suspend")
+                    )
+                        badgeClass = "badge-stalled";
+
+                    // Image section
+                    var imgHtml;
+                    if (p.hero_image_url) {
+                        imgHtml =
+                            '<div class="card-img-wrap">' +
+                            '<span class="card-status-badge ' +
+                            badgeClass +
+                            '">' +
+                            esc(p.status || "Unknown") +
+                            "</span>" +
+                            '<img class="card-img" src="' +
+                            esc(p.hero_image_url) +
+                            '" alt="' +
+                            esc(p.project_name) +
+                            '" loading="lazy" />' +
+                            "</div>";
+                    } else {
+                        imgHtml =
+                            '<div class="card-img-wrap">' +
+                            '<span class="card-status-badge ' +
+                            badgeClass +
+                            '">' +
+                            esc(p.status || "Unknown") +
+                            "</span>" +
+                            '<div class="card-img-placeholder">' +
+                            '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>' +
+                            "</div>" +
+                            "</div>";
+                    }
+
+                    // Progress
+                    var progressHtml = "";
+                    if (pct !== null) {
+                        progressHtml =
+                            '<div class="card-progress">' +
+                            '<div class="card-progress-header">' +
+                            '<span class="card-progress-label">Completion</span>' +
+                            '<span class="card-progress-pct">' +
+                            pct +
+                            "%</span>" +
+                            "</div>" +
+                            '<div class="card-progress-track">' +
+                            '<div class="card-progress-fill" style="width:' +
+                            pct +
+                            '%"></div>' +
+                            "</div>" +
+                            "</div>";
+                    }
+
+                    // People served
+                    var peopleHtml = "";
+                    if (p.people_served) {
+                        peopleHtml =
+                            '<div class="card-people"><strong>' +
+                            Number(p.people_served).toLocaleString() +
+                            "</strong> people served</div>";
+                    }
+
+                    card.innerHTML =
+                        imgHtml +
+                        '<div class="card-body">' +
+                        '<span class="card-type">' +
+                        esc(p.project_type || "Project") +
+                        "</span>" +
+                        '<p class="card-title">' +
+                        esc(p.project_name) +
+                        "</p>" +
+                        (p.description
+                            ? '<p class="card-description">' +
+                              esc(p.description) +
+                              "</p>"
+                            : "") +
+                        progressHtml +
+                        peopleHtml +
+                        '<span class="card-cta">View Project ' +
+                        '<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>' +
+                        "</span>" +
+                        "</div>";
+
+                    return card;
+                }
+
+                function esc(str) {
+                    return String(str)
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;");
+                }
+
+                function showError(msg) {
+                    document.getElementById("banner-title").textContent =
+                        "Projects";
+                    document.getElementById("projects-grid").innerHTML =
+                        '<div class="state-box"><h3>Could not load projects</h3><p>' +
+                        msg +
+                        "</p></div>";
+                    document.getElementById("list-count").textContent = "";
+                }
+
+                // Hamburger
+                var hamburger = document.getElementById("navHamburger");
+                var navLinks = document.getElementById("navLinks");
+                if (hamburger) {
+                    hamburger.addEventListener("click", function () {
+                        navLinks.classList.toggle("open");
+                        hamburger.classList.toggle("open");
+                    });
+                }
+            })();
+        </script>
+    </body>
+</html>

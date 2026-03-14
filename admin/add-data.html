@@ -78,6 +78,68 @@
                 transform: scale(1.1);
             }
 
+            /* Website Content divider */
+            .website-content-divider {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 8px 0 4px;
+            }
+            .website-content-divider::before,
+            .website-content-divider::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: #3f4c63;
+            }
+            .website-content-divider span {
+                font-size: 0.7rem;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                color: #60a5fa;
+                white-space: nowrap;
+            }
+
+            /* Paragraph / image block remove button */
+            .block-remove-btn {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                background: #374151;
+                border: none;
+                color: #9ca3af;
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                font-size: 14px;
+                line-height: 1;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition:
+                    background 0.15s,
+                    color 0.15s;
+            }
+            .block-remove-btn:hover {
+                background: #ef4444;
+                color: white;
+                transform: none;
+            }
+
+            .image-block {
+                position: relative;
+            }
+            .image-block-preview {
+                display: none;
+                margin-top: 6px;
+                width: 100%;
+                max-height: 140px;
+                object-fit: cover;
+                border-radius: 4px;
+                border: 1px solid #3f4c63;
+            }
+
             /* Tooltip styles */
             .tooltip-container {
                 position: relative;
@@ -308,6 +370,87 @@
                                     class="w-full text-base h-9 p-2 font-inter"
                                 />
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- ─────────────────────────────────────────── -->
+                    <!-- WEBSITE CONTENT SECTION                      -->
+                    <!-- ─────────────────────────────────────────── -->
+                    <div class="website-content-divider">
+                        <span class="font-marlin">WEBSITE CONTENT</span>
+                    </div>
+
+                    <p
+                        class="text-gray-400 text-xs font-marlinsoftmedium -mt-2"
+                    >
+                        Optional — fill this in to publish an article on the
+                        public projects page.
+                    </p>
+
+                    <!-- Hero Image -->
+                    <div>
+                        <label class="block text-sm font-bold mb-1 font-marlin"
+                            >PRIMARY IMAGE URL</label
+                        >
+                        <input
+                            type="url"
+                            id="hero_image_url"
+                            placeholder="https://..."
+                            class="w-full text-base h-9 p-2 font-inter"
+                        />
+                        <div id="hero-preview-wrap" class="hidden mt-2">
+                            <img
+                                id="hero-preview"
+                                src=""
+                                alt="Hero preview"
+                                class="w-full rounded border border-gray-600 object-cover"
+                                style="max-height: 180px"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Paragraphs -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-bold font-marlin"
+                                >PARAGRAPHS</label
+                            >
+                            <button
+                                type="button"
+                                id="addParagraphBtn"
+                                class="text-xs font-marlin text-blue-400 hover:text-blue-300 border border-blue-400 hover:border-blue-300 px-3 py-1 rounded"
+                            >
+                                + ADD PARAGRAPH
+                            </button>
+                        </div>
+                        <div id="paragraphs-container" class="space-y-3">
+                            <!-- First paragraph always present -->
+                            <div class="paragraph-block relative">
+                                <textarea
+                                    class="w-full text-base p-2 font-inter paragraph-input"
+                                    placeholder="Write a paragraph about this project..."
+                                    rows="4"
+                                ></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gallery Images -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-sm font-bold font-marlin"
+                                >OTHER IMAGES</label
+                            >
+                            <button
+                                type="button"
+                                id="addImageBtn"
+                                class="text-xs font-marlin text-blue-400 hover:text-blue-300 border border-blue-400 hover:border-blue-300 px-3 py-1 rounded"
+                            >
+                                + ADD IMAGE
+                            </button>
+                        </div>
+                        <div id="images-container" class="space-y-3">
+                            <!-- dynamically added -->
                         </div>
                     </div>
 
