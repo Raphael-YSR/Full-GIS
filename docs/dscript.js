@@ -160,30 +160,17 @@ document.addEventListener("DOMContentLoaded", function () {
              </div>
          `;
 
-    // Article button — links to public project article page
-    const articleBtnHtml = project.id
-      ? `<a href="/projects/${project.id}"
-            target="_blank"
-            style="
-              display: block;
-              margin-top: 14px;
-              padding: 8px 14px;
-              background: #4CAF50;
-              color: white;
-              text-decoration: none;
-              text-align: center;
-              font-size: 11px;
-              font-weight: 700;
-              letter-spacing: 0.1em;
-              border-radius: 4px;
-              transition: background 0.2s;
-            "
-            onmouseover="this.style.background='#3d8b3d'"
-            onmouseout="this.style.background='#4CAF50'"
-          >
-            VIEW PROJECT ARTICLE →
-          </a>`
-      : "";
+    // Truncate description if needed
+    const maxDescLength = 150;
+    let description = project.description || "No description available";
+    let readMoreBtn = "";
+
+    if (description.length > maxDescLength) {
+      const shortDesc = description.substring(0, maxDescLength) + "...";
+      // Use backticks for template literals and escape the description properly
+      readMoreBtn = `<div style="margin-top: 5px;"><button class="btn read-more-btn" style="font-size: 10px; padding: 3px 8px;" onclick="toggleFullDescription(this, \`${encodeURIComponent(description)}\`)">READ MORE</button></div>`;
+      description = shortDesc;
+    }
 
     content.innerHTML = `
             <h3 style="margin-top: 0; margin-bottom: 15px;">${
@@ -196,26 +183,43 @@ document.addEventListener("DOMContentLoaded", function () {
             }</h3>
             <div><strong>STATUS:</strong> ${project.status || "N/A"}</div>
             <div><strong>COUNTY:</strong> ${project.county || "N/A"}</div>
+            <div style="margin-top: 10px;"><strong>DESCRIPTION:</strong></div>
+            <div class="project-description">${description}</div>
+            ${readMoreBtn}
             <div style="margin-top: 10px;"><strong>PROGRESS:</strong></div>
             ${progressBarHtml}
-            ${articleBtnHtml}
         `;
 
     projectDetailPopup.style.display = "block";
+    // Use requestAnimationFrame to ensure the display style is applied before adding the class
     requestAnimationFrame(() => {
       projectDetailPopup.classList.add("show");
     });
   }
 
+  window.toggleFullDescription = function (button, encodedDesc) {
+    // Decode using backticks if necessary or adjust based on how it's encoded
+    const description = decodeURIComponent(encodedDesc);
+    const descElement = button.parentElement.previousElementSibling;
+
+    if (button.textContent === "READ MORE") {
+      descElement.textContent = description;
+      button.textContent = "READ LESS";
+    } else {
+      descElement.textContent = description.substring(0, 150) + "...";
+      button.textContent = "READ MORE";
+    }
+  };
+
   // --- Filter Initialization ---
+  // Single source of truth: DB status → internal key
   const statusMapping = {
     COMPLETE: "complete",
-    "IN PROGRESS": "ongoing",
-    "PLANNING & DESIGN": "planning",
-    DESIGN: "design",
+    ONGOING: "ongoing",
+    PLANNING: "planning",
   };
-  Object.keys(statusMapping).forEach((status) => {
-    activeFilters.status[statusMapping[status]] = true;
+  ["complete", "ongoing", "planning"].forEach((key) => {
+    activeFilters.status[key] = true;
   });
   const typeCategories = [
     "Water",
@@ -332,25 +336,16 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Determine status color
-    let status = project.status
-      ? project.status.toLowerCase().trim()
-      : "unknown";
-    let color;
-    switch (status) {
-      case "complete":
-        color = "#1f78b4";
-        break;
-      case "ongoing":
-        color = "#33a02c ";
-        break;
-      case "design":
-        color = "#e6550d ";
-        break;
-      default:
-        color = "#444";
-        status = "unknown";
-    }
+    // Normalise DB status to internal key
+    const rawStatus = project.status ? project.status.toLowerCase().trim() : "";
+    const statusColors = {
+      complete: "#1f78b4", // blue
+      ongoing: "#33a02c", // green
+      planning: "#e6550d", // orange
+    };
+    const status =
+      statusColors[rawStatus] !== undefined ? rawStatus : "planning";
+    const color = statusColors[status];
 
     // Size of the icon
     const iconSize = [8, 8];
@@ -706,92 +701,64 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Modified updateFiltersFromUI function to handle exclusion logic
   function updateFiltersFromUI() {
-    // Define clear mapping between status options and their values
+    // 1:complete  2:ongoing  3:planning — matches the 3 checkboxes in index.html
     const statusMap = {
       1: "complete",
-      2: "ongoing", // This matches 'IN PROGRESS' in UI
-      3: "planning", // This matches 'PLANNING & DESIGN' in UI
+      2: "ongoing",
+      3: "planning",
     };
 
-    // Reset filters to empty objects
     activeFilters.status = {};
     activeFilters.types = {};
-    activeFilters.exclusions = []; // New array to track status+type combinations to exclude
+    activeFilters.exclusions = [];
 
-    // First, process all main option checkboxes (status categories)
+    // Main status checkboxes
     document
       .querySelectorAll('.option input[type="checkbox"]')
       .forEach((checkbox) => {
         const mainOption = checkbox.id.replace("option", "");
         const statusKey = statusMap[mainOption];
+        if (!statusKey) return;
 
-        if (statusKey) {
-          if (checkbox.checked) {
-            // Add the status to active filters
-            activeFilters.status[statusKey] = true;
-
-            // Add special handling for combined statuses
-            if (statusKey === "planning") {
-              activeFilters.status["design"] = true; // Make sure 'design' status is included with 'planning'
-            }
-          } else {
-            // Process unchecked main options and their suboptions for exclusions
-            // Track all unchecked type suboptions for this status
-            document
-              .querySelectorAll(`.sub-option[data-main="${mainOption}"]`)
-              .forEach((subCheckbox) => {
-                if (!subCheckbox.checked) {
-                  const typeKey = subCheckbox.parentElement.textContent
-                    .trim()
-                    .toLowerCase();
-                  if (typeKey) {
-                    // Add this status+type combo to exclusions
-                    activeFilters.exclusions.push({
-                      status: statusKey,
-                      type: typeKey,
-                    });
-                  }
-                }
-              });
-          }
+        if (checkbox.checked) {
+          activeFilters.status[statusKey] = true;
+        } else {
+          document
+            .querySelectorAll(`.sub-option[data-main="${mainOption}"]`)
+            .forEach((sub) => {
+              const typeKey = sub.parentElement.textContent
+                .trim()
+                .toLowerCase();
+              if (typeKey)
+                activeFilters.exclusions.push({
+                  status: statusKey,
+                  type: typeKey,
+                });
+            });
         }
       });
 
-    // Process suboptions (project types) that are checked under checked parent options
+    // Sub-option type checkboxes
     document.querySelectorAll(".sub-option").forEach((checkbox) => {
       const mainOption = checkbox.getAttribute("data-main");
       const parentCheckbox = document.getElementById(`option${mainOption}`);
+      if (!parentCheckbox || !parentCheckbox.checked) return;
 
-      if (parentCheckbox && parentCheckbox.checked) {
-        const typeKey = checkbox.parentElement.textContent.trim().toLowerCase();
+      const typeKey = checkbox.parentElement.textContent.trim().toLowerCase();
+      if (!typeKey) return;
 
-        if (checkbox.checked) {
-          // Add this type to active filters
-          if (typeKey) {
-            activeFilters.types[typeKey] = true;
-          }
-        } else {
-          // If parent is checked but this type is unchecked, add to exclusions
-          const statusKey = statusMap[mainOption];
-          if (statusKey && typeKey) {
-            activeFilters.exclusions.push({
-              status: statusKey,
-              type: typeKey,
-            });
-          }
-        }
+      if (checkbox.checked) {
+        activeFilters.types[typeKey] = true;
+      } else {
+        const statusKey = statusMap[mainOption];
+        if (statusKey)
+          activeFilters.exclusions.push({ status: statusKey, type: typeKey });
       }
     });
 
-    // Make sure county filter is up-to-date
     const countySelect = document.getElementById("county-select");
-    if (countySelect) {
-      activeFilters.county = countySelect.value.toLowerCase();
-    }
-
-    //console.log("Updated filters:", JSON.stringify(activeFilters));
+    if (countySelect) activeFilters.county = countySelect.value.toLowerCase();
   }
 
   // function to handle exclusion logic and county filtering

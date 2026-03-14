@@ -444,7 +444,12 @@
             <h4>FILTER BY STATUS</h4>
             <div>
                 <div class="option">
-                    <input type="checkbox" class="checkbox" id="option1" />
+                    <input
+                        type="checkbox"
+                        class="checkbox"
+                        id="option1"
+                        checked
+                    />
                     <label class="option-label" onclick="toggleSubOptions(1)">
                         COMPLETE <span id="icon1" class="expand-icon">+</span>
                     </label>
@@ -454,6 +459,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="1"
                         />
                         Water</label
@@ -462,6 +468,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="1"
                         />
                         Sanitation</label
@@ -470,6 +477,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="1"
                         />
                         Boreholes</label
@@ -478,6 +486,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="1"
                         />
                         Dams</label
@@ -486,6 +495,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="1"
                         />
                         Irrigation</label
@@ -494,6 +504,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="1"
                         />
                         Other</label
@@ -502,7 +513,12 @@
             </div>
             <div>
                 <div class="option">
-                    <input type="checkbox" class="checkbox" id="option2" />
+                    <input
+                        type="checkbox"
+                        class="checkbox"
+                        id="option2"
+                        checked
+                    />
                     <label class="option-label" onclick="toggleSubOptions(2)">
                         ONGOING <span id="icon2" class="expand-icon">+</span>
                     </label>
@@ -512,6 +528,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="2"
                         />
                         Water</label
@@ -520,6 +537,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="2"
                         />
                         Sanitation</label
@@ -528,6 +546,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="2"
                         />
                         Boreholes</label
@@ -536,6 +555,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="2"
                         />
                         Dams</label
@@ -544,6 +564,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="2"
                         />
                         Irrigation</label
@@ -552,6 +573,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="2"
                         />
                         Other</label
@@ -560,9 +582,14 @@
             </div>
             <div>
                 <div class="option">
-                    <input type="checkbox" class="checkbox" id="option3" />
+                    <input
+                        type="checkbox"
+                        class="checkbox"
+                        id="option3"
+                        checked
+                    />
                     <label class="option-label" onclick="toggleSubOptions(3)">
-                        PLANNING &amp; DESIGN
+                        PLANNING
                         <span id="icon3" class="expand-icon">+</span>
                     </label>
                 </div>
@@ -571,6 +598,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="3"
                         />
                         Water</label
@@ -579,6 +607,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="3"
                         />
                         Sanitation</label
@@ -587,6 +616,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="3"
                         />
                         Boreholes</label
@@ -595,6 +625,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="3"
                         />
                         Dams</label
@@ -603,6 +634,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="3"
                         />
                         Irrigation</label
@@ -611,6 +643,7 @@
                         ><input
                             type="checkbox"
                             class="checkbox sub-option"
+                            checked
                             data-main="3"
                         />
                         Other</label
@@ -620,12 +653,21 @@
             <hr />
             <p><strong>FILTER BY COUNTY</strong></p>
             <select id="county-select">
-                <option value="all">All</option>
-                <option value="nyeri">Nyeri</option>
-                <option value="embu">Embu</option>
-                <option value="meru">Meru</option>
-                <option value="kirinyaga">Kirinyaga</option>
-                <option value="tharaka nithi">Tharaka Nithi</option>
+                <option value="all">All Counties</option>
+                <optgroup label="── Mandated ──">
+                    <option value="embu">Embu</option>
+                    <option value="kirinyaga">Kirinyaga</option>
+                    <option value="meru">Meru</option>
+                    <option value="nyeri">Nyeri</option>
+                    <option value="tharaka nithi">Tharaka Nithi</option>
+                </optgroup>
+                <optgroup label="── Featured ──">
+                    <option value="garissa">Garissa</option>
+                    <option value="isiolo">Isiolo</option>
+                    <option value="mandera">Mandera</option>
+                    <option value="marsabit">Marsabit</option>
+                    <option value="muranga">Murang'a</option>
+                </optgroup>
             </select>
             <hr />
             <div class="map-layers">
