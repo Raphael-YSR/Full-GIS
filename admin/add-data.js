@@ -150,7 +150,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const typeSelect = document.getElementById("project_type");
       const statusSelect = document.getElementById("project_status");
 
-      // Grouped county dropdown
       const mandated = counties.filter((c) => c.is_mandated);
       const featured = counties.filter((c) => !c.is_mandated);
 

@@ -148,71 +148,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function showProjectDetail(project) {
     const content = document.getElementById("project-detail-content");
-
-    // Calculate progress bar width
     const progress = project.progress !== null ? project.progress : 0;
     const progressBarHtml = `
-             <div style="margin-top: 8px;">
-                 <div style="background-color: #444; height: 12px; border-radius: 6px; overflow: hidden;">
-                     <div style="background-color: #4CAF50; height: 100%; width: ${progress}%;"></div>
-                 </div>
-                 <div style="text-align: right; font-size: 12px; margin-top: 2px;">${progress}%</div>
-             </div>
-         `;
-
-    // Truncate description if needed
-    const maxDescLength = 150;
-    let description = project.description || "No description available";
-    let readMoreBtn = "";
-
-    if (description.length > maxDescLength) {
-      const shortDesc = description.substring(0, maxDescLength) + "...";
-      // Use backticks for template literals and escape the description properly
-      readMoreBtn = `<div style="margin-top: 5px;"><button class="btn read-more-btn" style="font-size: 10px; padding: 3px 8px;" onclick="toggleFullDescription(this, \`${encodeURIComponent(description)}\`)">READ MORE</button></div>`;
-      description = shortDesc;
-    }
-
+      <div style="margin-top:8px;">
+        <div style="background-color:#444;height:12px;border-radius:6px;overflow:hidden;">
+          <div style="background-color:#4CAF50;height:100%;width:${progress}%;"></div>
+        </div>
+        <div style="text-align:right;font-size:12px;margin-top:2px;">${progress}%</div>
+      </div>`;
+    const articleBtnHtml = project.id
+      ? `<a href="/projects/${project.id}" target="_blank"
+           style="display:block;margin-top:14px;padding:8px 14px;background:#4CAF50;color:white;
+                  text-decoration:none;text-align:center;font-size:11px;font-weight:700;
+                  letter-spacing:0.1em;border-radius:4px;"
+           onmouseover="this.style.background='#3d8b3d'"
+           onmouseout="this.style.background='#4CAF50'">
+           VIEW PROJECT ARTICLE →
+         </a>`
+      : "";
     content.innerHTML = `
-            <h3 style="margin-top: 0; margin-bottom: 15px;">${
-              project.project_name
-                ? project.project_name
-                    .split(" ")
-                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")
-                : "Unnamed Project"
-            }</h3>
-            <div><strong>STATUS:</strong> ${project.status || "N/A"}</div>
-            <div><strong>COUNTY:</strong> ${project.county || "N/A"}</div>
-            <div style="margin-top: 10px;"><strong>DESCRIPTION:</strong></div>
-            <div class="project-description">${description}</div>
-            ${readMoreBtn}
-            <div style="margin-top: 10px;"><strong>PROGRESS:</strong></div>
-            ${progressBarHtml}
-        `;
-
+      <h3 style="margin-top:0;margin-bottom:15px;">${
+        project.project_name
+          ? project.project_name
+              .split(" ")
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(" ")
+          : "Unnamed Project"
+      }</h3>
+      <div><strong>STATUS:</strong> ${project.status || "N/A"}</div>
+      <div><strong>COUNTY:</strong> ${project.county || "N/A"}</div>
+      <div style="margin-top:10px;"><strong>PROGRESS:</strong></div>
+      ${progressBarHtml}
+      ${articleBtnHtml}`;
     projectDetailPopup.style.display = "block";
-    // Use requestAnimationFrame to ensure the display style is applied before adding the class
     requestAnimationFrame(() => {
       projectDetailPopup.classList.add("show");
     });
   }
 
-  window.toggleFullDescription = function (button, encodedDesc) {
-    // Decode using backticks if necessary or adjust based on how it's encoded
-    const description = decodeURIComponent(encodedDesc);
-    const descElement = button.parentElement.previousElementSibling;
-
-    if (button.textContent === "READ MORE") {
-      descElement.textContent = description;
-      button.textContent = "READ LESS";
-    } else {
-      descElement.textContent = description.substring(0, 150) + "...";
-      button.textContent = "READ MORE";
-    }
-  };
-
   // --- Filter Initialization ---
-  // Single source of truth: DB status → internal key
   const statusMapping = {
     COMPLETE: "complete",
     ONGOING: "ongoing",
@@ -339,9 +313,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Normalise DB status to internal key
     const rawStatus = project.status ? project.status.toLowerCase().trim() : "";
     const statusColors = {
-      complete: "#1f78b4", // blue
-      ongoing: "#33a02c", // green
-      planning: "#e6550d", // orange
+      complete: "#1f78b4",
+      ongoing: "#33a02c",
+      planning: "#e6550d",
     };
     const status =
       statusColors[rawStatus] !== undefined ? rawStatus : "planning";
@@ -702,25 +676,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updateFiltersFromUI() {
-    // 1:complete  2:ongoing  3:planning — matches the 3 checkboxes in index.html
-    const statusMap = {
-      1: "complete",
-      2: "ongoing",
-      3: "planning",
-    };
-
+    const statusMap = { 1: "complete", 2: "ongoing", 3: "planning" };
     activeFilters.status = {};
     activeFilters.types = {};
     activeFilters.exclusions = [];
 
-    // Main status checkboxes
     document
       .querySelectorAll('.option input[type="checkbox"]')
       .forEach((checkbox) => {
         const mainOption = checkbox.id.replace("option", "");
         const statusKey = statusMap[mainOption];
         if (!statusKey) return;
-
         if (checkbox.checked) {
           activeFilters.status[statusKey] = true;
         } else {
@@ -739,15 +705,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
 
-    // Sub-option type checkboxes
     document.querySelectorAll(".sub-option").forEach((checkbox) => {
       const mainOption = checkbox.getAttribute("data-main");
       const parentCheckbox = document.getElementById(`option${mainOption}`);
       if (!parentCheckbox || !parentCheckbox.checked) return;
-
       const typeKey = checkbox.parentElement.textContent.trim().toLowerCase();
       if (!typeKey) return;
-
       if (checkbox.checked) {
         activeFilters.types[typeKey] = true;
       } else {
