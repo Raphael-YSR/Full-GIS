@@ -967,27 +967,32 @@
                     return;
                 }
 
-                fetch("/projects/" + projectId + "/article")
-                    .then(function (res) {
-                        if (!res.ok)
-                            throw new Error(
-                                res.status === 404
-                                    ? "not_found"
-                                    : "server_error",
+                fetch(`/projects/${projectId}/article`)
+                    .then((res) => res.json())
+                    .then((data) => {
+                        // 1. Update Hero Image
+                        const heroEl = document.getElementById("hero-image");
+                        if (heroEl) heroEl.src = data.hero_image_url;
+
+                        // 2. Clear and Fill Content Blocks
+                        const container =
+                            document.getElementById("content-blocks"); // Ensure this ID exists!
+                        if (!container)
+                            return console.error(
+                                "Container #content-blocks not found",
                             );
-                        return res.json();
+
+                        container.innerHTML = ""; // Clear loader
+
+                        data.blocks.forEach((block) => {
+                            if (block.block_type === "paragraph") {
+                                container.innerHTML += `<p class="article-text">${block.content}</p>`;
+                            } else if (block.block_type === "image") {
+                                container.innerHTML += `<img src="${block.content}" class="article-img" />`;
+                            }
+                        });
                     })
-                    .then(function (data) {
-                        render(data);
-                    })
-                    .catch(function (err) {
-                        showError(
-                            err.message === "not_found"
-                                ? "This project could not be found."
-                                : "Failed to load project. Please try again later.",
-                            err.message === "not_found",
-                        );
-                    });
+                    .catch((err) => showError("Failed to render content"));
 
                 function render(d) {
                     document.title = d.project_name + " — TWWDA";

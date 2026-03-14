@@ -256,12 +256,10 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
           ],
         ),
       );
-      res
-        .status(201)
-        .json({
-          message: `Project '${project_name}' has been added!`,
-          id: newProjectId,
-        });
+      res.status(201).json({
+        message: `Project '${project_name}' has been added!`,
+        id: newProjectId,
+      });
     } catch (err) {
       console.error("Error adding project:", err);
       if (err.code === "23505")
@@ -440,12 +438,10 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
       res.json({ ...project, blocks });
     } catch (err) {
       console.error(`Error fetching article for project ${projectId}:`, err);
-      res
-        .status(500)
-        .json({
-          error: "Error fetching project article.",
-          ...(isProd ? {} : { details: err.message }),
-        });
+      res.status(500).json({
+        error: "Error fetching project article.",
+        ...(isProd ? {} : { details: err.message }),
+      });
     }
   });
 
@@ -511,20 +507,16 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
           ],
         ),
       );
-      res
-        .status(201)
-        .json({
-          message: "Article created successfully.",
-          article_id: articleId,
-        });
+      res.status(201).json({
+        message: "Article created successfully.",
+        article_id: articleId,
+      });
     } catch (err) {
       console.error(`Error creating article for project ${projectId}:`, err);
-      res
-        .status(500)
-        .json({
-          error: "Error creating article.",
-          ...(isProd ? {} : { details: err.message }),
-        });
+      res.status(500).json({
+        error: "Error creating article.",
+        ...(isProd ? {} : { details: err.message }),
+      });
     }
   });
 
@@ -591,12 +583,10 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
       res.json({ message: "Article updated successfully." });
     } catch (err) {
       console.error(`Error updating article for project ${projectId}:`, err);
-      res
-        .status(500)
-        .json({
-          error: "Error updating article.",
-          ...(isProd ? {} : { details: err.message }),
-        });
+      res.status(500).json({
+        error: "Error updating article.",
+        ...(isProd ? {} : { details: err.message }),
+      });
     }
   });
 
@@ -633,12 +623,10 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
       res.json(rows);
     } catch (err) {
       console.error(`Error fetching projects for county "${slug}":`, err);
-      res
-        .status(500)
-        .json({
-          error: "Error fetching county projects.",
-          ...(isProd ? {} : { details: err.message }),
-        });
+      res.status(500).json({
+        error: "Error fetching county projects.",
+        ...(isProd ? {} : { details: err.message }),
+      });
     }
   });
 
