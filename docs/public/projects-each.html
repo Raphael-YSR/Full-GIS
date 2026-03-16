@@ -953,17 +953,301 @@
             </nav>
         </div>
 
-        <div id="article-root">
-            <!-- everything will be placed here by JavaScript -->
-        </div>
+        <script>
+            (function () {
+                /* ── helpers ───────────────────────────────────────────── */
+                function esc(str) {
+                    return String(str)
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;");
+                }
 
-        <!-- Lightbox markup – make sure this exists too -->
-        <div id="lightbox" class="lightbox">
-            <span id="lb-close">&times;</span>
-            <img id="lb-img" src="" alt="Lightbox image" />
-            <span id="lb-counter">1 / 1</span>
-            <span id="lb-prev">&#10094;</span>
-            <span id="lb-next">&#10095;</span>
-        </div>
+                function statItem(label, value) {
+                    return (
+                        '<div class="stat-item">' +
+                        '<div class="stat-label">' +
+                        label +
+                        "</div>" +
+                        '<div class="stat-value">' +
+                        esc(String(value)) +
+                        "</div>" +
+                        "</div>"
+                    );
+                }
+
+                function showError(msg, isNotFound) {
+                    root.innerHTML =
+                        '<div class="state-wrap">' +
+                        "<h2>" +
+                        (isNotFound
+                            ? "Project Not Found"
+                            : "Something went wrong") +
+                        "</h2>" +
+                        "<p>" +
+                        esc(msg) +
+                        "</p>" +
+                        '<p style="margin-top:16px;"><a href="/projects">← Back to Projects</a></p>' +
+                        "</div>";
+                }
+
+                /* ── get project id from URL (/projects/26) ────────────── */
+                var root = document.getElementById("article-root");
+                var pathParts = window.location.pathname
+                    .split("/")
+                    .filter(Boolean);
+                var projectId = pathParts[pathParts.length - 1];
+
+                if (!projectId || isNaN(parseInt(projectId, 10))) {
+                    showError("Invalid project URL.", true);
+                    return;
+                }
+
+                /* ── fetch ─────────────────────────────────────────────── */
+                fetch("/projects/" + projectId + "/article")
+                    .then(function (res) {
+                        if (!res.ok) {
+                            return res.json().then(function (body) {
+                                throw new Error(
+                                    body.error || "HTTP " + res.status,
+                                );
+                            });
+                        }
+                        return res.json();
+                    })
+                    .then(render)
+                    .catch(function (err) {
+                        console.error("Article fetch error:", err);
+                        showError(err.message || "Failed to load project.");
+                    });
+
+                /* ── render ─────────────────────────────────────────────── */
+                function render(d) {
+                    document.title = d.project_name + " — TWWDA";
+
+                    /* gallery images (hero first, then content images) */
+                    var galleryImages = [];
+                    if (d.hero_image_url) galleryImages.push(d.hero_image_url);
+                    (d.blocks || []).forEach(function (b) {
+                        if (b.block_type === "image")
+                            galleryImages.push(b.content);
+                    });
+
+                    /* stats strip */
+                    var stats = "";
+                    if (d.county) stats += statItem("County", d.county);
+                    if (d.project_type)
+                        stats += statItem("Type", d.project_type);
+                    if (d.status) stats += statItem("Status", d.status);
+                    if (d.people_served)
+                        stats += statItem(
+                            "People Served",
+                            Number(d.people_served).toLocaleString(),
+                        );
+
+                    /* progress bar */
+                    var pct =
+                        d.progress != null
+                            ? Math.min(
+                                  100,
+                                  Math.max(0, parseInt(d.progress, 10)),
+                              )
+                            : null;
+                    var progressHtml =
+                        pct !== null
+                            ? '<div class="progress-wrap">' +
+                              '<div class="progress-header">' +
+                              '<span class="progress-label">Completion</span>' +
+                              '<span class="progress-pct">' +
+                              pct +
+                              "%</span>" +
+                              "</div>" +
+                              '<div class="progress-track">' +
+                              '<div class="progress-fill" style="width:0%" data-target="' +
+                              pct +
+                              '%"></div>' +
+                              "</div></div>"
+                            : "";
+
+                    /* hero image */
+                    var heroHtml = d.hero_image_url
+                        ? '<div class="article-lead-img-wrap">' +
+                          '<img class="article-lead-img" src="' +
+                          esc(d.hero_image_url) +
+                          '" alt="' +
+                          esc(d.project_name) +
+                          '" />' +
+                          "</div>"
+                        : "";
+
+                    /* content blocks */
+                    var contentHtml = "";
+                    if (d.blocks && d.blocks.length > 0) {
+                        d.blocks.forEach(function (b) {
+                            if (b.block_type === "paragraph") {
+                                contentHtml +=
+                                    '<p class="block-paragraph">' +
+                                    esc(b.content) +
+                                    "</p>";
+                            } else if (b.block_type === "image") {
+                                contentHtml +=
+                                    '<img class="block-image" src="' +
+                                    esc(b.content) +
+                                    '" ' +
+                                    'alt="Project photo" loading="lazy" data-lightbox />';
+                            }
+                        });
+                    } else {
+                        contentHtml =
+                            '<div class="no-article-notice">' +
+                            "Detailed article content for this project has not been published yet. " +
+                            "Check back soon for updates." +
+                            "</div>";
+                    }
+
+                    /* published date */
+                    var dateStr = d.published_at
+                        ? new Date(d.published_at).toLocaleDateString("en-KE", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                          })
+                        : "";
+
+                    /* back link */
+                    var backHref = d.county
+                        ? "/projects/county/" +
+                          d.county.toLowerCase().replace(/\s+/g, "-")
+                        : "/projects";
+                    var backLabel = d.county
+                        ? "Back to " + d.county + " Projects"
+                        : "All Projects";
+
+                    /* assemble */
+                    root.innerHTML =
+                        /* hero header */
+                        '<div class="article-hero">' +
+                        '<div class="article-hero-inner">' +
+                        '<div class="hero-meta-row">' +
+                        '<span class="hero-label">Projects</span>' +
+                        (d.county
+                            ? '<span class="hero-badge">' +
+                              esc(d.county) +
+                              "</span>"
+                            : "") +
+                        (d.project_type
+                            ? '<span class="hero-badge">' +
+                              esc(d.project_type) +
+                              "</span>"
+                            : "") +
+                        "</div>" +
+                        "<h1>" +
+                        esc(d.project_name) +
+                        "</h1>" +
+                        (stats
+                            ? '<div class="stats-strip">' + stats + "</div>"
+                            : "") +
+                        progressHtml +
+                        "</div></div>" +
+                        /* lead image */
+                        heroHtml +
+                        /* article body */
+                        '<div class="article-body-wrap">' +
+                        '<div class="article-content">' +
+                        (dateStr
+                            ? '<p style="font-size:.68rem;font-weight:700;letter-spacing:.12em;' +
+                              'text-transform:uppercase;color:var(--ink-light);margin-bottom:24px;">' +
+                              dateStr +
+                              "</p>"
+                            : "") +
+                        contentHtml +
+                        "</div>" +
+                        '<a href="' +
+                        backHref +
+                        '" class="article-back">' +
+                        '<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" ' +
+                        'd="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>' +
+                        esc(backLabel) +
+                        "</a>" +
+                        "</div>";
+
+                    /* animate progress bar */
+                    requestAnimationFrame(function () {
+                        var fill = root.querySelector(".progress-fill");
+                        if (fill) {
+                            setTimeout(function () {
+                                fill.style.width = fill.dataset.target;
+                            }, 100);
+                        }
+                    });
+
+                    /* lightbox */
+                    if (galleryImages.length === 0) return;
+
+                    var current = 0;
+                    var lightbox = document.getElementById("lightbox");
+                    var lbImg = document.getElementById("lb-img");
+                    var lbCounter = document.getElementById("lb-counter");
+
+                    function openLightbox(idx) {
+                        current =
+                            ((idx % galleryImages.length) +
+                                galleryImages.length) %
+                            galleryImages.length;
+                        lbImg.src = galleryImages[current];
+                        lbCounter.textContent =
+                            current + 1 + " / " + galleryImages.length;
+                        lightbox.classList.add("open");
+                    }
+                    function closeLightbox() {
+                        lightbox.classList.remove("open");
+                    }
+
+                    document.getElementById("lb-close").onclick = closeLightbox;
+                    document.getElementById("lb-prev").onclick = function () {
+                        openLightbox(current - 1);
+                    };
+                    document.getElementById("lb-next").onclick = function () {
+                        openLightbox(current + 1);
+                    };
+                    lightbox.onclick = function (e) {
+                        if (e.target === lightbox) closeLightbox();
+                    };
+                    document.addEventListener("keydown", function (e) {
+                        if (!lightbox.classList.contains("open")) return;
+                        if (e.key === "ArrowLeft") openLightbox(current - 1);
+                        if (e.key === "ArrowRight") openLightbox(current + 1);
+                        if (e.key === "Escape") closeLightbox();
+                    });
+
+                    /* attach lightbox clicks to block images */
+                    setTimeout(function () {
+                        root.querySelectorAll(
+                            ".block-image[data-lightbox]",
+                        ).forEach(function (img) {
+                            img.addEventListener("click", function () {
+                                var idx = galleryImages.indexOf(img.src);
+                                openLightbox(idx >= 0 ? idx : 0);
+                            });
+                        });
+                    }, 50);
+                }
+
+                /* ── mobile menu ────────────────────────────────────────── */
+                var mmBtn = document.getElementById("mobile-menu-btn");
+                var mm = document.getElementById("mobile-menu");
+                var mmClose = document.getElementById("mobile-menu-close");
+                if (mmBtn)
+                    mmBtn.addEventListener("click", function () {
+                        mm.classList.add("open");
+                    });
+                if (mmClose)
+                    mmClose.addEventListener("click", function () {
+                        mm.classList.remove("open");
+                    });
+            })();
+        </script>
     </body>
 </html>
