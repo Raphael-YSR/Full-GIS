@@ -368,6 +368,9 @@ document.addEventListener("DOMContentLoaded", function () {
       case "sewer":
         rawType = "sanitation";
         break;
+      case "borehole":
+        rawType = "boreholes";
+        break;
     }
     const projectType = rawType;
 
