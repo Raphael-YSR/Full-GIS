@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectId = new URLSearchParams(window.location.search).get("id");
   const editProjectForm = document.getElementById("editProjectForm");
   const articleForm = document.getElementById("articleForm");
+  const projectSubmitBtn = editProjectForm.querySelector("[type=submit]");
+  const articleSubmitBtn = document.getElementById("articleSubmitBtn");
 
   // ─── Popup ───────────────────────────────────────────────────
   const popupContainer = document.createElement("div");
@@ -34,7 +36,30 @@ document.addEventListener("DOMContentLoaded", () => {
     popupContainer.classList.add("hidden");
   });
 
-  // ─── Track whether an article already exists ─────────────────
+  // ─── Dirty tracking ───────────────────────────────────────────
+  function setEnabled(btn, enabled) {
+    btn.disabled = !enabled;
+    btn.classList.toggle("opacity-50", !enabled);
+    btn.classList.toggle("cursor-not-allowed", !enabled);
+  }
+
+  setEnabled(projectSubmitBtn, false);
+  setEnabled(articleSubmitBtn, false);
+
+  editProjectForm.addEventListener("input", () =>
+    setEnabled(projectSubmitBtn, true),
+  );
+  editProjectForm.addEventListener("change", () =>
+    setEnabled(projectSubmitBtn, true),
+  );
+  articleForm.addEventListener("input", () =>
+    setEnabled(articleSubmitBtn, true),
+  );
+  articleForm.addEventListener("change", () =>
+    setEnabled(articleSubmitBtn, true),
+  );
+
+  // ─── Track whether an article already exists ──────────────────
   let articleExists = false;
 
   // ─── Hero Image Preview ──────────────────────────────────────
@@ -68,14 +93,29 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
     wrap.querySelector("textarea").value = value;
     wrap
-      .querySelector(".block-remove-btn")
-      .addEventListener("click", () => wrap.remove());
+      .querySelector("textarea")
+      .addEventListener("input", () => setEnabled(articleSubmitBtn, true));
+    wrap.querySelector(".block-remove-btn").addEventListener("click", () => {
+      wrap.remove();
+      setEnabled(articleSubmitBtn, true);
+    });
     return wrap;
   }
 
-  document.getElementById("addParagraphBtn").addEventListener("click", () => {
-    paragraphsContainer.appendChild(createParagraphBlock());
-  });
+  function createAddParagraphBtn() {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className =
+      "text-xs font-marlin text-blue-400 hover:text-blue-300 border border-blue-400 hover:border-blue-300 px-3 py-1 rounded mt-2 block";
+    btn.textContent = "+ ADD PARAGRAPH";
+    btn.addEventListener("click", () => {
+      const newBlock = createParagraphBlock();
+      paragraphsContainer.insertBefore(newBlock, btn);
+      newBlock.querySelector("textarea").focus();
+      setEnabled(articleSubmitBtn, true);
+    });
+    return btn;
+  }
 
   // ─── Gallery Image Blocks ─────────────────────────────────────
   const imagesContainer = document.getElementById("images-container");
@@ -96,9 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (value) {
       preview.src = value;
       preview.style.display = "block";
-      preview.onerror = () => {
-        preview.style.display = "none";
-      };
+      preview.onerror = () => (preview.style.display = "none");
     }
 
     input.addEventListener("input", () => {
@@ -106,50 +144,42 @@ document.addEventListener("DOMContentLoaded", () => {
       if (url) {
         preview.src = url;
         preview.style.display = "block";
-        preview.onerror = () => {
-          preview.style.display = "none";
-        };
+        preview.onerror = () => (preview.style.display = "none");
       } else {
         preview.style.display = "none";
       }
+      setEnabled(articleSubmitBtn, true);
     });
 
-    wrap
-      .querySelector(".block-remove-btn")
-      .addEventListener("click", () => wrap.remove());
+    wrap.querySelector(".block-remove-btn").addEventListener("click", () => {
+      wrap.remove();
+      setEnabled(articleSubmitBtn, true);
+    });
     return wrap;
   }
 
-  document.getElementById("addImageBtn").addEventListener("click", () => {
-    imagesContainer.appendChild(createImageBlock());
-  });
-
-  // ─── Collect blocks from DOM ──────────────────────────────────
-  function collectBlocks() {
-    const blocks = [];
-    let sortOrder = 0;
-
-    paragraphsContainer.querySelectorAll(".paragraph-input").forEach((ta) => {
-      const text = ta.value.trim();
-      if (text)
-        blocks.push({
-          block_type: "paragraph",
-          content: text,
-          sort_order: sortOrder++,
-        });
+  function createAddImageBtn() {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className =
+      "text-xs font-marlin text-blue-400 hover:text-blue-300 border border-blue-400 hover:border-blue-300 px-3 py-1 rounded mt-2 block";
+    btn.textContent = "+ ADD IMAGE";
+    btn.addEventListener("click", () => {
+      const newBlock = createImageBlock();
+      imagesContainer.insertBefore(newBlock, btn);
+      newBlock.querySelector("input").focus();
+      setEnabled(articleSubmitBtn, true);
     });
+    return btn;
+  }
 
-    imagesContainer.querySelectorAll(".image-url-input").forEach((input) => {
-      const url = input.value.trim();
-      if (url)
-        blocks.push({
-          block_type: "image",
-          content: url,
-          sort_order: sortOrder++,
-        });
-    });
-
-    return blocks;
+  // ─── Seed empty containers ────────────────────────────────────
+  function seedEmptyContainers() {
+    paragraphsContainer.innerHTML = "";
+    paragraphsContainer.appendChild(createParagraphBlock());
+    paragraphsContainer.appendChild(createAddParagraphBtn());
+    imagesContainer.innerHTML = "";
+    imagesContainer.appendChild(createAddImageBtn());
   }
 
   // ─── Populate article section from fetched data ───────────────
@@ -160,6 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
       articleExists = false;
       badge.textContent = "NEW";
       badge.className = "article-status-badge badge-new";
+      seedEmptyContainers();
       return;
     }
 
@@ -174,19 +205,45 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     paragraphsContainer.innerHTML = "";
-    imagesContainer.innerHTML = "";
-
-    (data.blocks || []).forEach((block) => {
-      if (block.block_type === "paragraph") {
-        paragraphsContainer.appendChild(createParagraphBlock(block.content));
-      } else if (block.block_type === "image") {
-        imagesContainer.appendChild(createImageBlock(block.content));
-      }
-    });
-
-    if (paragraphsContainer.children.length === 0) {
+    (data.blocks || [])
+      .filter((b) => b.block_type === "paragraph")
+      .forEach((b) =>
+        paragraphsContainer.appendChild(createParagraphBlock(b.content)),
+      );
+    if (paragraphsContainer.children.length === 0)
       paragraphsContainer.appendChild(createParagraphBlock());
-    }
+    paragraphsContainer.appendChild(createAddParagraphBtn());
+
+    imagesContainer.innerHTML = "";
+    (data.blocks || [])
+      .filter((b) => b.block_type === "image")
+      .forEach((b) => imagesContainer.appendChild(createImageBlock(b.content)));
+    imagesContainer.appendChild(createAddImageBtn());
+  }
+
+  // ─── Collect blocks ───────────────────────────────────────────
+  function collectBlocks() {
+    const blocks = [];
+    let sortOrder = 0;
+    paragraphsContainer.querySelectorAll(".paragraph-input").forEach((ta) => {
+      const text = ta.value.trim();
+      if (text)
+        blocks.push({
+          block_type: "paragraph",
+          content: text,
+          sort_order: sortOrder++,
+        });
+    });
+    imagesContainer.querySelectorAll(".image-url-input").forEach((input) => {
+      const url = input.value.trim();
+      if (url)
+        blocks.push({
+          block_type: "image",
+          content: url,
+          sort_order: sortOrder++,
+        });
+    });
+    return blocks;
   }
 
   // ─── Fetch project + article data ────────────────────────────
@@ -194,16 +251,16 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const [projectRes, articleRes] = await Promise.all([
         fetch(`/gis/projects/${id}`),
-        fetch(`/projects/${id}/article`),
+        fetch(`/gis/projects/${id}/article`),
       ]);
 
       if (!projectRes.ok) throw new Error("Project not found");
       const project = await projectRes.json();
 
-      document.getElementById("latitude").value = project.latitude;
-      document.getElementById("longitude").value = project.longitude;
-      document.getElementById("progress").value = project.progress;
-      document.getElementById("description").value = project.description || "";
+      document.getElementById("latitude").value = project.latitude ?? "";
+      document.getElementById("longitude").value = project.longitude ?? "";
+      document.getElementById("progress").value = project.progress ?? "";
+      document.getElementById("description").value = project.description ?? "";
 
       const projectDetailsDiv = document.getElementById("projectDetails");
       if (projectDetailsDiv) {
@@ -226,7 +283,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (articleRes.ok) {
         const articleData = await articleRes.json();
         populateArticleSection(articleData);
+      } else {
+        seedEmptyContainers();
       }
+
+      // Data just loaded — nothing changed yet, keep buttons disabled
+      setEnabled(projectSubmitBtn, false);
+      setEnabled(articleSubmitBtn, false);
     } catch (error) {
       console.error("Error fetching details:", error);
       showPopup("Error loading project details.");
@@ -235,13 +298,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (projectId) fetchProjectDetails(projectId);
 
-  // ─── Metadata form submit ─────────────────────────────────────
+  // ─── Project metadata form submit ────────────────────────────
   if (editProjectForm) {
     editProjectForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const submitBtn = editProjectForm.querySelector("[type=submit]");
-      submitBtn.disabled = true;
-      submitBtn.textContent = "SAVING...";
+      setEnabled(projectSubmitBtn, false);
+      projectSubmitBtn.textContent = "SAVING...";
 
       const projectData = Object.fromEntries(new FormData(editProjectForm));
       try {
@@ -255,12 +317,13 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           const err = await response.json();
           showPopup(`Error: ${err.error}`);
+          setEnabled(projectSubmitBtn, true);
         }
       } catch (error) {
         showPopup("Error updating project.");
+        setEnabled(projectSubmitBtn, true);
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "UPDATE PROJECT";
+        projectSubmitBtn.textContent = "UPDATE PROJECT";
       }
     });
   }
@@ -269,16 +332,15 @@ document.addEventListener("DOMContentLoaded", () => {
   if (articleForm) {
     articleForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const submitBtn = document.getElementById("articleSubmitBtn");
-      submitBtn.disabled = true;
-      submitBtn.textContent = "SAVING...";
+      setEnabled(articleSubmitBtn, false);
+      articleSubmitBtn.textContent = "SAVING...";
 
       const heroUrl = heroInput?.value.trim() || null;
       const blocks = collectBlocks();
       const method = articleExists ? "PUT" : "POST";
 
       try {
-        const response = await fetch(`/projects/${projectId}/article`, {
+        const response = await fetch(`/gis/projects/${projectId}/article`, {
           method,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ hero_image_url: heroUrl, blocks }),
@@ -295,12 +357,13 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           const err = await response.json();
           showPopup(`Error: ${err.error}`);
+          setEnabled(articleSubmitBtn, true);
         }
       } catch (error) {
         showPopup("Error saving website content.");
+        setEnabled(articleSubmitBtn, true);
       } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "SAVE WEBSITE CONTENT";
+        articleSubmitBtn.textContent = "SAVE WEBSITE CONTENT";
       }
     });
   }
