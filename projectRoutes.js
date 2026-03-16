@@ -397,6 +397,46 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
   // ARTICLE ROUTES
   // ─────────────────────────────────────────────────────────────
 
+  // GET /projects/county/:slug — Public: projects for a county
+  router.get("/projects/county/:slug", async (req, res) => {
+    const slug = req.params.slug.toLowerCase().trim();
+    const slugSpaced = slug.replace(/-/g, " ");
+    try {
+      const rows = await withDb((client) =>
+        client.query(
+          `SELECT p.id, p.project_name, p.description, p.people_served, p.progress,
+                  s.status, t.type AS project_type, c.county_name AS county,
+                  pa.hero_image_url
+           FROM public.project p
+           JOIN public.county c ON p.county_id = c.id
+           JOIN public.status s ON p.project_status = s.id
+           JOIN public.type t ON p.project_type = t.id
+           LEFT JOIN public.project_article pa ON pa.project_id = p.id
+           WHERE LOWER(c.county_name) = $1 OR LOWER(c.county_name) = $2
+           ORDER BY p.project_name ASC`,
+          [slug, slugSpaced],
+        ),
+      );
+      if (rows.length === 0) {
+        const countyCheck = await withDb((client) =>
+          client.query(
+            "SELECT county_name FROM public.county WHERE LOWER(county_name) = $1 OR LOWER(county_name) = $2",
+            [slug, slugSpaced],
+          ),
+        );
+        if (countyCheck.length === 0)
+          return res.status(404).json({ error: `County "${slug}" not found.` });
+      }
+      res.json(rows);
+    } catch (err) {
+      console.error(`Error fetching projects for county "${slug}":`, err);
+      res.status(500).json({
+        error: "Error fetching county projects.",
+        ...(isProd ? {} : { details: err.message }),
+      });
+    }
+  });
+
   // GET /projects/:id/article — Public
   router.get("/projects/:id/article", async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
@@ -585,46 +625,6 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
       console.error(`Error updating article for project ${projectId}:`, err);
       res.status(500).json({
         error: "Error updating article.",
-        ...(isProd ? {} : { details: err.message }),
-      });
-    }
-  });
-
-  // GET /projects/county/:slug — Public: projects for a county
-  router.get("/projects/county/:slug", async (req, res) => {
-    const slug = req.params.slug.toLowerCase().trim();
-    const slugSpaced = slug.replace(/-/g, " ");
-    try {
-      const rows = await withDb((client) =>
-        client.query(
-          `SELECT p.id, p.project_name, p.description, p.people_served, p.progress,
-                  s.status, t.type AS project_type, c.county_name AS county,
-                  pa.hero_image_url
-           FROM public.project p
-           JOIN public.county c ON p.county_id = c.id
-           JOIN public.status s ON p.project_status = s.id
-           JOIN public.type t ON p.project_type = t.id
-           LEFT JOIN public.project_article pa ON pa.project_id = p.id
-           WHERE LOWER(c.county_name) = $1 OR LOWER(c.county_name) = $2
-           ORDER BY p.project_name ASC`,
-          [slug, slugSpaced],
-        ),
-      );
-      if (rows.length === 0) {
-        const countyCheck = await withDb((client) =>
-          client.query(
-            "SELECT county_name FROM public.county WHERE LOWER(county_name) = $1 OR LOWER(county_name) = $2",
-            [slug, slugSpaced],
-          ),
-        );
-        if (countyCheck.length === 0)
-          return res.status(404).json({ error: `County "${slug}" not found.` });
-      }
-      res.json(rows);
-    } catch (err) {
-      console.error(`Error fetching projects for county "${slug}":`, err);
-      res.status(500).json({
-        error: "Error fetching county projects.",
         ...(isProd ? {} : { details: err.message }),
       });
     }
