@@ -101,9 +101,9 @@ const superAdminAuth = (req, res, next) => {
 // ROUTES
 // ===========================================
 
-app.use(createRouter(requireAuth, superAdminAuth));
-app.use(createProjectRouter(requireAuth, superAdminAuth));
+app.use(createProjectRouter(requireAuth, superAdminAuth)); // API routes first
 app.use(createAdminRouter(requireAuth, superAdminAuth));
+app.use(createRouter(requireAuth, superAdminAuth));
 
 app.get("/health", (req, res) => res.status(200).send("OK"));
 
