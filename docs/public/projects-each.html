@@ -1005,7 +1005,7 @@
                 }
 
                 /* ── fetch ─────────────────────────────────────────────── */
-                fetch("/api/projects/" + projectId + "/article")
+                fetch("/gis/projects/" + projectId + "/article")
                     .then(function (res) {
                         if (!res.ok) {
                             return res.json().then(function (body) {

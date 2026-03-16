@@ -1142,7 +1142,7 @@
                 document.title = countyDisplay + " County Projects — TWWDA";
 
                 /* ── fetch ─────────────────────────────────────────────── */
-                fetch("/api/projects/county/" + slug)
+                fetch("/gis/projects/county/" + slug)
                     .then(function (res) {
                         if (!res.ok) {
                             return res.json().then(function (body) {
