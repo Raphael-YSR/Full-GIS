@@ -4,8 +4,8 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Project — Tana Water Works Development Agency</title>
-        <link rel="icon" type="image/png" href="../images/logo.png" />
-        <link rel="shortcut icon" type="image/png" href="../images/logo.png" />
+        <link rel="icon" type="image/png" href="/images/logo.png" />
+        <link rel="shortcut icon" type="image/png" href="/images/logo.png" />
         <link
             href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
             rel="stylesheet"
@@ -955,260 +955,270 @@
 
         <script>
             (function () {
-                var root = document.getElementById("article-root");
+                const root =
+                    document.getElementById("project-root") || document.body;
+                const projectId = window.location.pathname.split("/").pop();
 
-                var pathParts = window.location.pathname
-                    .split("/")
-                    .filter(Boolean);
-                var projectId = pathParts[pathParts.length - 1];
-
-                if (!projectId || isNaN(parseInt(projectId))) {
-                    showError("Invalid project URL.", true);
+                if (!projectId || isNaN(projectId)) {
+                    showError("Invalid project ID in URL.", true);
                     return;
                 }
 
+                // Show loading state immediately
+                root.innerHTML = `
+              <div class="state-wrap loading">
+                <div class="spinner"></div>
+                <p>Loading project details...</p>
+              </div>
+            `;
+
                 fetch(`/projects/${projectId}/article`)
-                    .then((res) => res.json())
-                    .then((data) => {
-                        // 1. Update Hero Image
-                        const heroEl = document.getElementById("hero-image");
-                        if (heroEl) heroEl.src = data.hero_image_url;
-
-                        // 2. Clear and Fill Content Blocks
-                        const container =
-                            document.getElementById("content-blocks"); // Ensure this ID exists!
-                        if (!container)
-                            return console.error(
-                                "Container #content-blocks not found",
+                    .then((response) => {
+                        if (!response.ok) {
+                            if (response.status === 404) {
+                                throw new Error("Project not found", {
+                                    cause: "notfound",
+                                });
+                            }
+                            throw new Error(
+                                `Server responded with ${response.status}`,
                             );
-
-                        container.innerHTML = ""; // Clear loader
-
-                        data.blocks.forEach((block) => {
-                            if (block.block_type === "paragraph") {
-                                container.innerHTML += `<p class="article-text">${block.content}</p>`;
-                            } else if (block.block_type === "image") {
-                                container.innerHTML += `<img src="${block.content}" class="article-img" />`;
-                            }
-                        });
+                        }
+                        return response.json();
                     })
-                    .catch((err) => showError("Failed to render content"));
+                    .then((project) => {
+                        if (!project || !project.id) {
+                            showError(
+                                "Project data is incomplete or empty.",
+                                false,
+                            );
+                            return;
+                        }
 
-                function render(d) {
-                    document.title = d.project_name + " — TWWDA";
+                        // ── Page title ────────────────────────────────────────
+                        document.title = `${project.project_name} — Tana Water Works Development Agency`;
 
-                    var imageBlocks = (d.blocks || []).filter(function (b) {
-                        return b.block_type === "image";
-                    });
+                        // ── Banner title ──────────────────────────────────────
+                        document.getElementById("banner-title").textContent =
+                            project.project_name;
 
-                    var stats = "";
-                    if (d.county) stats += statItem("County", d.county);
-                    if (d.project_type)
-                        stats += statItem("Type", d.project_type);
-                    if (d.status) stats += statItem("Status", d.status);
-                    if (d.people_served)
-                        stats += statItem(
-                            "People Served",
-                            Number(d.people_served).toLocaleString(),
+                        // ── Hero image ────────────────────────────────────────
+                        const heroImg = document.getElementById("hero-image");
+                        if (project.hero_image_url) {
+                            heroImg.src = project.hero_image_url;
+                            heroImg.alt = project.project_name;
+                            heroImg.style.display = "block";
+                        } else {
+                            heroImg.style.display = "none";
+                        }
+
+                        // ── Stats strip ───────────────────────────────────────
+                        const statsContainer =
+                            document.getElementById("stats-strip");
+                        statsContainer.innerHTML = "";
+
+                        if (project.county) {
+                            statsContainer.innerHTML += statItem(
+                                "County",
+                                project.county,
+                            );
+                        }
+                        if (project.status) {
+                            statsContainer.innerHTML += statItem(
+                                "Status",
+                                project.status,
+                            );
+                        }
+                        if (project.project_type) {
+                            statsContainer.innerHTML += statItem(
+                                "Type",
+                                project.project_type,
+                            );
+                        }
+                        if (project.people_served) {
+                            statsContainer.innerHTML += statItem(
+                                "People Served",
+                                Number(project.people_served).toLocaleString(),
+                            );
+                        }
+
+                        // ── Progress bar ──────────────────────────────────────
+                        const progressWrap =
+                            document.getElementById("progress-wrap");
+                        if (project.progress != null && project.progress >= 0) {
+                            const pct = Math.round(project.progress);
+                            progressWrap.innerHTML = `
+                    <div class="progress-header">
+                      <span class="progress-label">Project Completion</span>
+                      <span class="progress-value">${pct}%</span>
+                    </div>
+                    <div class="progress-track">
+                      <div class="progress-fill" style="width: ${pct}%"></div>
+                    </div>
+                  `;
+                            progressWrap.style.display = "block";
+                        } else {
+                            progressWrap.style.display = "none";
+                        }
+
+                        // ── Main content blocks ───────────────────────────────
+                        const contentContainer =
+                            document.getElementById("article-content");
+                        contentContainer.innerHTML = "";
+
+                        // Description (fallback if no blocks)
+                        if (
+                            project.description &&
+                            project.description.trim() !== "" &&
+                            project.description.trim() !== project.project_name
+                        ) {
+                            contentContainer.innerHTML += `
+                    <p class="intro-paragraph">${esc(project.description.trim())}</p>
+                  `;
+                        }
+
+                        // Content blocks (paragraphs + images)
+                        if (project.blocks && Array.isArray(project.blocks)) {
+                            project.blocks
+                                .sort((a, b) => a.sort_order - b.sort_order)
+                                .forEach((block) => {
+                                    if (
+                                        block.block_type === "paragraph" &&
+                                        block.content?.trim()
+                                    ) {
+                                        contentContainer.innerHTML += `
+                          <p>${esc(block.content.trim())}</p>
+                        `;
+                                    } else if (
+                                        block.block_type === "image" &&
+                                        block.content
+                                    ) {
+                                        contentContainer.innerHTML += `
+                          <figure class="article-image" data-lightbox>
+                            <img src="${block.content}" alt="Project image" loading="lazy" />
+                            <figcaption>Project in progress</figcaption>
+                          </figure>
+                        `;
+                                    }
+                                });
+                        }
+
+                        // If no meaningful content at all
+                        if (contentContainer.innerHTML.trim() === "") {
+                            contentContainer.innerHTML = `
+                    <p class="no-content-notice">No detailed description available for this project yet.</p>
+                  `;
+                        }
+
+                        // ── Lightbox setup (unchanged) ────────────────────────
+                        setupLightbox();
+                    })
+                    .catch((err) => {
+                        console.error("Project fetch error:", err);
+                        const isNotFound =
+                            err.cause === "notfound" ||
+                            err.message.includes("not found");
+                        showError(
+                            err.message || "Failed to load project.",
+                            isNotFound,
                         );
-
-                    var pct =
-                        d.progress != null
-                            ? Math.min(100, Math.max(0, parseInt(d.progress)))
-                            : null;
-                    var progressHtml =
-                        pct !== null
-                            ? '<div class="progress-wrap"><div class="progress-header"><span class="progress-label">Completion</span><span class="progress-pct">' +
-                              pct +
-                              '%</span></div><div class="progress-track"><div class="progress-fill" style="width:0%" data-target="' +
-                              pct +
-                              '%"></div></div></div>'
-                            : "";
-
-                    var heroHtml = d.hero_image_url
-                        ? '<div class="article-lead-img-wrap"><img class="article-lead-img" src="' +
-                          esc(d.hero_image_url) +
-                          '" alt="' +
-                          esc(d.project_name) +
-                          '" /></div>'
-                        : "";
-
-                    var contentHtml = "";
-                    if (d.blocks && d.blocks.length > 0) {
-                        d.blocks.forEach(function (b) {
-                            if (b.block_type === "paragraph") {
-                                contentHtml +=
-                                    '<p class="block-paragraph">' +
-                                    esc(b.content) +
-                                    "</p>";
-                            } else if (b.block_type === "image") {
-                                contentHtml +=
-                                    '<img class="block-image" src="' +
-                                    esc(b.content) +
-                                    '" alt="Project photo" loading="lazy" data-lightbox />';
-                            }
-                        });
-                    } else if (!d.article_id) {
-                        contentHtml =
-                            '<div class="no-article-notice">Detailed article content for this project has not been published yet. Check back soon for updates.</div>';
-                    }
-
-                    var galleryImages = imageBlocks.map(function (b) {
-                        return b.content;
-                    });
-                    if (d.hero_image_url)
-                        galleryImages.unshift(d.hero_image_url);
-
-                    var dateStr = d.published_at
-                        ? new Date(d.published_at).toLocaleDateString("en-KE", {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                          })
-                        : "";
-
-                    var backHref = d.county
-                        ? "/projects/county/" +
-                          d.county.toLowerCase().replace(/\s+/g, "-")
-                        : "/projects";
-                    var backLabel = d.county
-                        ? "Back to " + d.county + " Projects"
-                        : "All Projects";
-
-                    root.innerHTML =
-                        '<div class="article-hero"><div class="article-hero-inner">' +
-                        '<div class="hero-meta-row"><span class="hero-label">Projects</span>' +
-                        (d.county
-                            ? '<span class="hero-badge">' +
-                              esc(d.county) +
-                              "</span>"
-                            : "") +
-                        (d.project_type
-                            ? '<span class="hero-badge">' +
-                              esc(d.project_type) +
-                              "</span>"
-                            : "") +
-                        "</div><h1>" +
-                        esc(d.project_name) +
-                        "</h1>" +
-                        (stats
-                            ? '<div class="stats-strip">' + stats + "</div>"
-                            : "") +
-                        progressHtml +
-                        "</div></div>" +
-                        heroHtml +
-                        '<div class="article-body-wrap"><div class="article-content">' +
-                        (dateStr
-                            ? '<p style="font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-light);margin-bottom:24px;">' +
-                              dateStr +
-                              "</p>"
-                            : "") +
-                        contentHtml +
-                        "</div>" +
-                        '<a href="' +
-                        backHref +
-                        '" class="article-back"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>' +
-                        esc(backLabel) +
-                        "</a>" +
-                        "</div>";
-
-                    requestAnimationFrame(function () {
-                        var fill = root.querySelector(".progress-fill");
-                        if (fill)
-                            setTimeout(function () {
-                                fill.style.width = fill.dataset.target;
-                            }, 100);
                     });
 
-                    // Lightbox
-                    var current = 0;
-                    var lightbox = document.getElementById("lightbox");
-                    var lbImg = document.getElementById("lb-img");
-                    var lbCounter = document.getElementById("lb-counter");
-
-                    function openLightbox(idx) {
-                        current = idx;
-                        lbImg.src = galleryImages[current];
-                        lbCounter.textContent =
-                            current + 1 + " / " + galleryImages.length;
-                        lightbox.classList.add("open");
-                    }
-                    function closeLightbox() {
-                        lightbox.classList.remove("open");
-                    }
-                    function prevImg() {
-                        current =
-                            (current - 1 + galleryImages.length) %
-                            galleryImages.length;
-                        openLightbox(current);
-                    }
-                    function nextImg() {
-                        current = (current + 1) % galleryImages.length;
-                        openLightbox(current);
-                    }
-
-                    document.getElementById("lb-close").onclick = closeLightbox;
-                    document.getElementById("lb-prev").onclick = prevImg;
-                    document.getElementById("lb-next").onclick = nextImg;
-                    lightbox.onclick = function (e) {
-                        if (e.target === lightbox) closeLightbox();
-                    };
-                    document.addEventListener("keydown", function (e) {
-                        if (!lightbox.classList.contains("open")) return;
-                        if (e.key === "ArrowLeft") prevImg();
-                        if (e.key === "ArrowRight") nextImg();
-                        if (e.key === "Escape") closeLightbox();
-                    });
-                    setTimeout(function () {
-                        root.querySelectorAll(
-                            ".block-image[data-lightbox]",
-                        ).forEach(function (img) {
-                            img.addEventListener("click", function () {
-                                var idx = galleryImages.indexOf(img.src);
-                                openLightbox(idx >= 0 ? idx : 0);
-                            });
-                        });
-                    }, 50);
-                }
-
-                function statItem(label, value) {
-                    return (
-                        '<div class="stat-item"><div class="stat-label">' +
-                        label +
-                        '</div><div class="stat-value">' +
-                        esc(String(value)) +
-                        "</div></div>"
-                    );
-                }
+                // ── Helpers ─────────────────────────────────────────────
                 function esc(str) {
                     return String(str)
                         .replace(/&/g, "&amp;")
                         .replace(/</g, "&lt;")
                         .replace(/>/g, "&gt;")
-                        .replace(/"/g, "&quot;");
-                }
-                function showError(msg, isNotFound) {
-                    root.innerHTML =
-                        '<div class="state-wrap"><h2>' +
-                        (isNotFound
-                            ? "Project Not Found"
-                            : "Something went wrong") +
-                        "</h2><p>" +
-                        msg +
-                        '</p><p style="margin-top:16px;"><a href="/projects">← Back to Projects</a></p></div>';
+                        .replace(/"/g, "&quot;")
+                        .replace(/'/g, "&#039;");
                 }
 
-                var mmBtn = document.getElementById("mobile-menu-btn");
-                var mm = document.getElementById("mobile-menu");
-                var mmClose = document.getElementById("mobile-menu-close");
-                if (mmBtn)
-                    mmBtn.addEventListener("click", function () {
-                        mm.classList.add("open");
+                function statItem(label, value) {
+                    return `
+                <div class="stat-item">
+                  <div class="stat-label">${label}</div>
+                  <div class="stat-value">${value}</div>
+                </div>
+              `;
+                }
+
+                function showError(msg, isNotFound = false) {
+                    const title = isNotFound
+                        ? "Project Not Found"
+                        : "Error Loading Project";
+                    root.innerHTML = `
+                <div class="state-wrap">
+                  <h2>${title}</h2>
+                  <p>${msg}</p>
+                  <p style="margin-top:24px;">
+                    <a href="/projects" class="back-link">← Back to All Projects</a>
+                  </p>
+                </div>
+              `;
+                }
+
+                // Lightbox logic (kept mostly as-is, just renamed functions for clarity)
+                function setupLightbox() {
+                    const images = Array.from(
+                        document.querySelectorAll(".article-image img"),
+                    );
+                    if (images.length === 0) return;
+
+                    const lightbox = document.getElementById("lightbox");
+                    if (!lightbox) return;
+
+                    let currentIndex = 0;
+
+                    function open(index) {
+                        currentIndex = index;
+                        const src = images[index].src;
+                        document.getElementById("lb-image").src = src;
+                        document.getElementById("lb-counter").textContent =
+                            `${index + 1} / ${images.length}`;
+                        lightbox.classList.add("open");
+                    }
+
+                    function close() {
+                        lightbox.classList.remove("open");
+                    }
+
+                    function prev() {
+                        currentIndex =
+                            (currentIndex - 1 + images.length) % images.length;
+                        open(currentIndex);
+                    }
+
+                    function next() {
+                        currentIndex = (currentIndex + 1) % images.length;
+                        open(currentIndex);
+                    }
+
+                    images.forEach((img, idx) => {
+                        img.addEventListener("click", () => open(idx));
                     });
-                if (mmClose)
-                    mmClose.addEventListener("click", function () {
-                        mm.classList.remove("open");
+
+                    document
+                        .getElementById("lb-close")
+                        ?.addEventListener("click", close);
+                    document
+                        .getElementById("lb-prev")
+                        ?.addEventListener("click", prev);
+                    document
+                        .getElementById("lb-next")
+                        ?.addEventListener("click", next);
+
+                    lightbox.addEventListener("click", (e) => {
+                        if (e.target === lightbox) close();
                     });
+
+                    document.addEventListener("keydown", (e) => {
+                        if (!lightbox.classList.contains("open")) return;
+                        if (e.key === "ArrowLeft") prev();
+                        if (e.key === "ArrowRight") next();
+                        if (e.key === "Escape") close();
+                    });
+                }
             })();
         </script>
     </body>
