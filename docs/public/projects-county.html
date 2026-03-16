@@ -1093,61 +1093,84 @@
 
         <script>
             (function () {
-                // ── Get county slug from URL: /projects/county/embu ──
+                /* ── helpers ───────────────────────────────────────────── */
+                function esc(str) {
+                    return String(str)
+                        .replace(/&/g, "&amp;")
+                        .replace(/</g, "&lt;")
+                        .replace(/>/g, "&gt;")
+                        .replace(/"/g, "&quot;");
+                }
+
+                function toTitleCase(str) {
+                    return str
+                        .replace(/-/g, " ")
+                        .replace(/\b\w/g, function (c) {
+                            return c.toUpperCase();
+                        });
+                }
+
+                function showError(msg) {
+                    document.getElementById("banner-title").textContent =
+                        "Projects";
+                    document.getElementById("list-count").textContent = "";
+                    document.getElementById("projects-grid").innerHTML =
+                        '<div class="state-box">' +
+                        "<h3>Could not load projects</h3>" +
+                        "<p>" +
+                        esc(msg) +
+                        "</p>" +
+                        "</div>";
+                }
+
+                /* ── get county slug from URL (/projects/county/embu) ──── */
                 var parts = window.location.pathname.split("/").filter(Boolean);
-                var slug = parts[parts.length - 1]; // last segment
+                var slug = parts[parts.length - 1];
 
                 if (!slug) {
                     showError("Invalid URL.");
                     return;
                 }
 
-                var countyDisplay = slug
-                    .replace(/-/g, " ")
-                    .replace(/\b\w/g, function (c) {
-                        return c.toUpperCase();
-                    });
+                var countyDisplay = toTitleCase(slug);
 
-                // Update banner immediately with slug-derived name
+                /* ── update banner immediately from slug ────────────────── */
                 document.getElementById("banner-title").textContent =
                     countyDisplay + " County";
                 document.getElementById("breadcrumb-county").textContent =
                     countyDisplay + " County";
                 document.title = countyDisplay + " County Projects — TWWDA";
 
-                // ── Fetch projects ──
+                /* ── fetch ─────────────────────────────────────────────── */
                 fetch("/projects/county/" + slug)
                     .then(function (res) {
-                        if (res.status === 404) throw new Error("not_found");
-                        if (!res.ok) throw new Error("server_error");
+                        if (!res.ok) {
+                            return res.json().then(function (body) {
+                                throw new Error(
+                                    body.error || "HTTP " + res.status,
+                                );
+                            });
+                        }
                         return res.json();
                     })
-                    .then(function (projects) {
-                        render(projects, countyDisplay);
-                    })
+                    .then(render)
                     .catch(function (err) {
-                        if (err.message === "not_found") {
-                            showError(
-                                'No county found matching "' +
-                                    countyDisplay +
-                                    '".',
-                            );
-                        } else {
-                            showError(
+                        console.error("County fetch error:", err);
+                        showError(
+                            err.message ||
                                 "Failed to load projects. Please try again.",
-                            );
-                        }
+                        );
                     });
 
-                function render(projects, countyName) {
+                /* ── render ─────────────────────────────────────────────── */
+                function render(projects) {
                     var grid = document.getElementById("projects-grid");
                     var countEl = document.getElementById("list-count");
                     var sub = document.getElementById("banner-sub");
 
-                    // Update banner sub
-                    if (projects.length > 0) {
-                        var countyFull =
-                            projects[0].county || countyName + " County";
+                    /* refine banner title from real data if available */
+                    if (projects.length > 0 && projects[0].county) {
+                        var countyFull = projects[0].county;
                         document.getElementById("banner-title").textContent =
                             countyFull;
                         document.getElementById(
@@ -1185,15 +1208,16 @@
                     });
                 }
 
+                /* ── build a single card ────────────────────────────────── */
                 function buildCard(p) {
-                    var card = document.createElement("a");
-                    card.href = "/projects/" + p.id;
-                    card.className = "project-card";
-
                     var pct =
                         p.progress != null
-                            ? Math.min(100, Math.max(0, parseInt(p.progress)))
+                            ? Math.min(
+                                  100,
+                                  Math.max(0, parseInt(p.progress, 10)),
+                              )
                             : null;
+
                     var statusLower = (p.status || "").toLowerCase().trim();
                     var badgeClass = "badge-default";
                     if (statusLower.includes("complete"))
@@ -1211,64 +1235,54 @@
                     )
                         badgeClass = "badge-stalled";
 
-                    // Image section
-                    var imgHtml;
-                    if (p.hero_image_url) {
-                        imgHtml =
-                            '<div class="card-img-wrap">' +
-                            '<span class="card-status-badge ' +
-                            badgeClass +
-                            '">' +
-                            esc(p.status || "Unknown") +
-                            "</span>" +
-                            '<img class="card-img" src="' +
-                            esc(p.hero_image_url) +
-                            '" alt="' +
-                            esc(p.project_name) +
-                            '" loading="lazy" />' +
-                            "</div>";
-                    } else {
-                        imgHtml =
-                            '<div class="card-img-wrap">' +
-                            '<span class="card-status-badge ' +
-                            badgeClass +
-                            '">' +
-                            esc(p.status || "Unknown") +
-                            "</span>" +
-                            '<div class="card-img-placeholder">' +
-                            '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>' +
-                            "</div>" +
-                            "</div>";
-                    }
+                    /* image / placeholder */
+                    var imgHtml =
+                        '<div class="card-img-wrap">' +
+                        '<span class="card-status-badge ' +
+                        badgeClass +
+                        '">' +
+                        esc(p.status || "Unknown") +
+                        "</span>" +
+                        (p.hero_image_url
+                            ? '<img class="card-img" src="' +
+                              esc(p.hero_image_url) +
+                              '" alt="' +
+                              esc(p.project_name) +
+                              '" loading="lazy" />'
+                            : '<div class="card-img-placeholder">' +
+                              '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+                              '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" ' +
+                              'd="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>' +
+                              "</svg></div>") +
+                        "</div>";
 
-                    // Progress
-                    var progressHtml = "";
-                    if (pct !== null) {
-                        progressHtml =
-                            '<div class="card-progress">' +
-                            '<div class="card-progress-header">' +
-                            '<span class="card-progress-label">Completion</span>' +
-                            '<span class="card-progress-pct">' +
-                            pct +
-                            "%</span>" +
-                            "</div>" +
-                            '<div class="card-progress-track">' +
-                            '<div class="card-progress-fill" style="width:' +
-                            pct +
-                            '%"></div>' +
-                            "</div>" +
-                            "</div>";
-                    }
+                    /* progress bar */
+                    var progressHtml =
+                        pct !== null
+                            ? '<div class="card-progress">' +
+                              '<div class="card-progress-header">' +
+                              '<span class="card-progress-label">Completion</span>' +
+                              '<span class="card-progress-pct">' +
+                              pct +
+                              "%</span>" +
+                              "</div>" +
+                              '<div class="card-progress-track">' +
+                              '<div class="card-progress-fill" style="width:' +
+                              pct +
+                              '%"></div>' +
+                              "</div></div>"
+                            : "";
 
-                    // People served
-                    var peopleHtml = "";
-                    if (p.people_served) {
-                        peopleHtml =
-                            '<div class="card-people"><strong>' +
-                            Number(p.people_served).toLocaleString() +
-                            "</strong> people served</div>";
-                    }
+                    /* people served */
+                    var peopleHtml = p.people_served
+                        ? '<div class="card-people"><strong>' +
+                          Number(p.people_served).toLocaleString() +
+                          "</strong> people served</div>"
+                        : "";
 
+                    var card = document.createElement("a");
+                    card.href = "/projects/" + p.id;
+                    card.className = "project-card";
                     card.innerHTML =
                         imgHtml +
                         '<div class="card-body">' +
@@ -1286,40 +1300,26 @@
                         progressHtml +
                         peopleHtml +
                         '<span class="card-cta">View Project ' +
-                        '<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>' +
+                        '<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>' +
                         "</span>" +
                         "</div>";
 
                     return card;
                 }
 
-                function esc(str) {
-                    return String(str)
-                        .replace(/&/g, "&amp;")
-                        .replace(/</g, "&lt;")
-                        .replace(/>/g, "&gt;")
-                        .replace(/"/g, "&quot;");
-                }
-
-                function showError(msg) {
-                    document.getElementById("banner-title").textContent =
-                        "Projects";
-                    document.getElementById("projects-grid").innerHTML =
-                        '<div class="state-box"><h3>Could not load projects</h3><p>' +
-                        msg +
-                        "</p></div>";
-                    document.getElementById("list-count").textContent = "";
-                }
-
-                // Hamburger
-                var hamburger = document.getElementById("navHamburger");
-                var navLinks = document.getElementById("navLinks");
-                if (hamburger) {
-                    hamburger.addEventListener("click", function () {
-                        navLinks.classList.toggle("open");
-                        hamburger.classList.toggle("open");
+                /* ── mobile menu ────────────────────────────────────────── */
+                var mmBtn = document.getElementById("mobile-menu-btn");
+                var mm = document.getElementById("mobile-menu");
+                var mmClose = document.getElementById("mobile-menu-close");
+                if (mmBtn)
+                    mmBtn.addEventListener("click", function () {
+                        mm.classList.add("open");
                     });
-                }
+                if (mmClose)
+                    mmClose.addEventListener("click", function () {
+                        mm.classList.remove("open");
+                    });
             })();
         </script>
     </body>
