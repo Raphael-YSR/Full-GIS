@@ -398,7 +398,7 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
   // ─────────────────────────────────────────────────────────────
 
   // GET /projects/county/:slug — Public: projects for a county
-  router.get("/projects/county/:slug", async (req, res) => {
+  router.get("/gis/projects/county/:slug", async (req, res) => {
     const slug = req.params.slug.toLowerCase().trim();
     const slugSpaced = slug.replace(/-/g, " ");
     try {
@@ -438,7 +438,7 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
   });
 
   // GET /projects/:id/article — Public
-  router.get("/projects/:id/article", async (req, res) => {
+  router.get("/gis/projects/:id/article", async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
     if (isNaN(projectId))
       return res.status(400).json({ error: "Invalid project ID." });
@@ -486,7 +486,7 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
   });
 
   // POST /projects/:id/article — Protected: create
-  router.post("/projects/:id/article", requireAuth, async (req, res) => {
+  router.post("/gis/projects/:id/article", requireAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
     if (isNaN(projectId))
       return res.status(400).json({ error: "Invalid project ID." });
@@ -561,7 +561,7 @@ export default function createProjectRouter(requireAuth, superAdminAuth) {
   });
 
   // PUT /projects/:id/article — Protected: update
-  router.put("/projects/:id/article", requireAuth, async (req, res) => {
+  router.put("/gis/projects/:id/article", requireAuth, async (req, res) => {
     const projectId = parseInt(req.params.id, 10);
     if (isNaN(projectId))
       return res.status(400).json({ error: "Invalid project ID." });
