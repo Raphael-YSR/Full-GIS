@@ -195,10 +195,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return wrap;
   }
 
-  function getAddParagraphBtn() {
-    return document.getElementById("addParagraphBtn");
-  }
-
   function createAddParagraphBtn() {
     const btn = document.createElement("button");
     btn.type = "button";
