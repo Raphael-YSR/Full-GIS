@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Contact Us — Tana Water Works Development Agency</title>
+        <link rel="icon" type="image/png" href="../images/logo.png" />
+        <link rel="shortcut icon" type="image/png" href="../images/logo.png" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../landingStyle.css" />
+        <style>
+            .page-banner {
+                background: var(--ink);
+                border-bottom: 3px solid var(--green);
+                padding: 36px 0;
+            }
+            .page-banner-inner {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 0 24px;
+            }
+            .page-banner-eyebrow {
+                font-size: 10px;
+                font-weight: 600;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--green-mid);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            .page-banner-eyebrow::before {
+                content: "";
+                display: block;
+                width: 20px;
+                height: 1.5px;
+                background: var(--green);
+            }
+            .page-banner h1 {
+                font-family: "IBM Plex Serif", serif;
+                font-size: clamp(26px, 4vw, 40px);
+                font-weight: 600;
+                color: #f0f2ef;
+                line-height: 1.2;
+            }
+            .breadcrumb {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 12px;
+                font-size: 11.5px;
+                color: #5a5e5a;
+            }
+            .breadcrumb a {
+                color: #5a5e5a;
+                text-decoration: none;
+                transition: color 0.15s;
+            }
+            .breadcrumb a:hover {
+                color: var(--green-mid);
+            }
+            .breadcrumb-sep {
+                color: #3a3e3a;
+            }
+            .breadcrumb-current {
+                color: var(--green-mid);
+            }
+
+            .page-wrap {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 48px 24px 64px;
+            }
+            .section-heading {
+                font-family: "IBM Plex Serif", serif;
+                font-size: 22px;
+                font-weight: 600;
+                color: #2a3a92;
+                margin-bottom: 10px;
+            }
+            .section-rule {
+                height: 2px;
+                background: linear-gradient(to right, #87c74b, transparent);
+                margin-bottom: 36px;
+            }
+
+            .content-intro {
+                background: var(--white);
+                border: 2px solid var(--rule);
+                border-left: 4px solid var(--green);
+                padding: 24px 32px;
+                margin-bottom: 40px;
+                font-size: 15px;
+                line-height: 1.8;
+                color: var(--ink-mid);
+            }
+
+            /* ===============================
+               ACCESS TO INFORMATION PAGE
+            ================================= */
+
+            .page-section {
+                padding: 80px 0;
+                background: #f8f9fb;
+            }
+
+            .container {
+                width: 90%;
+                max-width: 1100px;
+                margin: 0 auto;
+            }
+
+            /* ===== Header ===== */
+
+            .page-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .page-header h1 {
+                font-size: 34px;
+                letter-spacing: 1px;
+                font-weight: 600;
+                margin-bottom: 10px;
+                color: #111;
+            }
+
+            .subtitle {
+                font-size: 14px;
+                letter-spacing: 2px;
+                color: #777;
+            }
+
+            /* ===== Intro Text =====
+
+            .page-intro {
+                width: 90%;
+                max-width: 1100px;
+                margin: 0 auto 60px auto;
+                text-align: left;
+                padding-left: 20px;
+                border-left: 3px solid #0d3b66;
+            }
+
+            .page-intro p {
+                font-size: 15px;
+                line-height: 1.8;
+                color: #555;
+            }
+            */
+
+            .page-intro {
+                max-width: 680px;
+                margin: 0 auto 60px auto;
+                text-align: center;
+                position: relative;
+                padding-bottom: 25px;
+            }
+
+            .page-intro::after {
+                content: "";
+                width: 60px;
+                height: 2px;
+                background: #0d3b66;
+                display: block;
+                margin: 25px auto 0 auto;
+                opacity: 0.7;
+            }
+
+            .page-intro p {
+                font-size: 15px;
+                line-height: 1.8;
+                color: #555;
+            }
+
+            /* ===== Form Card ===== */
+
+            .form-card {
+                background: #ffffff;
+                padding: 50px 60px;
+                border-radius: 6px;
+
+                /* subtle left shadow */
+                box-shadow: -12px 12px 30px rgba(0, 0, 0, 0.06);
+            }
+
+            /* ===== Section Titles ===== */
+
+            .section-title {
+                margin: 40px 0 20px 0;
+                font-size: 14px;
+                letter-spacing: 1.5px;
+                font-weight: 600;
+                color: #222;
+            }
+
+            /* ===== Form Layout ===== */
+
+            .form-row {
+                display: flex;
+                gap: 25px;
+                margin-bottom: 20px;
+            }
+
+            .form-group {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .form-group.full {
+                flex: 100%;
+            }
+
+            /* ===== Labels ===== */
+
+            label {
+                font-size: 12px;
+                letter-spacing: 1px;
+                margin-bottom: 8px;
+                color: #444;
+            }
+
+            /* ===== Inputs ===== */
+
+            input,
+            textarea {
+                padding: 12px 14px;
+                border: 1px solid #dcdcdc;
+                border-radius: 4px;
+                font-size: 14px;
+                transition: all 0.2s ease;
+                outline: none;
+            }
+
+            input:focus,
+            textarea:focus {
+                border-color: #0d3b66;
+                box-shadow: 0 0 0 2px rgba(13, 59, 102, 0.08);
+            }
+
+            /* ===== Terms ===== */
+
+            .terms {
+                margin-top: 25px;
+            }
+
+            .checkbox-wrap {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 12px;
+                letter-spacing: 1px;
+                color: #555;
+            }
+
+            .checkbox-wrap input {
+                width: 16px;
+                height: 16px;
+            }
+
+            /* ===== Button ===== */
+
+            .form-actions {
+                margin-top: 35px;
+                text-align: right;
+            }
+
+            .primary-btn {
+                padding: 12px 30px;
+                border: none;
+                background: #0d3b66;
+                color: #fff;
+                font-size: 13px;
+                letter-spacing: 1px;
+                cursor: pointer;
+                border-radius: 4px;
+                transition: all 0.25s ease;
+            }
+
+            .primary-btn:hover {
+                background: #08263f;
+            }
+
+            /* ===== Responsive ===== */
+
+            @media (max-width: 768px) {
+                .form-card {
+                    padding: 35px 25px;
+                }
+
+                .form-row {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+
+                .form-actions {
+                    text-align: center;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- TOP BAR -->
+        <div class="topbar">
+            <div class="topbar-inner">
+                <a
+                    href="/corruption"
+                    style="display: flex; align-items: center; gap: 6px"
+                >
+                    <svg
+                        width="13"
+                        height="13"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                    </svg>
+                    Report Corruption
+                </a>
+                <div class="topbar-sep"></div>
+
+                <a href="/working-with-us">Vacancies</a>
+                <a href="http://mail.tanawwda.go.ke/" target="_blank"
+                    >Staff Mail</a
+                >
+                <div class="topbar-sep"></div>
+                <div class="topbar-social">
+                    <a
+                        href="https://web.facebook.com/tanawaterworksagency/"
+                        target="_blank"
+                        title="Facebook"
+                        ><svg
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                            /></svg
+                    ></a>
+                    <a
+                        href="https://twitter.com/tanawwda"
+                        target="_blank"
+                        title="Twitter/X"
+                        ><svg
+                            width="14"
+                            height="14"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                            /></svg
+                    ></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- HEADER -->
+        <header class="site-header" id="site-header">
+            <div class="header-inner">
+                <div class="logo-wrap">
+                    <a href="/"
+                        ><img
+                            src="https://tanawwda.go.ke/wp-content/uploads/2021/04/banner.png"
+                            alt="Tana Water Works Development Agency"
+                    /></a>
+                </div>
+                <nav class="desktop-nav">
+                    <a href="/" class="nav-item">Home</a>
+                    <div class="dropdown-wrap">
+                        <button class="nav-item">
+                            About Us
+                            <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+                        <div class="dropdown-panel">
+                            <a href="/background">Background</a>
+                            <a href="/vision-mission"
+                                >Vision, Mission &amp; Core Values</a
+                            >
+                            <a href="/mandate">Mandate / Functions</a>
+                            <a href="/board-of-directors">Board of Directors</a>
+                            <a href="/management">Management</a>
+                            <a href="/organogram">Organogram</a>
+                            <a href="/strategic-plan">Strategic Plan</a>
+                            <a href="/service-charter">Our Service Charter</a>
+                            <a href="/quality-policy">TWWDA Quality Policy</a>
+                        </div>
+                    </div>
+                    <div class="dropdown-wrap">
+                        <button class="nav-item">
+                            Projects
+                            <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+                        <div class="dropdown-panel wide">
+                            <div class="dp-section">Our Projects</div>
+                            <div class="dp-grid">
+                                <div class="dp-col">
+                                    <a href="/projects/county/embu"
+                                        >Embu County</a
+                                    >
+                                    <a href="/projects/county/kirinyaga"
+                                        >Kirinyaga County</a
+                                    >
+                                    <a href="/projects/county/meru"
+                                        >Meru County</a
+                                    >
+                                    <a href="/projects/county/nyeri"
+                                        >Nyeri County</a
+                                    >
+                                    <a href="/projects/county/tharaka"
+                                        >Tharaka Nithi County</a
+                                    >
+                                </div>
+                                <div class="dp-col">
+                                    <div
+                                        class="dp-section"
+                                        style="border-top: none"
+                                    >
+                                        Other Agencies
+                                    </div>
+                                    <a href="/projects/county/garissa"
+                                        >Garissa County</a
+                                    >
+                                    <a href="/projects/county/isiolo"
+                                        >Isiolo County</a
+                                    >
+                                    <a href="/projects/county/mandera"
+                                        >Mandera County</a
+                                    >
+                                    <a href="/projects/county/marsabit"
+                                        >Marsabit County</a
+                                    >
+                                    <a href="/projects/county/muranga"
+                                        >Muranga County</a
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/gis" class="nav-item" target="_blank">Web-GIS</a>
+                    <div class="dropdown-wrap">
+                        <button class="nav-item">
+                            Media Center
+                            <svg
+                                width="12"
+                                height="12"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2.5"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+                        <div class="dropdown-panel">
+                            <a href="/news">News</a
+                            ><a href="/speeches">Speeches</a>
+                            <a href="/publications">Publications</a>
+                            <a href="/access-to-information"
+                                >Access to Information</a
+                            >
+                            <a href="/events">Events</a
+                            ><a href="/photo-gallery">Photo Gallery</a>
+                            <a href="/video-gallery">Video Gallery</a
+                            ><a href="/downloads">Downloads</a>
+                        </div>
+                    </div>
+                    <a href="/tenders" class="nav-item active-link">Tenders</a>
+                    <a href="/contact-us" class="nav-item">Contact Us</a>
+                </nav>
+
+                <div style="display: flex; align-items: center; gap: 12px">
+                    <div class="header-search" id="desktop-search">
+                        <input
+                            type="text"
+                            placeholder="Search…"
+                            aria-label="Search"
+                        />
+                        <button aria-label="Submit search">
+                            <svg
+                                width="14"
+                                height="14"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+                    <button
+                        class="hamburger"
+                        id="mobile-menu-btn"
+                        aria-label="Open menu"
+                    >
+                        <svg
+                            width="20"
+                            height="20"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"
+                            />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- PAGE BANNER -->
+        <div class="page-banner">
+            <div class="page-banner-inner">
+                <div class="page-banner-eyebrow">Media Center</div>
+                <h1>Contact Us</h1>
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="/">Home</a><span class="breadcrumb-sep">›</span>
+                    <span class="breadcrumb-current"
+                        >Contact Us</span
+                    >
+                </nav>
+            </div>
+        </div>
+            <!-- Intro -->
+
+            <div class="container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1>REACH OUT TO US</h1>
+                    <p class="subtitle">PLEASE FILL THIS FORM</p>
+                </div>
+
+                <!-- Form Card -->
+                <div class="form-card">
+                    <form>
+                        <!-- Name -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>FIRST NAME (REQUIRED)</label>
+                                <input type="text" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label>LAST NAME (REQUIRED)</label>
+                                <input type="text" required />
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <h3 class="section-title">CONTACT INFORMATION</h3>
+
+                        <div class="form-row">
+                            <div class="form-group full">
+                                <label>YOUR ADDRESS (REQUIRED)</label>
+                                <input type="text" required />
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>TOWN (REQUIRED)</label>
+                                <input type="text" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label>POSTAL CODE</label>
+                                <input type="text" />
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group full">
+                                <label>YOUR EMAIL (REQUIRED)</label>
+                                <input type="email" required />
+                            </div>
+                        </div>
+
+                        <!-- Physical Location -->
+                        <h3 class="section-title">PHYSICAL LOCATION</h3>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>STREET / ROAD</label>
+                                <input type="text" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>BUILDING</label>
+                                <input type="text" />
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>FLOOR / ROOM</label>
+                                <input type="text" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>PHONE NUMBER (REQUIRED)</label>
+                                <input type="tel" required />
+                            </div>
+                        </div>
+
+                        <!-- Subject -->
+                        <div class="form-row">
+                            <div class="form-group full">
+                                <label>SUBJECT (REQUIRED)</label>
+                                <input type="text" required />
+                            </div>
+                        </div>
+
+                        <!-- Information Requested -->
+                        <div class="form-row">
+                            <div class="form-group full">
+                                <label>INFORMATION REQUESTED (REQUIRED)</label>
+                                <textarea rows="5" required></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Terms -->
+                        <div class="terms">
+                            <label class="checkbox-wrap">
+                                <input type="checkbox" required />
+                                <span>TERMS & CONDITIONS APPLY</span>
+                            </label>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="form-actions">
+                            <button type="submit" class="primary-btn">
+                                SUBMIT
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="site-footer">
+            <div class="footer-main">
+                <div class="footer-col">
+                    <div class="footer-col-label">Certification</div>
+                    <div class="footer-iso-badge">
+                        <img
+                            src="https://tanawwda.go.ke/wp-content/uploads/2021/01/iso5.png"
+                            alt="ISO 9001:2015"
+                        />
+                        <p class="footer-iso-text">
+                            <strong>TWWDA is ISO 9001:2015 certified.</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-label">Important Links</div>
+                    <ul class="footer-links">
+                        <li>
+                            <a href="/about-us"
+                                >Water Works Development Agencies</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://www.wra.go.ke/" target="_blank"
+                                >Water Resources Authority</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://www.waterauthority.go.ke/"
+                                target="_blank"
+                                >National Water Harvesting &amp; Storage
+                                Authority</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://www.waterfund.go.ke/"
+                                target="_blank"
+                                >Water Sector Trust Fund</a
+                            >
+                        </li>
+                        <li>
+                            <a href="http://www.kewi.or.ke/" target="_blank"
+                                >Kenya Water Institute</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://hydrologistsboard.go.ke/"
+                                target="_blank"
+                                >Hydrologists Registration Board</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                href="http://www.irrigation.go.ke/"
+                                target="_blank"
+                                >National Irrigation Authority</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-label">Government Links</div>
+                    <ul class="footer-links">
+                        <li>
+                            <a href="https://water.go.ke" target="_blank"
+                                >Ministry of Water and Sanitation</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://treasury.go.ke" target="_blank"
+                                >National Treasury and Planning</a
+                            >
+                        </li>
+                        <li>
+                            <a href="http://cog.go.ke" target="_blank"
+                                >County Governments</a
+                            >
+                        </li>
+                        <li>
+                            <a href="https://wasreb.go.ke" target="_blank"
+                                >Water Services Regulatory Board</a
+                            >
+                        </li>
+                        <li>
+                            <a href="http://waterreforms.go.ke/" target="_blank"
+                                >Water Sector Reform Programme</a
+                            >
+                        </li>
+                        <li>
+                            <a href="http://kwscrp.org/" target="_blank"
+                                >Kenya Water Security &amp; Climate
+                                Resilience</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-label">Our Contacts</div>
+                    <div class="footer-contacts">
+                        <div class="footer-contact-item">
+                            <svg
+                                class="footer-contact-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                            </svg>
+                            <span class="footer-contact-text"
+                                >Maji House, along Baden Powell Road<br />P.O.
+                                Box 1292 – 10100, Nyeri, Kenya</span
+                            >
+                        </div>
+                        <div class="footer-contact-item">
+                            <svg
+                                class="footer-contact-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                />
+                            </svg>
+                            <span class="footer-contact-text"
+                                >+254 724 259 891<br />+254 61-2032282</span
+                            >
+                        </div>
+                        <div class="footer-contact-item">
+                            <svg
+                                class="footer-contact-icon"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="1.5"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                />
+                            </svg>
+                            <span class="footer-contact-text"
+                                ><a href="mailto:info@tanawwda.go.ke"
+                                    >info@tanawwda.go.ke</a
+                                ></span
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span class="footer-copyright"
+                    >Copyright &copy; 2026 Tana Water Works Development
+                    Agency.</span
+                >
+                <div class="footer-bottom-links">
+                    <a
+                        href="http://tanawwda.go.ke/wp-content/uploads/2025/10/Water-and-Sanitation-Sub-Sector-Report-18-09-2025.pdf"
+                        >Sub-Sector Report</a
+                    >
+                    <a href="/contact-us">Feedback</a>
+                    <a href="/working-with-us">Vacancies</a>
+                    <a href="http://mail.tanawwda.go.ke/" target="_blank"
+                        >Staff Mail</a
+                    >
+                </div>
+            </div>
+        </footer>
+
+        <!-- MOBILE MENU -->
+        <div
+            class="mobile-menu"
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation menu"
+        >
+            <div class="mm-head">
+                <img
+                    src="https://tanawwda.go.ke/wp-content/uploads/2021/04/banner.png"
+                    alt="Tana Water Works Development Agency"
+                />
+                <button
+                    class="mm-close"
+                    id="mobile-menu-close"
+                    aria-label="Close menu"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    </svg>
+                </button>
+            </div>
+            <div class="mm-search">
+                <form action="/" method="get">
+                    <input
+                        type="text"
+                        name="s"
+                        placeholder="Search…"
+                        aria-label="Search"
+                    />
+                </form>
+            </div>
+            <nav class="mm-nav">
+                <a href="/" class="mm-link">Home</a>
+                <details class="mm-group" open>
+                    <summary>
+                        About Us
+                        <svg
+                            class="chevron"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+                    </summary>
+                    <div class="mm-sub">
+                        <a href="/background">Background</a>
+                        <a href="/vision-mission"
+                            >Vision, Mission &amp; Core Values</a
+                        >
+                        <a href="/mandate">Mandate / Functions</a>
+                        <a href="/board-of-directors">Board of Directors</a>
+                        <a href="/management">Management</a>
+                        <a href="/organogram">Organogram</a>
+                        <a href="/strategic-plan">Strategic Plan</a>
+                        <a href="/service-charter">Our Service Charter</a>
+                        <a href="/quality-policy">TWWDA Quality Policy</a>
+                    </div>
+                </details>
+                <details class="mm-group">
+                    <summary>
+                        Projects
+                        <svg
+                            class="chevron"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+                    </summary>
+                    <div class="mm-sub">
+                        <div class="mm-sub-label">Our Projects</div>
+                        <a href="/projects/county/embu">Embu County</a
+                        ><a href="/projects/county/kirinyaga"
+                            >Kirinyaga County</a
+                        >
+                        <a href="/projects/county/meru">Meru County</a
+                        ><a href="/projects/county/nyeri">Nyeri County</a>
+                        <a href="/projects/county/tharaka"
+                            >Tharaka Nithi County</a
+                        >
+                        <div class="mm-sub-label" style="margin-top: 6px">
+                            Other Agencies
+                        </div>
+                        <a href="/projects/county/garissa">Garissa County</a
+                        ><a href="/projects/county/isiolo">Isiolo County</a>
+                        <a href="/projects/county/mandera">Mandera County</a
+                        ><a href="/projects/county/marsabit">Marsabit County</a>
+                        <a href="/projects/county/muranga">Muranga County</a>
+                    </div>
+                </details>
+                <a href="/gis" class="mm-link" target="_blank">Web-GIS</a>
+                <details class="mm-group">
+                    <summary>
+                        Media Center
+                        <svg
+                            class="chevron"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            />
+                        </svg>
+                    </summary>
+                    <div class="mm-sub">
+                        <a href="/news">News</a><a href="/speeches">Speeches</a>
+                        <a href="/publications">Publications</a>
+                        <a href="/access-to-information"
+                            >Access to Information</a
+                        >
+                        <a href="/events">Events</a
+                        ><a href="/photo-gallery">Photo Gallery</a>
+                        <a href="/video-gallery">Video Gallery</a
+                        ><a href="/downloads">Downloads</a>
+                    </div>
+                </details>
+                <a href="/tenders" class="mm-link">Tenders</a>
+                <a href="/contact-us" class="mm-link">Contact Us</a>
+            </nav>
+        </div>
+
+        <script>
+            const header = document.getElementById("site-header");
+            const desktopSearch = document.getElementById("desktop-search");
+            function syncSearch() {
+                desktopSearch.style.display =
+                    window.innerWidth >= 1024 ? "block" : "none";
+            }
+            syncSearch();
+            window.addEventListener("resize", syncSearch);
+            window.addEventListener("scroll", () => {
+                header.classList.toggle("scrolled", window.scrollY > 50);
+            });
+            const mobileMenu = document.getElementById("mobile-menu");
+            const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+            const mobileMenuClose =
+                document.getElementById("mobile-menu-close");
+            function openMenu() {
+                mobileMenu.classList.add("open");
+                document.body.style.overflow = "hidden";
+            }
+            function closeMenu() {
+                mobileMenu.classList.remove("open");
+                document.body.style.overflow = "";
+            }
+            mobileMenuBtn.addEventListener("click", openMenu);
+            mobileMenuClose.addEventListener("click", closeMenu);
+            mobileMenu.addEventListener("click", (e) => {
+                if (e.target === mobileMenu) closeMenu();
+            });
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") closeMenu();
+            });
+
+            // app.put requests logic for info requested by public
+        </script>
+    </body>
+</html>
