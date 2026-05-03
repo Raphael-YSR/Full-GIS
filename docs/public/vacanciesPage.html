@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Tender — Tana Water Works Development Agency</title>
+        <title>Vacancy — Tana Water Works Development Agency</title>
         <link rel="icon" type="image/png" href="../images/logo.png" />
         <link rel="shortcut icon" type="image/png" href="../images/logo.png" />
         <link
@@ -172,13 +172,13 @@
             }
 
             /* ── Description ── */
-            .tender-description {
+            .vacancy-description {
                 font-size: 15px;
                 line-height: 1.85;
                 color: var(--ink-mid);
                 margin-bottom: 40px;
             }
-            .tender-description p + p {
+            .vacancy-description p + p {
                 margin-top: 14px;
             }
 
@@ -215,8 +215,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: #fff0f0;
-                border: 2px solid #ffd0d0;
+                background: #e8f0e8;
+                border: 2px solid #c0dcc0;
             }
             .doc-icon svg {
                 width: 22px;
@@ -230,7 +230,7 @@
                 font-weight: 600;
                 letter-spacing: 0.12em;
                 text-transform: uppercase;
-                color: #c0392b;
+                color: #2a6b2a;
                 margin-bottom: 4px;
             }
             .doc-title {
@@ -297,7 +297,7 @@
             }
 
             /* ── Sidebar ── */
-            .tender-sidebar {
+            .vacancy-sidebar {
                 display: flex;
                 flex-direction: column;
                 gap: 20px;
@@ -545,7 +545,7 @@
                             ><a href="/downloads">Downloads</a>
                         </div>
                     </div>
-                    <a href="/tenders" class="nav-item active-link">Tenders</a>
+                    <a href="/tenders" class="nav-item">Tenders</a>
                     <a href="/contact-us" class="nav-item">Contact Us</a>
                 </nav>
 
@@ -600,7 +600,7 @@
         <!-- PAGE BANNER — populated by JS -->
         <div class="page-banner">
             <div class="page-banner-inner">
-                <div class="page-banner-eyebrow">Tenders</div>
+                <div class="page-banner-eyebrow">Careers</div>
                 <h1 id="banner-title">Loading…</h1>
                 <div class="banner-meta">
                     <span class="meta-item" id="banner-date">
@@ -616,7 +616,7 @@
                 </div>
                 <nav class="breadcrumb" aria-label="Breadcrumb">
                     <a href="/">Home</a><span class="breadcrumb-sep">›</span>
-                    <a href="/tenders">Tenders</a
+                    <a href="/working-with-us">Vacancies</a
                     ><span class="breadcrumb-sep">›</span>
                     <span class="breadcrumb-current" id="breadcrumb-title"
                         >—</span
@@ -629,26 +629,26 @@
         <div class="page-wrap">
             <!-- ── Main column ── -->
             <main>
-                <a href="/tenders" class="back-link">
+                <a href="/working-with-us" class="back-link">
                     <svg viewBox="0 0 24 24">
                         <path d="M19 12H5M12 5l-7 7 7 7" />
                     </svg>
-                    Back to all tenders
+                    Back to all vacancies
                 </a>
 
-                <h2 class="section-heading">Tender Notice</h2>
+                <h2 class="section-heading">Job Advertisement</h2>
                 <div class="section-rule"></div>
-                <div class="tender-description" id="tender-description"></div>
+                <div class="vacancy-description" id="vacancy-description"></div>
 
-                <h2 class="section-heading">Tender Documents</h2>
+                <h2 class="section-heading">Application Documents</h2>
                 <div class="section-rule"></div>
                 <div class="docs-list" id="docs-list"></div>
             </main>
 
             <!-- ── Sidebar ── -->
-            <aside class="tender-sidebar">
+            <aside class="vacancy-sidebar">
                 <div class="sidebar-card">
-                    <div class="sidebar-card-label">Tender Details</div>
+                    <div class="sidebar-card-label">Vacancy Details</div>
                     <div class="sidebar-row">
                         <span class="sidebar-row-label">Reference</span>
                         <span class="sidebar-row-value" id="detail-id">—</span>
@@ -661,7 +661,9 @@
                     </div>
                     <div class="sidebar-row">
                         <span class="sidebar-row-label">Category</span>
-                        <span class="sidebar-row-value">Tenders</span>
+                        <span class="sidebar-row-value"
+                            >Career Opportunity</span
+                        >
                     </div>
                     <div class="sidebar-row">
                         <span class="sidebar-row-label">Status</span>
@@ -670,7 +672,7 @@
                         >
                     </div>
                     <div class="sidebar-row">
-                        <span class="sidebar-row-label">Documents</span>
+                        <span class="sidebar-row-label">Attachments</span>
                         <span class="sidebar-row-value" id="detail-doc-count"
                             >—</span
                         >
@@ -678,18 +680,18 @@
                 </div>
 
                 <div class="sidebar-card">
-                    <div class="sidebar-card-label">Procurement Office</div>
+                    <div class="sidebar-card-label">Human Resources</div>
                     <div class="sidebar-row">
                         <span class="sidebar-row-label">Department</span>
                         <span class="sidebar-row-value"
-                            >Supply Chain Management</span
+                            >Human Resource Management</span
                         >
                     </div>
                     <div class="sidebar-row">
                         <span class="sidebar-row-label">Email</span>
                         <span class="sidebar-row-value">
-                            <a href="mailto:info@tanawwda.go.ke"
-                                >info@tanawwda.go.ke</a
+                            <a href="mailto:hr@tanawwda.go.ke"
+                                >hr@tanawwda.go.ke</a
                             >
                         </span>
                     </div>
@@ -1060,16 +1062,16 @@
             });
         </script>
 
-        <!-- Load tenders data then render matched entry -->
-        <script src="../assets/vacancies/vacancies.js,"></script>
+        <!-- Load vacancies data then render matched entry -->
+        <script src="../assets/vacancies/vacancies.js"></script>
         <script>
             // ── Resolve :id from URL ──────────────────────────────────────
-            // Supports /tenders/some-slug and ?id=some-slug
-            function getTenderId() {
+            // Supports /vacancies/some-slug and ?id=some-slug
+            function getVacancyId() {
                 const parts = window.location.pathname
                     .replace(/\/$/, "")
                     .split("/");
-                const idx = parts.indexOf("tenders");
+                const idx = parts.indexOf("vacancies");
                 if (idx !== -1 && parts[idx + 1]) return parts[idx + 1];
                 return (
                     new URLSearchParams(window.location.search).get("id") ||
@@ -1077,69 +1079,71 @@
                 );
             }
 
-            const tenderId = getTenderId();
-            const tender = tenders.find(
-                (t) => t.id === tenderId || t.slug === tenderId,
+            const vacancyId = getVacancyId();
+            const vacancy = vacancies.find(
+                (v) => v.id === vacancyId || v.slug === vacancyId,
             );
 
             // ── Not found ─────────────────────────────────────────────────
-            if (!tender) {
+            if (!vacancy) {
                 document.getElementById("banner-title").textContent =
-                    "Tender Not Found";
-                document.getElementById("tender-description").innerHTML =
-                    `<p>The tender you are looking for could not be found.
-                     <a href="/tenders" style="color:var(--green-mid);">Return to all tenders →</a></p>`;
+                    "Vacancy Not Found";
+                document.getElementById("vacancy-description").innerHTML =
+                    `<p>The vacancy you are looking for could not be found.
+                     <a href="/working-with-us" style="color:var(--green-mid);">Return to all vacancies →</a></p>`;
             } else {
                 // ── Status from database field ────────────────────────────
-                const rawStatus = (tender.status || "closed").toLowerCase();
+                const rawStatus = (vacancy.status || "open").toLowerCase();
                 const statusLabel =
                     rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1);
-                const statusClass = rawStatus; // "open" or "closed"
+                const statusClass = rawStatus;
 
                 // ── Page title ────────────────────────────────────────────
-                document.title = `${tender.title} — TWWDA`;
+                document.title = `${vacancy.title} — TWWDA Careers`;
 
                 // ── Banner ────────────────────────────────────────────────
                 document.getElementById("banner-title").textContent =
-                    tender.title;
+                    vacancy.title;
                 document
                     .getElementById("banner-date")
-                    .querySelector("span").textContent = tender.date;
+                    .querySelector("span").textContent =
+                    vacancy.date || "Current Opening";
                 const statusBadge = document.getElementById("banner-status");
                 statusBadge.textContent = statusLabel;
                 statusBadge.className = `status-badge ${statusClass}`;
                 document.getElementById("breadcrumb-title").textContent =
-                    tender.title.length > 45
-                        ? tender.title.slice(0, 45) + "…"
-                        : tender.title;
+                    vacancy.title.length > 45
+                        ? vacancy.title.slice(0, 45) + "…"
+                        : vacancy.title;
 
                 // ── Sidebar ───────────────────────────────────────────────
-                document.getElementById("detail-id").textContent = tender.slug;
+                document.getElementById("detail-id").textContent =
+                    vacancy.slug || vacancy.id;
                 document.getElementById("detail-date").textContent =
-                    tender.date;
+                    vacancy.date || "June 2024";
                 document.getElementById("detail-status").innerHTML =
                     `<span class="status-badge ${statusClass}" style="font-size:9px;padding:3px 10px;">${statusLabel}</span>`;
                 document.getElementById("detail-doc-count").textContent =
-                    tender.documents && tender.documents.length
-                        ? `${tender.documents.length} document${tender.documents.length > 1 ? "s" : ""}`
+                    vacancy.documents && vacancy.documents.length
+                        ? `${vacancy.documents.length} attachment${vacancy.documents.length > 1 ? "s" : ""}`
                         : "None attached";
 
                 // ── Description ───────────────────────────────────────────
-                const descEl = document.getElementById("tender-description");
-                if (tender.paragraphs && tender.paragraphs.length) {
-                    descEl.innerHTML = tender.paragraphs
-                        .map((p) => `<p>${p}</p>`)
+                const descEl = document.getElementById("vacancy-description");
+                if (vacancy.paragraphs && vacancy.paragraphs.length) {
+                    descEl.innerHTML = vacancy.paragraphs
+                        .map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`)
                         .join("");
-                } else if (tender.description) {
-                    descEl.innerHTML = `<p>${tender.description}</p>`;
+                } else if (vacancy.description) {
+                    descEl.innerHTML = `<p>${vacancy.description}</p>`;
                 } else {
-                    descEl.innerHTML = `<p style="color:#8a8e88;font-style:italic;">No description available for this tender.</p>`;
+                    descEl.innerHTML = `<p style="color:#8a8e88;font-style:italic;">No description available for this vacancy.</p>`;
                 }
 
                 // ── Documents ─────────────────────────────────────────────
                 const docsList = document.getElementById("docs-list");
 
-                if (!tender.documents || tender.documents.length === 0) {
+                if (!vacancy.documents || vacancy.documents.length === 0) {
                     docsList.innerHTML = `
                         <div class="no-docs">
                             <svg viewBox="0 0 24 24">
@@ -1148,10 +1152,11 @@
                                 <line x1="9" y1="13" x2="15" y2="13"/>
                                 <line x1="9" y1="17" x2="15" y2="17"/>
                             </svg>
-                            No documents have been attached to this tender yet.
+                            No application documents have been attached to this vacancy yet.
+                            <br>Please send your application to hr@tanawwda.go.ke
                         </div>`;
                 } else {
-                    tender.documents.forEach((doc) => {
+                    vacancy.documents.forEach((doc) => {
                         const card = document.createElement("div");
                         card.className = "doc-card";
                         card.innerHTML = `
@@ -1159,15 +1164,15 @@
                                 <div class="doc-icon">
                                     <svg viewBox="0 0 24 24" fill="none">
                                         <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"
-                                            stroke="#c0392b" stroke-width="1.5"
+                                            stroke="#2a6b2a" stroke-width="1.5"
                                             stroke-linecap="round" stroke-linejoin="round"/>
                                         <path d="M14 2v6h6"
-                                            stroke="#c0392b" stroke-width="1.5"
+                                            stroke="#2a6b2a" stroke-width="1.5"
                                             stroke-linecap="round" stroke-linejoin="round"/>
                                         <line x1="9" y1="13" x2="15" y2="13"
-                                            stroke="#c0392b" stroke-width="1.2" stroke-linecap="round"/>
+                                            stroke="#2a6b2a" stroke-width="1.2" stroke-linecap="round"/>
                                         <line x1="9" y1="17" x2="15" y2="17"
-                                            stroke="#c0392b" stroke-width="1.2" stroke-linecap="round"/>
+                                            stroke="#2a6b2a" stroke-width="1.2" stroke-linecap="round"/>
                                     </svg>
                                 </div>
                                 <div class="doc-meta">
