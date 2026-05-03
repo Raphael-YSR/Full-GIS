@@ -14,6 +14,8 @@ import { pool, withDb } from "./db.js";
 import createRouter from "./routes.js";
 import createProjectRouter from "./projectRoutes.js";
 import createAdminRouter from "./adminRoutes.js";
+import createTenderRouter from "./tenderRoutes.js";
+import createVacancyRouter from "./vacancyRoutes.js";
 
 dotenv.config();
 
@@ -104,6 +106,8 @@ const superAdminAuth = (req, res, next) => {
 app.use(createProjectRouter(requireAuth, superAdminAuth)); // API routes first
 app.use(createAdminRouter(requireAuth, superAdminAuth));
 app.use(createRouter(requireAuth, superAdminAuth));
+app.use(createTenderRouter(requireAuth, superAdminAuth));
+app.use(createVacancyRouter(requireAuth, superAdminAuth));
 
 app.get("/health", (req, res) => res.status(200).send("OK"));
 
