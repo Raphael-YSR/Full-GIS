@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Edit Vacancy | GIS Admin Dashboard</title>
+        <link rel="icon" type="image/png" href="../../docs/images/logo.png" />
+        <link
+            rel="shortcut icon"
+            type="image/png"
+            href="../../docs/images/logo.png"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="/admin/styles.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+        <style>
+            input,
+            select,
+            textarea {
+                background-color: #1e293b;
+                border: 1px solid #3f4c63;
+                color: white;
+                padding: 0.75rem;
+                border-radius: 0.375rem;
+                width: 100%;
+                margin-top: 0.25rem;
+            }
+            input:focus,
+            select:focus,
+            textarea:focus {
+                outline: none;
+                border-color: #60a5fa;
+            }
+            textarea {
+                min-height: 100px;
+            }
+            .form-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+            .form-row-3 {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1rem;
+            }
+            .section-divider {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin: 24px 0 16px;
+            }
+            .section-divider::before,
+            .section-divider::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: #3f4c63;
+            }
+            .section-divider span {
+                font-size: 0.7rem;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                color: #60a5fa;
+                white-space: nowrap;
+            }
+            .block-remove-btn {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                background: #374151;
+                border: none;
+                color: #9ca3af;
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                font-size: 14px;
+                line-height: 1;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition:
+                    background 0.15s,
+                    color 0.15s;
+            }
+            .block-remove-btn:hover {
+                background: #ef4444;
+                color: white;
+                transform: none;
+            }
+            .document-block {
+                position: relative;
+                margin-bottom: 0.5rem;
+            }
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+            .modal-content {
+                background-color: #1f2937;
+                border-radius: 0.5rem;
+                padding: 2rem;
+                width: 90%;
+                max-width: 400px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
+            .hidden {
+                display: none;
+            }
+            .vacancy-header {
+                background-color: #374151;
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-bottom: 1.5rem;
+            }
+            .vacancy-header h2 {
+                font-size: 1.25rem;
+                font-weight: bold;
+                margin-bottom: 0.5rem;
+            }
+            .vacancy-header p {
+                color: #9ca3af;
+                font-size: 0.875rem;
+            }
+            .status-badge {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 9999px;
+                font-size: 0.65rem;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+            }
+            .status-open {
+                background: #14532d;
+                color: #86efac;
+            }
+            .status-closed {
+                background: #7f1d1d;
+                color: #fca5a5;
+            }
+            .status-filled {
+                background: #1e3a5f;
+                color: #93c5fd;
+            }
+            .btn-save {
+                background-color: #3b82f6;
+                transition: background-color 0.2s;
+            }
+            .btn-save:hover {
+                background-color: #2563eb;
+            }
+            .btn-save:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 text-white min-h-screen">
+        <a
+            href="/admin/vacancies/manage-vacancies.html"
+            class="fixed top-4 left-4 z-50 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md shadow-md font-marlin text-sm transition"
+        >
+            ← Back to Vacancies
+        </a>
+
+        <div class="container mx-auto px-4 py-8 max-w-4xl">
+            <header class="mb-8 text-center">
+                <h1 class="text-3xl font-bold font-marlin">EDIT VACANCY</h1>
+                <p class="text-gray-400 font-marlinsoftmedium">
+                    Update existing job opportunity
+                </p>
+            </header>
+
+            <div id="vacancyInfo" class="vacancy-header hidden">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Main Form -->
+            <div class="bg-gray-800 p-8 rounded-lg shadow-lg">
+                <form id="editVacancyForm" class="space-y-6">
+                    <!-- Basic Information -->
+                    <div>
+                        <label class="block text-sm font-bold mb-1 font-marlin"
+                            >JOB TITLE *</label
+                        >
+                        <input type="text" id="title" name="title" required />
+                    </div>
+
+                    <div class="form-row">
+                        <div>
+                            <label
+                                class="block text-sm font-bold mb-1 font-marlin"
+                                >SLUG *</label
+                            >
+                            <input type="text" id="slug" name="slug" required />
+                            <p class="text-xs text-gray-400 mt-1">
+                                URL-friendly identifier
+                            </p>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-bold mb-1 font-marlin"
+                                >REFERENCE NUMBER</label
+                            >
+                            <input type="text" id="reference_number" />
+                        </div>
+                    </div>
+
+                    <div class="form-row-3">
+                        <div>
+                            <label
+                                class="block text-sm font-bold mb-1 font-marlin"
+                                >JOB GRADE</label
+                            >
+                            <input type="text" id="job_grade" />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-bold mb-1 font-marlin"
+                                >DEPARTMENT</label
+                            >
+                            <input type="text" id="department" />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-bold mb-1 font-marlin"
+                                >LOCATION</label
+                            >
+                            <input type="text" id="location" />
+                        </div>
+                    </div>
+
+                    <div class="form-row-3">
+                        <div>
+                            <label
+                                class="block text-sm font-bold mb-1 font-marlin"
+                                >EMPLOYMENT TYPE</label
+                            >
+                            <select id="employment_type">
+                                <option value="permanent">Permanent</option>
+                                <option value="contract">Contract</option>
+                                <option value="internship">Internship</option>
+                                <option value="temporary">Temporary</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-bold mb-1 font-marlin"
+                                >SALARY RANGE</label
+                            >
+                            <input type="text" id="salary_range" />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-bold mb-1 font-marlin"
+                                >STATUS</label
+                            >
+                            <select id="status">
+                                <option value="open">Open</option>
+                                <option value="closed">Closed</option>
+                                <option value="filled">Filled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div>
+                            <label
+                                class="block text-sm font-bold mb-1 font-marlin"
+                                >PUBLISHED DATE</label
+                            >
+                            <input type="date" id="published_date" />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-bold mb-1 font-marlin"
+                                >CLOSING DATE</label
+                            >
+                            <input type="date" id="closing_date" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold mb-1 font-marlin"
+                            >JOB DESCRIPTION</label
+                        >
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold mb-1 font-marlin"
+                            >REQUIREMENTS</label
+                        >
+                        <textarea id="requirements" rows="4"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold mb-1 font-marlin"
+                            >RESPONSIBILITIES</label
+                        >
+                        <textarea id="responsibilities" rows="4"></textarea>
+                    </div>
+
+                    <button
+                        type="submit"
+                        id="saveBtn"
+                        class="w-full btn-save text-white py-3 px-4 rounded font-medium font-marlin transition"
+                    >
+                        UPDATE VACANCY
+                    </button>
+                </form>
+            </div>
+
+            <!-- Attachments Section -->
+            <div class="bg-gray-800 p-8 rounded-lg shadow-lg mt-6">
+                <div class="section-divider">
+                    <span>ATTACHMENTS</span>
+                </div>
+                <div id="documents-container"></div>
+                <button
+                    type="button"
+                    id="saveDocumentsBtn"
+                    class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded font-marlin transition"
+                >
+                    SAVE ATTACHMENTS
+                </button>
+            </div>
+        </div>
+
+        <!-- Success/Error Popup -->
+        <div id="popup" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="text-center">
+                    <i
+                        id="popupIcon"
+                        class="fas fa-check-circle text-green-500 text-5xl mb-4"
+                    ></i>
+                    <h2
+                        id="popupTitle"
+                        class="text-xl font-bold font-marlin mb-2"
+                    >
+                        Success
+                    </h2>
+                    <p id="popupMessage" class="text-gray-300"></p>
+                    <button
+                        id="closePopup"
+                        class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-marlin"
+                    >
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/admin/vacancies/edit-vacancy.js"></script>
+    </body>
+</html>

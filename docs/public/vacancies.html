@@ -874,7 +874,123 @@
             });
         </script>
 
-        <script src="../assets/vacancies/vacancies.js"></script>
+        <!-- Replace the script that loads vacancies.js -->
+
+        <script>
+            const container = document.getElementById("vacancies-container");
+            let currentPage = 1;
+            let isLoading = false;
+
+            async function loadVacancies(page = 1) {
+                if (isLoading) return;
+                isLoading = true;
+
+                container.innerHTML =
+                    '<div class="text-center py-12 col-span-2"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div><p class="mt-2 text-gray-500">Loading vacancies...</p></div>';
+
+                try {
+                    const response = await fetch(
+                        `/gis/vacancies?page=${page}&limit=20&status=open`,
+                    );
+                    const result = await response.json();
+
+                    if (!response.ok) throw new Error(result.error);
+
+                    const vacancies = result.data;
+                    const pagination = result.pagination;
+
+                    if (vacancies.length === 0) {
+                        container.innerHTML =
+                            '<div class="text-center py-12 col-span-2"><p class="text-gray-500">No open vacancies at the moment. Please check back later.</p></div>';
+                        isLoading = false;
+                        return;
+                    }
+
+                    container.innerHTML = "";
+
+                    vacancies.forEach((doc) => {
+                        const card = document.createElement("div");
+                        card.className = "doc-card";
+
+                        card.innerHTML = `
+                            <div class="doc-card-top">
+                                <div class="doc-icon" style="background:#e8f0e8; border-color:#c0dcc0;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#2a6b2a" stroke-width="1.5">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="8" y1="13" x2="16" y2="13"/>
+                                        <line x1="8" y1="17" x2="12" y2="17"/>
+                                    </svg>
+                                </div>
+                                <div class="doc-meta">
+                                    <div class="doc-type">${doc.employment_type ? doc.employment_type.toUpperCase() : "Career"} Opportunity</div>
+                                    <div class="doc-title">${escapeHtml(doc.title)}</div>
+                                    ${doc.department ? `<div class="doc-desc" style="font-size:11px; margin-top:4px;">Department: ${escapeHtml(doc.department)}</div>` : ""}
+                                    ${doc.location ? `<div class="doc-desc" style="font-size:11px;">Location: ${escapeHtml(doc.location)}</div>` : ""}
+                                    ${doc.closing_date ? `<div class="doc-desc" style="font-size:11px; margin-top:4px;"><span style="color:#c0392b;">Closing: ${new Date(doc.closing_date).toLocaleDateString()}</span></div>` : ""}
+                                </div>
+                            </div>
+                            <a href="/vacancies/${doc.id}" class="doc-download">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                                VIEW DETAILS
+                            </a>
+                        `;
+
+                        container.appendChild(card);
+                    });
+
+                    if (pagination.pages > 1) {
+                        addPagination(pagination, loadVacancies);
+                    }
+                } catch (err) {
+                    console.error("Error loading vacancies:", err);
+                    container.innerHTML =
+                        '<div class="text-center py-12 col-span-2"><p class="text-red-500">Failed to load vacancies. Please try again later.</p></div>';
+                }
+
+                isLoading = false;
+            }
+
+            function escapeHtml(str) {
+                if (!str) return "";
+                return str.replace(/[&<>]/g, function (m) {
+                    if (m === "&") return "&amp;";
+                    if (m === "<") return "&lt;";
+                    if (m === ">") return "&gt;";
+                    return m;
+                });
+            }
+
+            function addPagination(pagination, loadFn) {
+                const existingPagination = document.getElementById(
+                    "vacancies-pagination",
+                );
+                if (existingPagination) existingPagination.remove();
+
+                const paginationDiv = document.createElement("div");
+                paginationDiv.id = "vacancies-pagination";
+                paginationDiv.className = "flex justify-center gap-2 mt-8";
+                paginationDiv.innerHTML = `
+                    <button class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 ${pagination.page === 1 ? "opacity-50 cursor-not-allowed" : ""}"
+                            ${pagination.page === 1 ? "disabled" : `onclick="window.goToPage(${pagination.page - 1})"`}>
+                        ← Previous
+                    </button>
+                    <span class="px-3 py-1 text-gray-600">Page ${pagination.page} of ${pagination.pages}</span>
+                    <button class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 ${pagination.page === pagination.pages ? "opacity-50 cursor-not-allowed" : ""}"
+                            ${pagination.page === pagination.pages ? "disabled" : `onclick="window.goToPage(${pagination.page + 1})"`}>
+                        Next →
+                    </button>
+                `;
+
+                container.parentNode.appendChild(paginationDiv);
+                window.goToPage = (page) => loadFn(page);
+            }
+
+            loadVacancies();
+        </script>
+
         <script>
             const container = document.getElementById("vacancies-container");
 

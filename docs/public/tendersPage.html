@@ -1061,7 +1061,134 @@
         </script>
 
         <!-- Load tenders data then render matched entry -->
-        <script src="../assets/tenders/tenders.js"></script>
+        // Replace the script that loads tenders.js and finds tender with this:
+
+        <script>
+            // Remove: <script src="../assets/tenders/tenders.js"></script>
+
+            // ── Resolve :id from URL ──────────────────────────────────────
+            function getTenderId() {
+                const parts = window.location.pathname.replace(/\/$/, "").split("/");
+                const idx = parts.indexOf("tenders");
+                if (idx !== -1 && parts[idx + 1]) return parts[idx + 1];
+                return new URLSearchParams(window.location.search).get("id") || null;
+            }
+
+            const tenderId = getTenderId();
+
+            async function loadTender() {
+                if (!tenderId) {
+                    document.getElementById("banner-title").textContent = "Tender Not Found";
+                    document.getElementById("tender-description").innerHTML = `<p>Tender ID not provided. <a href="/tenders" style="color:var(--green-mid);">Return to all tenders →</a></p>`;
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/gis/tenders/${tenderId}`);
+
+                    if (!response.ok) {
+                        if (response.status === 404) throw new Error("Tender not found");
+                        throw new Error("Failed to load tender");
+                    }
+
+                    const tender = await response.json();
+                    renderTender(tender);
+
+                } catch (err) {
+                    console.error("Error loading tender:", err);
+                    document.getElementById("banner-title").textContent = "Tender Not Found";
+                    document.getElementById("tender-description").innerHTML = `<p>The tender you are looking for could not be found. <a href="/tenders" style="color:var(--green-mid);">Return to all tenders →</a></p>`;
+                }
+            }
+
+            function renderTender(tender) {
+                const rawStatus = (tender.status || "closed").toLowerCase();
+                const statusLabel = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1);
+                const statusClass = rawStatus;
+
+                document.title = `${tender.title} — TWWDA`;
+
+                // Banner
+                document.getElementById("banner-title").textContent = tender.title;
+                document.getElementById("banner-date").querySelector("span").textContent = new Date(tender.published_date).toLocaleDateString();
+                const statusBadge = document.getElementById("banner-status");
+                statusBadge.textContent = statusLabel;
+                statusBadge.className = `status-badge ${statusClass}`;
+                document.getElementById("breadcrumb-title").textContent = tender.title.length > 45 ? tender.title.slice(0, 45) + "…" : tender.title;
+
+                // Sidebar
+                document.getElementById("detail-id").textContent = tender.reference_number || tender.slug;
+                document.getElementById("detail-date").textContent = new Date(tender.published_date).toLocaleDateString();
+                document.getElementById("detail-status").innerHTML = `<span class="status-badge ${statusClass}" style="font-size:9px;padding:3px 10px;">${statusLabel}</span>`;
+                document.getElementById("detail-doc-count").textContent = tender.documents && tender.documents.length ? `${tender.documents.length} document${tender.documents.length > 1 ? "s" : ""}` : "None attached";
+
+                // Description
+                const descEl = document.getElementById("tender-description");
+                if (tender.description) {
+                    descEl.innerHTML = `<p>${escapeHtml(tender.description)}</p>`;
+                } else if (tender.paragraphs && tender.paragraphs.length) {
+                    descEl.innerHTML = tender.paragraphs.map(p => `<p>${escapeHtml(p.content)}</p>`).join("");
+                } else {
+                    descEl.innerHTML = `<p style="color:#8a8e88;font-style:italic;">No description available for this tender.</p>`;
+                }
+
+                // Closing date info
+                if (tender.closing_date) {
+                    const closingInfo = document.createElement("div");
+                    closingInfo.className = "tender-closing-info mt-4 p-3 bg-gray-50 border-l-4 border-green-500";
+                    closingInfo.innerHTML = `<strong>Closing Date:</strong> ${new Date(tender.closing_date).toLocaleDateString()}`;
+                    descEl.appendChild(closingInfo);
+                }
+
+                // Documents
+                const docsList = document.getElementById("docs-list");
+
+                if (!tender.documents || tender.documents.length === 0) {
+                    docsList.innerHTML = `<div class="no-docs"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>No documents have been attached to this tender yet.</div>`;
+                } else {
+                    tender.documents.forEach((doc) => {
+                        const card = document.createElement("div");
+                        card.className = "doc-card";
+                        card.innerHTML = `
+                            <div class="doc-card-top">
+                                <div class="doc-icon">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#c0392b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M14 2v6h6" stroke="#c0392b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="9" y1="13" x2="15" y2="13" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round"/>
+                                        <line x1="9" y1="17" x2="15" y2="17" stroke="#c0392b" stroke-width="1.2" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="doc-meta">
+                                    <div class="doc-type">${doc.document_type || "PDF"} Document</div>
+                                    <div class="doc-title">${escapeHtml(doc.title)}</div>
+                                </div>
+                            </div>
+                            <a href="${doc.file_url}" target="_blank" class="doc-download">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                Download ${doc.document_type || "PDF"}
+                            </a>
+                        `;
+                        docsList.appendChild(card);
+                    });
+                }
+            }
+
+            function escapeHtml(str) {
+                if (!str) return "";
+                return str.replace(/[&<>]/g, function(m) {
+                    if (m === "&") return "&amp;";
+                    if (m === "<") return "&lt;";
+                    if (m === ">") return "&gt;";
+                    return m;
+                });
+            }
+
+            loadTender();
+        </script>
+
         <script>
             // ── Resolve :id from URL ──────────────────────────────────────
             // Supports /tenders/some-slug and ?id=some-slug

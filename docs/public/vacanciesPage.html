@@ -1063,7 +1063,170 @@
         </script>
 
         <!-- Load vacancies data then render matched entry -->
-        <script src="../assets/vacancies/vacancies.js"></script>
+        // Replace the script that loads vacancies.js with:
+
+        <script>
+            function getVacancyId() {
+                const parts = window.location.pathname
+                    .replace(/\/$/, "")
+                    .split("/");
+                const idx = parts.indexOf("vacancies");
+                if (idx !== -1 && parts[idx + 1]) return parts[idx + 1];
+                return (
+                    new URLSearchParams(window.location.search).get("id") ||
+                    null
+                );
+            }
+
+            const vacancyId = getVacancyId();
+
+            async function loadVacancy() {
+                if (!vacancyId) {
+                    document.getElementById("banner-title").textContent =
+                        "Vacancy Not Found";
+                    document.getElementById("vacancy-description").innerHTML =
+                        `<p>Vacancy ID not provided. <a href="/working-with-us" style="color:var(--green-mid);">Return to all vacancies →</a></p>`;
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/gis/vacancies/${vacancyId}`);
+
+                    if (!response.ok) {
+                        if (response.status === 404)
+                            throw new Error("Vacancy not found");
+                        throw new Error("Failed to load vacancy");
+                    }
+
+                    const vacancy = await response.json();
+                    renderVacancy(vacancy);
+                } catch (err) {
+                    console.error("Error loading vacancy:", err);
+                    document.getElementById("banner-title").textContent =
+                        "Vacancy Not Found";
+                    document.getElementById("vacancy-description").innerHTML =
+                        `<p>The vacancy you are looking for could not be found. <a href="/working-with-us" style="color:var(--green-mid);">Return to all vacancies →</a></p>`;
+                }
+            }
+
+            function renderVacancy(vacancy) {
+                const rawStatus = (vacancy.status || "open").toLowerCase();
+                const statusLabel =
+                    rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1);
+                const statusClass = rawStatus;
+
+                document.title = `${vacancy.title} — TWWDA Careers`;
+
+                // Banner
+                document.getElementById("banner-title").textContent =
+                    vacancy.title;
+                document
+                    .getElementById("banner-date")
+                    .querySelector("span").textContent = new Date(
+                    vacancy.published_date,
+                ).toLocaleDateString();
+                const statusBadge = document.getElementById("banner-status");
+                statusBadge.textContent = statusLabel;
+                statusBadge.className = `status-badge ${statusClass}`;
+                document.getElementById("breadcrumb-title").textContent =
+                    vacancy.title.length > 45
+                        ? vacancy.title.slice(0, 45) + "…"
+                        : vacancy.title;
+
+                // Sidebar
+                document.getElementById("detail-id").textContent =
+                    vacancy.reference_number || vacancy.slug;
+                document.getElementById("detail-date").textContent = new Date(
+                    vacancy.published_date,
+                ).toLocaleDateString();
+                document.getElementById("detail-status").innerHTML =
+                    `<span class="status-badge ${statusClass}" style="font-size:9px;padding:3px 10px;">${statusLabel}</span>`;
+                document.getElementById("detail-doc-count").textContent =
+                    vacancy.documents && vacancy.documents.length
+                        ? `${vacancy.documents.length} attachment${vacancy.documents.length > 1 ? "s" : ""}`
+                        : "None attached";
+
+                // Description
+                const descEl = document.getElementById("vacancy-description");
+                let descriptionHtml = "";
+
+                if (vacancy.description) {
+                    descriptionHtml += `<p>${escapeHtml(vacancy.description)}</p>`;
+                }
+
+                if (vacancy.requirements) {
+                    descriptionHtml += `<h3 class="font-bold mt-4 mb-2 text-green-700">Requirements:</h3><p>${escapeHtml(vacancy.requirements).replace(/\n/g, "<br>")}</p>`;
+                }
+
+                if (vacancy.responsibilities) {
+                    descriptionHtml += `<h3 class="font-bold mt-4 mb-2 text-green-700">Responsibilities:</h3><p>${escapeHtml(vacancy.responsibilities).replace(/\n/g, "<br>")}</p>`;
+                }
+
+                if (vacancy.job_grade) {
+                    descriptionHtml += `<p class="mt-4"><strong>Job Grade:</strong> ${escapeHtml(vacancy.job_grade)}</p>`;
+                }
+
+                if (vacancy.salary_range) {
+                    descriptionHtml += `<p><strong>Salary Range:</strong> ${escapeHtml(vacancy.salary_range)}</p>`;
+                }
+
+                if (vacancy.closing_date) {
+                    descriptionHtml += `<p class="mt-4 p-3 bg-gray-50 border-l-4 border-green-500"><strong>Closing Date:</strong> ${new Date(vacancy.closing_date).toLocaleDateString()}</p>`;
+                }
+
+                descEl.innerHTML =
+                    descriptionHtml ||
+                    `<p style="color:#8a8e88;font-style:italic;">No description available for this vacancy.</p>`;
+
+                // Documents
+                const docsList = document.getElementById("docs-list");
+
+                if (!vacancy.documents || vacancy.documents.length === 0) {
+                    docsList.innerHTML = `<div class="no-docs"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>No application documents have been attached to this vacancy yet.<br>Please send your application to hr@tanawwda.go.ke</div>`;
+                } else {
+                    vacancy.documents.forEach((doc) => {
+                        const card = document.createElement("div");
+                        card.className = "doc-card";
+                        card.innerHTML = `
+                            <div class="doc-card-top">
+                                <div class="doc-icon">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#2a6b2a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M14 2v6h6" stroke="#2a6b2a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <line x1="9" y1="13" x2="15" y2="13" stroke="#2a6b2a" stroke-width="1.2" stroke-linecap="round"/>
+                                        <line x1="9" y1="17" x2="15" y2="17" stroke="#2a6b2a" stroke-width="1.2" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="doc-meta">
+                                    <div class="doc-type">${doc.document_type || "PDF"} Document</div>
+                                    <div class="doc-title">${escapeHtml(doc.title)}</div>
+                                </div>
+                            </div>
+                            <a href="${doc.file_url}" target="_blank" class="doc-download">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                Download ${doc.document_type || "PDF"}
+                            </a>
+                        `;
+                        docsList.appendChild(card);
+                    });
+                }
+            }
+
+            function escapeHtml(str) {
+                if (!str) return "";
+                return str.replace(/[&<>]/g, function (m) {
+                    if (m === "&") return "&amp;";
+                    if (m === "<") return "&lt;";
+                    if (m === ">") return "&gt;";
+                    return m;
+                });
+            }
+
+            loadVacancy();
+        </script>
+
         <script>
             // ── Resolve :id from URL ──────────────────────────────────────
             // Supports /vacancies/some-slug and ?id=some-slug

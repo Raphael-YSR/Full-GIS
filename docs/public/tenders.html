@@ -874,7 +874,117 @@
             });
         </script>
 
-        <script src="../assets/tenders/tenders.js"></script>
+        <!-- Replace the existing script that loads tenders.js with this -->
+
+        <script>
+            // Remove: <script src="../assets/tenders/tenders.js"></script>
+
+            const container = document.getElementById("tenders-container");
+            let currentPage = 1;
+            let isLoading = false;
+
+            async function loadTenders(page = 1) {
+                if (isLoading) return;
+                isLoading = true;
+
+                container.innerHTML = '<div class="text-center py-12 col-span-2"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div><p class="mt-2 text-gray-500">Loading tenders...</p></div>';
+
+                try {
+                    const response = await fetch(`/gis/tenders?page=${page}&limit=20&status=open`);
+                    const result = await response.json();
+
+                    if (!response.ok) throw new Error(result.error);
+
+                    const tenders = result.data;
+                    const pagination = result.pagination;
+
+                    if (tenders.length === 0) {
+                        container.innerHTML = '<div class="text-center py-12 col-span-2"><p class="text-gray-500">No open tenders at the moment. Please check back later.</p></div>';
+                        isLoading = false;
+                        return;
+                    }
+
+                    container.innerHTML = "";
+
+                    tenders.forEach((doc) => {
+                        const card = document.createElement("div");
+                        card.className = "doc-card";
+
+                        const publishedDate = new Date(doc.published_date);
+
+                        card.innerHTML = `
+                            <div class="doc-card-top">
+                                <div class="doc-icon" style="background:#f0f4ff; border-color:#c8d0f0; flex-direction:column; gap:2px;">
+                                    <span style="font-size:15px; font-weight:700; color:#2a3a92; line-height:1;">${publishedDate.getDate()}</span>
+                                    <span style="font-size:8px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#2a3a92;">${publishedDate.toLocaleString("default", { month: "short" })}</span>
+                                    <span style="font-size:8px; color:#6a7ab0;">${publishedDate.getFullYear()}</span>
+                                </div>
+                                <div class="doc-meta">
+                                    <div class="doc-type">Tender Notice · ${doc.reference_number || doc.id}</div>
+                                    <div class="doc-title">${escapeHtml(doc.title)}</div>
+                                    ${doc.closing_date ? `<div class="doc-desc" style="font-size:11px; margin-top:4px;"><span style="color:#c0392b;">Closing: ${new Date(doc.closing_date).toLocaleDateString()}</span></div>` : ''}
+                                </div>
+                            </div>
+                            <a href="/tenders/${doc.id}" class="doc-download">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                                VIEW TENDER
+                            </a>
+                        `;
+
+                        container.appendChild(card);
+                    });
+
+                    // Add pagination if needed
+                    if (pagination.pages > 1) {
+                        addPagination(pagination, loadTenders);
+                    }
+
+                } catch (err) {
+                    console.error("Error loading tenders:", err);
+                    container.innerHTML = '<div class="text-center py-12 col-span-2"><p class="text-red-500">Failed to load tenders. Please try again later.</p></div>';
+                }
+
+                isLoading = false;
+            }
+
+            function escapeHtml(str) {
+                if (!str) return "";
+                return str.replace(/[&<>]/g, function(m) {
+                    if (m === "&") return "&amp;";
+                    if (m === "<") return "&lt;";
+                    if (m === ">") return "&gt;";
+                    return m;
+                });
+            }
+
+            function addPagination(pagination, loadFn) {
+                const existingPagination = document.getElementById("tenders-pagination");
+                if (existingPagination) existingPagination.remove();
+
+                const paginationDiv = document.createElement("div");
+                paginationDiv.id = "tenders-pagination";
+                paginationDiv.className = "flex justify-center gap-2 mt-8";
+                paginationDiv.innerHTML = `
+                    <button class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 ${pagination.page === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${pagination.page === 1 ? 'disabled' : `onclick="window.goToPage(${pagination.page - 1})"`}>
+                        ← Previous
+                    </button>
+                    <span class="px-3 py-1 text-gray-600">Page ${pagination.page} of ${pagination.pages}</span>
+                    <button class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100 ${pagination.page === pagination.pages ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${pagination.page === pagination.pages ? 'disabled' : `onclick="window.goToPage(${pagination.page + 1})"`}>
+                        Next →
+                    </button>
+                `;
+
+                container.parentNode.appendChild(paginationDiv);
+                window.goToPage = (page) => loadFn(page);
+            }
+
+            loadTenders();
+        </script>
+
         <script>
             const container = document.getElementById("tenders-container");
 

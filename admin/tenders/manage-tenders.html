@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Manage Tenders | GIS Admin Dashboard</title>
+        <link rel="icon" type="image/png" href="../../docs/images/logo.png" />
+        <link
+            rel="shortcut icon"
+            type="image/png"
+            href="../../docs/images/logo.png"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="/admin/styles.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        />
+        <style>
+            .status-badge {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 9999px;
+                font-size: 0.65rem;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+            }
+            .status-open {
+                background: #14532d;
+                color: #86efac;
+            }
+            .status-closed {
+                background: #7f1d1d;
+                color: #fca5a5;
+            }
+            .status-cancelled {
+                background: #451a03;
+                color: #fcd34d;
+            }
+            .status-awarded {
+                background: #1e3a5f;
+                color: #93c5fd;
+            }
+            .delete-btn {
+                color: #ef4444;
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 1rem;
+                padding: 4px 8px;
+                border-radius: 4px;
+                transition: background 0.2s;
+            }
+            .delete-btn:hover {
+                background: rgba(239, 68, 68, 0.2);
+            }
+            .edit-btn {
+                color: #60a5fa;
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 1rem;
+                padding: 4px 8px;
+                border-radius: 4px;
+                transition: background 0.2s;
+            }
+            .edit-btn:hover {
+                background: rgba(96, 165, 250, 0.2);
+            }
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+            .modal-content {
+                background-color: #1f2937;
+                border-radius: 0.5rem;
+                padding: 2rem;
+                width: 90%;
+                max-width: 400px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
+            .hidden {
+                display: none;
+            }
+            .filter-bar {
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+                margin-bottom: 1.5rem;
+            }
+            .filter-select {
+                background-color: #1e293b;
+                border: 1px solid #3f4c63;
+                color: white;
+                padding: 0.5rem;
+                border-radius: 0.375rem;
+                font-size: 0.875rem;
+            }
+            .search-input {
+                background-color: #1e293b;
+                border: 1px solid #3f4c63;
+                color: white;
+                padding: 0.5rem;
+                border-radius: 0.375rem;
+                font-size: 0.875rem;
+                width: 250px;
+            }
+            .pagination {
+                display: flex;
+                justify-content: center;
+                gap: 0.5rem;
+                margin-top: 2rem;
+            }
+            .page-btn {
+                background-color: #1e293b;
+                border: 1px solid #3f4c63;
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            .page-btn:hover {
+                background-color: #334155;
+            }
+            .page-btn.active {
+                background-color: #3b82f6;
+                border-color: #3b82f6;
+            }
+            .page-btn.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 text-white min-h-screen">
+        <a
+            href="/gis/superadmin"
+            class="fixed top-4 left-4 z-50 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md shadow-md font-marlin text-sm transition"
+        >
+            ← Back to Dashboard
+        </a>
+
+        <div class="container mx-auto px-4 py-8 max-w-7xl">
+            <header class="mb-8">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold font-marlin">
+                            MANAGE TENDERS
+                        </h1>
+                        <p class="text-gray-400 font-marlinsoftmedium">
+                            View, edit, and delete procurement notices
+                        </p>
+                    </div>
+                    <a
+                        href="/admin/tenders/add-tender.html"
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-marlin text-sm transition flex items-center gap-2"
+                    >
+                        <i class="fas fa-plus"></i> ADD NEW TENDER
+                    </a>
+                </div>
+            </header>
+
+            <!-- Filters -->
+            <div class="bg-gray-800 p-4 rounded-lg mb-6">
+                <div class="filter-bar">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search by title or reference..."
+                        class="search-input"
+                    />
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Statuses</option>
+                        <option value="open">Open</option>
+                        <option value="closed">Closed</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="awarded">Awarded</option>
+                    </select>
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="works">Works</option>
+                        <option value="services">Services</option>
+                        <option value="goods">Goods</option>
+                        <option value="consultancy">Consultancy</option>
+                    </select>
+                    <button
+                        id="resetFilters"
+                        class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm transition"
+                    >
+                        Reset Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tenders Table -->
+            <div class="bg-gray-800 rounded-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-marlin text-gray-300"
+                                >
+                                    Ref No.
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-marlin text-gray-300"
+                                >
+                                    Title
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-marlin text-gray-300"
+                                >
+                                    Category
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-marlin text-gray-300"
+                                >
+                                    Published
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-marlin text-gray-300"
+                                >
+                                    Closing
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-marlin text-gray-300"
+                                >
+                                    Status
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-marlin text-gray-300"
+                                >
+                                    Docs
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-center text-xs font-marlin text-gray-300"
+                                >
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tendersTableBody">
+                            <tr>
+                                <td
+                                    colspan="8"
+                                    class="text-center py-8 text-gray-400"
+                                >
+                                    Loading tenders...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination" class="pagination"></div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="text-center mb-6">
+                    <i
+                        class="fas fa-exclamation-triangle text-red-500 text-5xl mb-4"
+                    ></i>
+                    <h2 class="text-2xl font-bold font-marlin">
+                        DELETE TENDER
+                    </h2>
+                    <p class="text-gray-300 mt-2 mb-4">
+                        Are you sure you want to delete "<span
+                            id="deleteTitle"
+                        ></span
+                        >"?
+                    </p>
+                    <p class="text-red-400 text-sm">
+                        This action cannot be undone.
+                    </p>
+                </div>
+                <div class="flex gap-4">
+                    <button
+                        id="confirmDeleteBtn"
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded font-marlin"
+                    >
+                        DELETE
+                    </button>
+                    <button
+                        id="cancelDeleteBtn"
+                        class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded font-marlin"
+                    >
+                        CANCEL
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Popup -->
+        <div id="popup" class="modal-overlay hidden">
+            <div class="modal-content">
+                <div class="text-center">
+                    <i
+                        id="popupIcon"
+                        class="fas fa-check-circle text-green-500 text-5xl mb-4"
+                    ></i>
+                    <h2
+                        id="popupTitle"
+                        class="text-xl font-bold font-marlin mb-2"
+                    >
+                        Success
+                    </h2>
+                    <p id="popupMessage" class="text-gray-300"></p>
+                    <button
+                        id="closePopup"
+                        class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-marlin"
+                    >
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="/admin/tenders/manage-tenders.js"></script>
+    </body>
+</html>
