@@ -84,7 +84,10 @@ export default function createRouter(requireAuth, superAdminAuth) {
   );
   router.get("/contact-us", (req, res) => res.sendFile(pub("contact-us.html")));
   router.get("/working-with-us", (req, res) =>
-    res.sendFile(pub("working-with-us.html")),
+    res.sendFile(pub("vacancies.html")),
+  );
+  router.get("/vacancies/:id", (req, res) =>
+    res.sendFile(pub("vacanciesPage.html")),
   );
   router.get("/corruption", (req, res) => res.sendFile(pub("corruption.html")));
 
